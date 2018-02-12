@@ -1,0 +1,15 @@
+rom_not_valid=This is not a valid rom, please try a different rom
+rom_not_runnable=This is not a launchable rom, please try a different rom
+rom_not_accessible=Impossible to access or read the rom, please try a different rom
+rom_unknown=Unknown rom error, please try a different rom
+rom_emulator=The external emulator returned an unknown error, please try a different rom
+cloneof=This rom is a clone of:
+unmount_failed=Failed to unmount the device
+no_disks=There are no mounted disks
+launch_rom=Launch rom
+erase_rom=Erase rom
+copy_rom_hdd=Copy rom to hard disk
+erase_rom_success=Rom erasing successful
+erase_rom_failed=Rom erasing failed
+copy_rom_success=Rom copying successful
+copy_rom_failed=Rom copying failed

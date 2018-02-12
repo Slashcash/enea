@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="enea" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Option virtualFolders="core/;core/emulator/;core/various/;core/usb/;core/filesystem/;core/emulator/advmame/;gui/;gui/states/;gui/graphic/;gui/input/;gui/various/;gui/elements/;gui/sound/;" />
+		<Build>
+			<Target title="Debug">
+				<Option output="./enea_debug" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add option="-DNDEBUG" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="./enea" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="include" />
+		</Compiler>
+		<Linker>
+			<Add library="udev" />
+			<Add library="pthread" />
+			<Add library="stdc++fs" />
+			<Add library="tinyxml2" />
+			<Add library="miniz" />
+			<Add library="sfml-graphics" />
+			<Add library="sfml-window" />
+			<Add library="sfml-system" />
+			<Add library="sfml-audio" />
+		</Linker>
+		<ExtraCommands>
+			<Add after="cbp2make -in enea.cbp -out Makefile" />
+			<Mode after="always" />
+		</ExtraCommands>
+		<Unit filename="include/advmame.hpp">
+			<Option virtualFolder="core/emulator/advmame/" />
+		</Unit>
+		<Unit filename="include/cfgfile.hpp">
+			<Option virtualFolder="core/various/" />
+		</Unit>
+		<Unit filename="include/database.hpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="include/emulator.hpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="include/errorstate.hpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="include/filesystem.hpp">
+			<Option virtualFolder="core/filesystem/" />
+		</Unit>
+		<Unit filename="include/fontmanager.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/generalemulator.hpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="include/gui.hpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="include/inputmanager.hpp">
+			<Option virtualFolder="gui/input/" />
+		</Unit>
+		<Unit filename="include/langfile.hpp">
+			<Option virtualFolder="gui/various/" />
+		</Unit>
+		<Unit filename="include/layer.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/list.hpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="include/logwriter.hpp">
+			<Option virtualFolder="core/various/" />
+		</Unit>
+		<Unit filename="include/mainstate.hpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="include/menu.hpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="include/node.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/observer.hpp">
+			<Option virtualFolder="gui/various/" />
+		</Unit>
+		<Unit filename="include/popup.hpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="include/rectangle.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/removabledisk.hpp">
+			<Option virtualFolder="core/usb/" />
+		</Unit>
+		<Unit filename="include/result.hpp">
+			<Option virtualFolder="core/various/" />
+		</Unit>
+		<Unit filename="include/rom.hpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="include/rompart.hpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="include/row.hpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="include/scene.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/signal.hpp">
+			<Option virtualFolder="gui/various/" />
+		</Unit>
+		<Unit filename="include/signaler.hpp">
+			<Option virtualFolder="gui/various/" />
+		</Unit>
+		<Unit filename="include/soundmanager.hpp">
+			<Option virtualFolder="gui/sound/" />
+		</Unit>
+		<Unit filename="include/sprite.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/state.hpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="include/text.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/texturemanager.hpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/xmldatabase.hpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="src/advmame.cpp">
+			<Option virtualFolder="core/emulator/advmame/" />
+		</Unit>
+		<Unit filename="src/cfgfile.cpp">
+			<Option virtualFolder="core/various/" />
+		</Unit>
+		<Unit filename="src/database.cpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="src/emulator.cpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="src/errorstate.cpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="src/filesystem.cpp">
+			<Option virtualFolder="core/filesystem/" />
+		</Unit>
+		<Unit filename="src/fontmanager.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/generalemulator.cpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="src/gui.cpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="src/inputmanager.cpp">
+			<Option virtualFolder="gui/input/" />
+		</Unit>
+		<Unit filename="src/langfile.cpp">
+			<Option virtualFolder="gui/various/" />
+		</Unit>
+		<Unit filename="src/layer.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/list.cpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="src/logwriter.cpp">
+			<Option virtualFolder="core/various/" />
+		</Unit>
+		<Unit filename="src/main.cpp" />
+		<Unit filename="src/mainstate.cpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="src/menu.cpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="src/node.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/observer.cpp">
+			<Option virtualFolder="gui/various/" />
+		</Unit>
+		<Unit filename="src/popup.cpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="src/rectangle.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/removabledisk.cpp">
+			<Option virtualFolder="core/usb/" />
+		</Unit>
+		<Unit filename="src/result.cpp">
+			<Option virtualFolder="core/various/" />
+		</Unit>
+		<Unit filename="src/rom.cpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="src/rompart.cpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Unit filename="src/row.cpp">
+			<Option virtualFolder="gui/elements/" />
+		</Unit>
+		<Unit filename="src/scene.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/signaler.cpp">
+			<Option virtualFolder="gui/various/" />
+		</Unit>
+		<Unit filename="src/soundmanager.cpp">
+			<Option virtualFolder="gui/sound/" />
+		</Unit>
+		<Unit filename="src/sprite.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/state.cpp">
+			<Option virtualFolder="gui/states/" />
+		</Unit>
+		<Unit filename="src/text.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/texturemanager.cpp">
+			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/xmldatabase.cpp">
+			<Option virtualFolder="core/emulator/" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
