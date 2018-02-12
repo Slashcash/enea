@@ -151,6 +151,7 @@ void MainState::updateEffectively() {
             if( !usb_buffer.empty() ) {usb_roms.insert(std::make_pair(it->first.getDevicePath(), usb_buffer)); buildRomList(); }
 
             if( active_section == USB_MENU ) { hideMenu(); buildUsbMenu(); } //if we are showing connected devices and one of them gets disconnected we wanto to update the list
+            else if( active_section == ROM_MENU ) hideMenu();
 
             emitSignal(Signal("USB_EVENT"));
         }
@@ -163,6 +164,7 @@ void MainState::updateEffectively() {
             if( found != usb_roms.end() ) { usb_roms.erase(found); buildRomList(); }
 
             if( active_section == USB_MENU ) { hideMenu(); buildUsbMenu(); }
+            else if( active_section == ROM_MENU ) hideMenu();
 
             emitSignal(Signal("USB_EVENT"));
         }
