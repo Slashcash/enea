@@ -30,6 +30,7 @@ class Result {
 
         //operator
         operator bool() const { return isSuccesful(); } //a safe cast to bool (with this we can use a result in an IF condition)
+        operator std::string() const;
 };
 
 #endif // _RESULT_HPP_
