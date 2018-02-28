@@ -31,7 +31,10 @@ class Result {
         //operator
         operator bool() const { return isSuccesful(); } //a safe cast to bool (with this we can use a result in an IF condition)
         operator std::string() const;
+        friend std::ostream& operator<<(std::ostream& os, const Result& theResult);
 };
+
+std::ostream& operator<<(std::ostream& os, const Result& theResult);
 
 #endif // _RESULT_HPP_
 
