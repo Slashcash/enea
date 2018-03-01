@@ -62,9 +62,16 @@ Result RemovableDisk::getConnectedDevices(std::vector<RemovableDisk>& theBuffer)
     theBuffer.clear();
 
     //initializing a new udev session
-    writeToLog("Initializing a new session for usb scanning...\n");
+    Result temp_res;
+
+    writeToLog("Initializing a new session for usb device scanning...");
     udev* udev_session = udev_new();
-    if( !udev_session ) return Result(ERR_SESSION_NOT_INITIALIZED);
+    if( !udev_session ) { //if it fails
+        temp_res.setErrorNumber(ERR_SESSION_NOT_INITIALIZED);
+        temp_res.setDescription("Unable to initialize session");
+        writeToLog(temp_res, LogWriter::Type::ERROR);
+        return Result(ERR_SESSION_NOT_INITIALIZED);
+    }
 
     //find all th scsi devices (they are probably usb disks)
     udev_enumerate* enumerate = udev_enumerate_new(udev_session);
@@ -76,7 +83,7 @@ Result RemovableDisk::getConnectedDevices(std::vector<RemovableDisk>& theBuffer)
     udev_list_entry* devices = udev_enumerate_get_list_entry(enumerate);
 
     //the actual scanning algorithm
-    writeToLog("Scanning for usb devices...\n");
+    writeToLog("Scanning for usb devices...");
     udev_list_entry_foreach(entry, devices) {
         udev_device* dev = udev_device_new_from_syspath(udev_session, udev_list_entry_get_name(entry));
 
@@ -95,10 +102,13 @@ Result RemovableDisk::getConnectedDevices(std::vector<RemovableDisk>& theBuffer)
 }
 
 Result RemovableDisk::enableHotplugDetection() {
-    if( hotplug_enabled ) return Result(Result::SUCCESS); //why even bother if already enabled?
+    if( hotplug_enabled ) {
+        writeToLog("Trying to enable usb hotplug detection while already enabled...", LogWriter::Type::WARNING);
+        return Result(Result::SUCCESS); //why even bother if already enabled?
+    }
 
     //initializing a new and separate udev session
-    writeToLog("Initializing a new hotplug monitoring session...\n");
+    writeToLog("Initializing a new hotplug monitoring session...");
     monitor_session = udev_new();
     if( monitor_session == nullptr ) return Result(ERR_SESSION_NOT_INITIALIZED);
 
@@ -115,23 +125,26 @@ Result RemovableDisk::enableHotplugDetection() {
     hotplug_enabled = true;
 
     //starting the thread
-    writeToLog("Starting the hotplug monitoring thread...\n");
+    writeToLog("Starting the hotplug monitoring thread...");
     hotplug_thread = std::thread(&hotplugDetection);
 
     return Result(Result::SUCCESS);
 }
 
 Result RemovableDisk::disableHotplugDetection() {
-    if( !hotplug_enabled ) return Result(Result::SUCCESS); //why even bother if it is already disabled
+    if( !hotplug_enabled ) {
+        writeToLog("Trying to disable usb hotplug detection while already disabled...", LogWriter::Type::WARNING);
+        return Result(Result::SUCCESS); //why even bother if it is already disabled
+    }
 
     //setting this to true will terminate the thread
     hotplug_exit = true;
 
-    writeToLog("Waiting for the hotplug thread to terminate...\n");
+    writeToLog("Waiting for the hotplug thread to terminate...");
     hotplug_thread.join(); //we wait for the thread to close
 
     //and we revert back all the control variables
-    writeToLog("Disabling hotplug...\n");
+    writeToLog("Disabling hotplug...");
     hotplug_exit = false;
     hotplug_enabled = false;
     udev_unref(monitor_session);
@@ -163,14 +176,14 @@ void RemovableDisk::hotplugDetection() {
             if( dev != nullptr ) { //a little bit of obnoxious checking (just in case something went wrong when retrieving the device
                 if( strcmp(udev_device_get_devtype(dev), "partition") == 0 ) { //if the device is a disk
                     if( strcmp(udev_device_get_action(dev), "add") == 0 ) { //if something has been added
-                        writeToLog("An hotplug event has been registered...\n");
+                        writeToLog("An hotplug connection has been registered...");
                         hotplug_mutex.lock();
                         hotplug_actions.push(std::make_pair(RemovableDisk(udev_device_get_devnode(dev), udev_device_get_syspath(dev)), DEVICE_CONNECTED)); //if the device is connected we push the pair to the queue
                         hotplug_mutex.unlock();
                     }
 
                     else if( strcmp(udev_device_get_action(dev), "remove") == 0 ) { //if something has been removed
-                        writeToLog("An hotplug event has been registered...\n");
+                        writeToLog("An hotplug disconnection has been registered...");
                         hotplug_mutex.lock();
                         hotplug_actions.push(std::make_pair(RemovableDisk(udev_device_get_devnode(dev), udev_device_get_syspath(dev)), DEVICE_DISCONNECTED)); //the same if disconnected
                         hotplug_mutex.unlock();
@@ -231,14 +244,22 @@ fs::path RemovableDisk::getMountPoint() const {
 
 Result RemovableDisk::mount() const {
     if( !isMounted() ) {
-        writeToLog("Mounting "+device_path.string()+"...\n");
+        writeToLog("Mounting "+device_path.string()+"...");
         std::string command = "pmount " + device_path.string();
         int system_result = system(command.c_str());
-        if( system_result ) return Result(system_result);
+        if( system_result ) {
+            Result res(system_result, "Failed to mount...");
+            writeToLog(res, LogWriter::Type::ERROR);
+            return res;
+        }
+
         else return Result(Result::SUCCESS);
     }
 
-    else return Result(Result::SUCCESS);
+    else {
+        writeToLog("Trying to mount "+device_path.string()+" which is already mounted...", LogWriter::Type::WARNING);
+        return  Result(Result::SUCCESS);
+    }
 }
 
 Result RemovableDisk::unmount() const {
@@ -246,11 +267,19 @@ Result RemovableDisk::unmount() const {
         writeToLog("Unmounting "+device_path.string()+"...\n");
         std::string command = "pumount " + device_path.string();
         int system_result = system(command.c_str());
-        if( system_result ) return Result(system_result);
+        if( system_result ) {
+            Result res(system_result, "Failed to unmount...");
+            writeToLog(res, LogWriter::Type::ERROR);
+            return res;
+        }
+
         else return Result(Result::SUCCESS);
     }
 
-    else return Result(Result::SUCCESS);
+    else {
+        writeToLog("Trying to unmount "+device_path.string()+" which is already unmounted...", LogWriter::Type::WARNING);
+        return  Result(Result::SUCCESS);
+    }
 }
 
 std::string RemovableDisk::getLabel() const {

@@ -69,11 +69,12 @@ class RemovableDisk : public virtual LogWriter {
         fs::path getSysPath() const { return sys_path; }
         fs::path getMountPoint() const;
         bool isMounted() const { return !getMountPoint().empty(); }
+        std::string getLabel() const;
 
         //functions
         Result mount() const; //this function mounts this device to the specified point. It currently uses a pmount system call to ensure a mounting without sudo
         Result unmount() const; //same as mount
-        std::string getLabel() const;
+
 
         //static functions
         static Result getConnectedDevices(std::vector<RemovableDisk>& theBuffer); //fills the buffer with all the connected devices
