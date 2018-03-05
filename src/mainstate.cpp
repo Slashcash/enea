@@ -259,6 +259,14 @@ void MainState::onNotify(const Signal& theSignal) {
                 if( found != usb_roms.end() ) { usb_roms.erase(found); buildRomList(); }
             }
         }
+        else if( active_section == ROM_MENU ) {
+            hideMenu();
+
+            if( menu.getSelected() == 0 ) launchRom();
+            else if( menu.getSelected() == 1 ) eraseRom();
+            else if( menu.getSelected() == 2 ) copyRom();
+
+        }
     }
 }
 

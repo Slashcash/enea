@@ -88,7 +88,7 @@ Result GeneralEmulator::runRom(const std::vector<fs::path>& theRomsPath) const {
 
     if( !fs::exists(best_pair.second) ) return Result(ERR_ROM_NOT_ACCESSIBLE); //if we can't find the rom on the filesystem
 
-    writeToLog("Preparing to launch the rom with "+best_pair.first.get()->getName()+"...\n");
+    writeToLog("Preparing to launch the rom with "+best_pair.first.get()->getName()+"...");
 
     if( !best_pair.first.get()->runRom(best_pair.second) ) return Result(ERR_EMULATOR);
 

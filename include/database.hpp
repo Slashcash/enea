@@ -16,7 +16,7 @@ class DataBase : public virtual LogWriter {
         DataBase(const DataBase& theDB) = delete; //seriously don't copy a db, it can be so memory intensive
 
         //functions
-        virtual Result loadFromFile(const fs::path& theDBPath) final { writeToLog("Loading database at "+theDBPath.string()+"...\n"); return loadFromFileEffectively(theDBPath); };
+        virtual Result loadFromFile(const fs::path& theDBPath) final;
 
         //pure virtual functions
         virtual std::string getRomOrigin(const std::string& theRom) const = 0; //this function should return the rom which may be merged with this (ie: neogeo when launching mslug)

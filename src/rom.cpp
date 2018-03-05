@@ -49,7 +49,7 @@ Result Rom::remove() const {
 }
 
 std::vector<Rom> Rom::searchInDirectory(const fs::path& theDirectoryPath) {
-    writeToLog("Scanning roms in "+theDirectoryPath.string()+"...\n");
+    writeToLog("Scanning roms in "+theDirectoryPath.string()+"...");
 
     std::vector<Rom> buffer_vector;
 

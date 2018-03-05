@@ -20,9 +20,12 @@ void LogWriter::writeToLog(const std::string& theMsg, const Type& theMsgType) {
     bool to_show = false;
     std::string to_write = theMsg + "\n"; //appending a newline character
 
+    if( theMsgType == WARNING ) to_write = "WARNING: " + to_write;
+    else if( theMsgType == ERROR ) to_write = "ERROR: " + to_write;
+
     if( filter_type == MSG ) to_show = true;
-    else if( filter_type == WARNING && (theMsgType == WARNING || theMsgType == ERROR) ) { to_show = true; to_write = "WARNING: " + theMsg; }
-    else if( filter_type == ERROR && theMsgType == ERROR ) { to_show = true; to_write = "ERROR: " + theMsg; }
+    else if( filter_type == WARNING && (theMsgType == WARNING || theMsgType == ERROR) ) to_show = true;
+    else if( filter_type == ERROR && theMsgType == ERROR ) to_show = true;
 
     //only writing if it is not filtered out
     if( to_show ) {

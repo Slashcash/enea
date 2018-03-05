@@ -7,7 +7,7 @@ Emulator::Emulator(const fs::path& theEmulatorPath, const std::string& theEmulat
 }
 
 Result Emulator::runRom(const fs::path& theRomPath) const {
-    writeToLog("Running "+theRomPath.string()+"...\n");
+    writeToLog("Running "+theRomPath.string()+"...");
     return runEffectively(theRomPath);
 }
 
