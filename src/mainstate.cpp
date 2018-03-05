@@ -16,7 +16,9 @@ MainState::MainState(sf::RenderWindow* theWindow) : State(theWindow) {
     Result temp_res;
 
     //loading the configuration file
-    if( !configuration_file.load(configuration_file.getDefaultBasePath() / "enea.cfg") )  //if it fails generate a default one
+    fs::path executable_path;
+    FileSystem::getExecutablePath(executable_path);
+    if( !configuration_file.load(executable_path / configuration_file.getDefaultBasePath() / "enea.cfg") )  //if it fails generate a default one
         if( !(temp_res = configuration_file.generateDefaultAndLoad(configuration_file.getDefaultBasePath() / "enea.cfg")) ) {
             exit();
             temp_res.setDescription("CFG_FILE");

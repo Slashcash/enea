@@ -17,7 +17,8 @@ class FileSystem : virtual public LogWriter {
         //enum
         enum Error { //All the errors for this class
             ERR_UNKNOWN_OPEN_MODE = 1,
-            ERR_OPEN_STREAM
+            ERR_OPEN_STREAM,
+            ERR_READLINK
         };
 
         enum Mode { //A stream can be opened in input or output
@@ -30,6 +31,7 @@ class FileSystem : virtual public LogWriter {
         static Result moveFile(const path& theOldLocation, const path& theNewLocation);
         static Result removeFile(const path& theFilePath);
         static Result copyFile(const path& theOldLocation, const path& theNewLocation);
+        static Result getExecutablePath(path& theBufferPath);
 };
 
 #endif // _FILESYSTEM_HPP_

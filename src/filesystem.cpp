@@ -1,5 +1,7 @@
 #include "filesystem.hpp"
 
+#include <unistd.h>
+
 Result FileSystem::openStream(std::fstream& theStream, const path& thePath, const Mode& theMode) {
     //setting the correct open mode
     std::ios_base::openmode open_mode;
@@ -44,4 +46,15 @@ Result FileSystem::copyFile(const path& theOldLocation, const path& theNewLocati
     Result temp_res(os_error_code.value(), os_error_code.message()); //building an error message eventually
     if( !temp_res ) writeToLog(temp_res, LogWriter::Type::ERROR);
     return temp_res; //i am unreliably and stupidly converting an int to an unsigned int, if something goes wrong is my fault!
+}
+
+Result FileSystem::getExecutablePath(fs::path& theBufferPath) {
+    const int BUFFER_SIZE = 2048;
+    char buffer[BUFFER_SIZE];
+    int readlink_result = readlink("/proc/self/exe", buffer, BUFFER_SIZE);
+    if( readlink_result == -1 || readlink_result == BUFFER_SIZE ) return Result(ERR_READLINK);
+    buffer[readlink_result] = '\0';
+    fs::path executable_path(buffer);
+    theBufferPath = executable_path.remove_filename();
+    return Result(Result::SUCCESS);
 }
