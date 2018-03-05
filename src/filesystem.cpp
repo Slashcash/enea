@@ -18,10 +18,12 @@ Result FileSystem::openStream(std::fstream& theStream, const path& thePath, cons
 
 Result FileSystem::moveFile(const path& theOldLocation, const path& theNewLocation) {
     std::error_code os_error_code;
-    writeToLog("Moving "+theOldLocation.string()+" to "+theNewLocation.string()+"...\n");
+    writeToLog("Moving "+theOldLocation.string()+" to "+theNewLocation.string()+"...");
 
     rename(theOldLocation, theNewLocation, os_error_code);
-    return Result(os_error_code.value()); //i am unreliably and stupidly converting an int to an unsigned int, if something goes wrong is my fault!
+    Result temp_res(os_error_code.value(), os_error_code.message()); //building an error message eventually
+    if( !temp_res ) writeToLog(temp_res, LogWriter::Type::ERROR);
+    return temp_res; //i am unreliably and stupidly converting an int to an unsigned int, if something goes wrong is my fault!
 }
 
 Result FileSystem::removeFile(const path& theFilePath) {
@@ -29,7 +31,9 @@ Result FileSystem::removeFile(const path& theFilePath) {
     writeToLog("Removing "+theFilePath.string()+"...\n");
 
     remove(theFilePath, os_error_code);
-    return Result(os_error_code.value()); //i am unreliably and stupidly converting an int to an unsigned int, if something goes wrong is my fault!
+    Result temp_res(os_error_code.value(), os_error_code.message()); //building an error message eventually
+    if( !temp_res ) writeToLog(temp_res, LogWriter::Type::ERROR);
+    return temp_res; //i am unreliably and stupidly converting an int to an unsigned int, if something goes wrong is my fault!
 }
 
 Result FileSystem::copyFile(const path& theOldLocation, const path& theNewLocation) {
@@ -37,5 +41,7 @@ Result FileSystem::copyFile(const path& theOldLocation, const path& theNewLocati
     writeToLog("Copying "+theOldLocation.string()+" to "+theNewLocation.string()+"...\n");
 
     copy_file(theOldLocation, theNewLocation, os_error_code);
-    return Result(os_error_code.value()); //i am unreliably and stupidly converting an int to an unsigned int, if something goes wrong is my fault!
+    Result temp_res(os_error_code.value(), os_error_code.message()); //building an error message eventually
+    if( !temp_res ) writeToLog(temp_res, LogWriter::Type::ERROR);
+    return temp_res; //i am unreliably and stupidly converting an int to an unsigned int, if something goes wrong is my fault!
 }
