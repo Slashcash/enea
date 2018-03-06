@@ -10,7 +10,7 @@ Gui::Gui(const unsigned int theScreenWidth, const unsigned int theScreenHeight) 
     redirectToFile("share/log.txt");
     #endif
 
-    writeToLog("Starting a new application window...\n");
+    writeToLog("Starting a new application window...");
     window.create(sf::VideoMode(theScreenWidth, theScreenHeight), APP_TITLE, sf::Style::Fullscreen); //creating the actual window
     window.setFramerateLimit(25); //25 frames are really more than enough (we could switch this to 20 so this won't save some precious electrical power)
     window.setMouseCursorVisible(false);

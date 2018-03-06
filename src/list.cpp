@@ -24,16 +24,17 @@ void List::drawCurrent(sf::RenderTarget& theRenderTarget, sf::RenderStates theRe
 }
 
 void List::setRowVector(const std::vector<Row>& theRows) {
-    rows = theRows;
+    rows.clear();
+    for(auto it = theRows.begin(); it < theRows.end(); it++) rows.push_back(*it);
     for(auto it = rows.begin(); it < rows.end(); it++) it->setActive(false);
     setAllParameters();
     calculatePages();
 }
 
 void List::calculatePages() {
-    if(!rows.empty()) {
-        pages.clear(); //resetting all the pages
+    pages.clear(); //resetting all the pages
 
+    if(!rows.empty()) {
         if( truncate_height < 0 ) truncate_height = 0; //just in case someone wants to be funny and setting a negative value
 
         if( truncate_height == 0 ) { std::vector<Row*> buffer; for(auto it = rows.begin(); it < rows.end(); it++) buffer.push_back(&(*it)); pages.push_back(buffer); }
@@ -64,12 +65,11 @@ void List::calculatePages() {
                 }
             }
         }
-
-
-        //set the selection back to zero for safety reasons
-        setSelected(0);
-        setPage(0);
     }
+
+    //set the selection back to zero for safety reasons
+    setSelected(0);
+    setPage(0);
 }
 
 void List::setAllParameters() {
@@ -133,10 +133,10 @@ void List::setActive(const bool isActive) {
 }
 
  void List::setPage(const unsigned int thePage) {
-    if( thePage >= 0 && thePage < pages.size() ) {
+    if( thePage >= 0 && (thePage < pages.size() || pages.empty()) ) {
         page = thePage;
         detachAllChildren();
-        attachChild(pages[page][0]);
+        if( !pages.empty() ) attachChild(pages[page][0]);
     }
 }
 

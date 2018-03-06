@@ -108,7 +108,7 @@ MainState::MainState(sf::RenderWindow* theWindow) : State(theWindow) {
     rom_clone.setSize(25);
     usb_sprite.setTexture(texture_manager.getTexture(configuration_file.getTexturesPath() / "usb.png"));
     usb_sprite.attachChild(&usb_info);
-    usb_sprite.setPosition(rom_list.getGlobalPosition().x, rom_list.getGlobalPosition().y+rom_list.getLocalBounds().height+75);
+    usb_sprite.setPosition(rom_list.getGlobalPosition().x, 1000);
     usb_info.setFont(font_manager.getFont(configuration_file.getFontsPath() / "dtmsans.otf"));
     usb_info.setSize(25);
     usb_info.setPosition(usb_sprite.getLocalBounds().width + 15, 0);
@@ -150,7 +150,7 @@ void MainState::updateEffectively() {
             connected_disks.push_back(it->first); //add it to the connected disks
             if( it->first.isMounted() ) mounted_disks.push_back(it->first); //if is mounted add it to the mounted disks
             std::vector<Rom> usb_buffer = Rom::searchInDirectory(it->first.getMountPoint() / configuration_file.getRomFolder());
-            if( !usb_buffer.empty() ) {usb_roms.insert(std::make_pair(it->first.getDevicePath(), usb_buffer)); buildRomList(); }
+            if( !usb_buffer.empty() ) {usb_roms.insert(std::make_pair(it->first.getDevicePath(), usb_buffer)); buildRomList(); buildRomInfo(); }
 
             if( active_section == USB_MENU ) { hideMenu(); buildUsbMenu(); } //if we are showing connected devices and one of them gets disconnected we wanto to update the list
             else if( active_section == ROM_MENU ) hideMenu();
@@ -163,7 +163,7 @@ void MainState::updateEffectively() {
             for( auto it2 = connected_disks.begin(); it2 < connected_disks.end(); it2++) if( it2->getDevicePath() == it->first.getDevicePath() ) connected_disks.erase(it2); //erasing it from the connected disks
             for( auto it2 = mounted_disks.begin(); it2 < mounted_disks.end(); it2++) if( it2->getDevicePath() == it->first.getDevicePath() ) mounted_disks.erase(it2); //erasing it from the mounted disks
             auto found = usb_roms.find(it->first.getDevicePath());
-            if( found != usb_roms.end() ) { usb_roms.erase(found); buildRomList(); }
+            if( found != usb_roms.end() ) { usb_roms.erase(found); buildRomList(); buildRomInfo(); }
 
             if( active_section == USB_MENU ) { hideMenu(); buildUsbMenu(); }
             else if( active_section == ROM_MENU ) hideMenu();
@@ -286,59 +286,77 @@ void MainState::buildRomList() {
     rom_list.setSelected(0);
     all_roms.clear();
 
+
     for(auto it = hard_disk_roms.begin(); it < hard_disk_roms.end(); it++) all_roms.push_back(*it);
     for(auto it = usb_roms.begin(); it != usb_roms.end(); it++) for( auto it2 = it->second.begin(); it2 < it->second.end(); it2++ ) { all_roms.push_back(*it2); }
     std::sort(all_roms.begin(), all_roms.end());
 
     std::vector<Row> buffer;
-    for(auto it = all_roms.begin(); it < all_roms.end(); it++) {
-        Row row_buffer;
-        row_buffer.setFont(font_manager.getFont(configuration_file.getFontsPath() / "dtmsans.otf"));
-        row_buffer.setString(it->getGame());
-        buffer.push_back(row_buffer);
-    }
+    //if( !all_roms.empty() ) {
+
+        for(auto it = all_roms.begin(); it < all_roms.end(); it++) {
+            Row row_buffer;
+            row_buffer.setFont(font_manager.getFont(configuration_file.getFontsPath() / "dtmsans.otf"));
+            row_buffer.setString(it->getGame());
+            buffer.push_back(row_buffer);
+        }
+    //}
 
     rom_list.setRowVector(buffer);
 }
 
 void MainState::buildRomInfo() {
-    const float SPACING = 15;
+    if( !all_roms.empty() ) { //if no rom is found we don't show any info
+        const float SPACING = 15;
 
-    rom_title.setString(all_roms[rom_selected].getGame());
-    rom_title.setOrigin(rom_title.getLocalBounds().width/2, 0);
-    rom_title.setPosition(scene.getSize().x/2, 450);
+        rom_title.setString(all_roms[rom_selected].getGame());
+        rom_title.setOrigin(rom_title.getLocalBounds().width/2, 0);
+        rom_title.setPosition(scene.getSize().x/2, 450);
 
-    rom_info.setString(all_roms[rom_selected].getInfo());
-    rom_info.setOrigin(rom_info.getLocalBounds().width/2, 0);
-    rom_info.setPosition(rom_title.getLocalBounds().width/2, rom_title.getLocalBounds().height+SPACING);
+        rom_info.setString(all_roms[rom_selected].getInfo());
+        rom_info.setOrigin(rom_info.getLocalBounds().width/2, 0);
+        rom_info.setPosition(rom_title.getLocalBounds().width/2, rom_title.getLocalBounds().height+SPACING);
 
-    rom_year.setString(all_roms[rom_selected].getManufacturer()+", "+all_roms[rom_selected].getYear());
-    rom_year.setOrigin(rom_year.getLocalBounds().width/2, 0);
-    rom_year.setPosition(rom_info.getLocalBounds().width/2, rom_info.getLocalBounds().height+SPACING);
+        rom_year.setString(all_roms[rom_selected].getManufacturer()+", "+all_roms[rom_selected].getYear());
+        rom_year.setOrigin(rom_year.getLocalBounds().width/2, 0);
+        rom_year.setPosition(rom_info.getLocalBounds().width/2, rom_info.getLocalBounds().height+SPACING);
 
-    std::string rom_parent;
-    if( !(rom_parent = all_roms[rom_selected].getParent()).empty() ) {
-        rom_isclone.setString(language.getValue("cloneof"));
-        rom_isclone.setOrigin(rom_isclone.getLocalBounds().width/2, 0);
-        rom_isclone.setPosition(rom_year.getLocalBounds().width/2, rom_year.getLocalBounds().height+SPACING*3);
+        std::string rom_parent;
+        if( !(rom_parent = all_roms[rom_selected].getParent()).empty() ) {
+            rom_isclone.setString(language.getValue("cloneof"));
+            rom_isclone.setOrigin(rom_isclone.getLocalBounds().width/2, 0);
+            rom_isclone.setPosition(rom_year.getLocalBounds().width/2, rom_year.getLocalBounds().height+SPACING*3);
 
-        rom_clone.setString(rom_parent);
-        rom_clone.setOrigin(rom_clone.getLocalBounds().width/2, 0);
-        rom_clone.setPosition(rom_isclone.getLocalBounds().width/2, rom_isclone.getLocalBounds().height+SPACING);
+            rom_clone.setString(rom_parent);
+            rom_clone.setOrigin(rom_clone.getLocalBounds().width/2, 0);
+            rom_clone.setPosition(rom_isclone.getLocalBounds().width/2, rom_isclone.getLocalBounds().height+SPACING);
+        }
+
+        else { rom_isclone.setString(""); rom_clone.setString(""); }
+
+        //we check if the rom is on hdd or on usb
+        std::string temp_rom_path;
+
+        if( (temp_rom_path = all_roms[rom_selected].getPaths()[0].string()).find(configuration_file.getRomPath()) == 0 ) scene.detachFromLayer(&usb_sprite, 1); //if it is not on an usb stick we don't show information on which stick contains the rom
+        else { //which stick contains it?
+            for(auto it = connected_disks.begin(); it < connected_disks.end(); it++)
+                if( temp_rom_path.find(it->getMountPoint()) == 0 )
+                    usb_info.setString(it->getLabel());
+
+            scene.attachToLayer(&usb_sprite, 1);
+        }
     }
 
-    else { rom_isclone.setString(""); rom_clone.setString(""); }
+    else { //We show a message instead and delete all the other info
+        rom_title.setString(language.getValue("no_rom_found"));
+        rom_title.setOrigin(rom_title.getLocalBounds().width/2, 0);
+        rom_title.setPosition(scene.getSize().x/2, 450);
 
-    //we check if the rom is on hdd or on usb
-    std::string temp_rom_path;
-
-    if( (temp_rom_path = all_roms[rom_selected].getPaths()[0].string()).find(configuration_file.getRomPath()) == 0 ) scene.detachFromLayer(&usb_sprite, 1); //if it is not on an usb stick we don't show information on which stick contains the rom
-    else { //which stick contains it?
-        for(auto it = connected_disks.begin(); it < connected_disks.end(); it++)
-            if( temp_rom_path.find(it->getMountPoint()) == 0 )
-                usb_info.setString(it->getLabel());
-
-        scene.attachToLayer(&usb_sprite, 1);
+        rom_info.setString("");
+        rom_year.setString("");
+        rom_isclone.setString("");
+        rom_clone.setString("");
+        scene.detachFromLayer(&usb_sprite, 1);
     }
 }
 
@@ -465,6 +483,7 @@ void MainState::eraseRom() {
 
     else popup_str = language.getValue("erase_rom_failed");
 
+    buildRomInfo();
     showPopUp(popup_str);
 }
 

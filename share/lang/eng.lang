@@ -13,3 +13,4 @@ erase_rom_success=Rom erasing successful
 erase_rom_failed=Rom erasing failed
 copy_rom_success=Rom copying successful
 copy_rom_failed=Rom copying failed
+no_rom_found=No rom found
