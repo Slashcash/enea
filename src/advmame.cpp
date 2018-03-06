@@ -9,7 +9,7 @@ AdvMAME::AdvMAME(const fs::path& theEmulatorPath) : Emulator(theEmulatorPath, "A
 
 Result AdvMAME::runEffectively(const fs::path& theRomPath) const {
     //we build the command
-    std::string console_command = getPath().string() + " -dir_rom " + theRomPath.parent_path().string() + " -cfg " + configuration_file_path.string() + " " + theRomPath.stem().string();
+    std::string console_command = getPath().string() + " -dir_rom " + theRomPath.parent_path().string() + " -cfg " + configuration_file_path.string() + " " + theRomPath.stem().string() + " &> /dev/null";
     unsigned int console_value = system(console_command.c_str());
 
     return Result(console_value);

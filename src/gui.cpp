@@ -1,13 +1,16 @@
 #include "gui.hpp"
 
 #include "mainstate.hpp"
+#include "filesystem.hpp"
 
 const std::string Gui::APP_TITLE = "Enea";
 
 Gui::Gui(const unsigned int theScreenWidth, const unsigned int theScreenHeight) {
     //before initializing the gui if we are in RELEASE mode we write the log to a file
     #ifndef NDEBUG
-    redirectToFile("share/log.txt");
+    fs::path exec_path;
+    FileSystem::getExecutablePath(exec_path);
+    redirectToFile(exec_path.string()+"/share/log.txt");
     #endif
 
     writeToLog("Starting a new application window...");

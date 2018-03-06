@@ -34,6 +34,7 @@ class LogWriter {
         static std::ofstream file_log; //if the log gets redirected to a file we store the file stream here
         static bool redirect_to_file; //this helps us knowing if the stream has been redirected to a file
         static Type filter_type; //set this variable to something different to set the message filtering by type
+        static bool log_enabled; //set this to enable/disable log
 
     protected:
         //ctor
@@ -44,6 +45,7 @@ class LogWriter {
         static void redirectToConsole() { redirect_to_file = false; } //redirects it back to the console
         static void writeToLog(const std::string& theMsg, const Type& theMsgType = MSG);
         static void filterType(const Type& theType) { filter_type = theType; } //use this function to filter out the log, MSG will show all messages, WARNING will show warnings and errors, ERRORS will show only errors
+        static void enableLog(const bool isEnabled) { log_enabled = isEnabled; }
 };
 
 #endif // _LOGWRITER_HPP_
