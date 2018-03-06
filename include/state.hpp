@@ -47,6 +47,7 @@ class State : public Observer, public Signaler { //why a state observs? well it 
         //functions
         bool askedToExit() const { return exit_from_state; }
         State* checkStateChangeRequest() { if( change_state.empty() ) return nullptr; else { State* to_return = change_state.front(); change_state.pop(); return to_return; } }
+        void discardAllInput() { input_manager.discardAllInputs(window); }
 
         //pure virtual functions
         virtual void draw() const final;

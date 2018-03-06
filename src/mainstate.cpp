@@ -465,7 +465,7 @@ void MainState::launchRom() {
     else {
         window->close();
         if( all_roms[rom_selected].launch() == GeneralEmulator::ERR_EMULATOR) showPopUp(language.getValue("rom_emulator"));
-        std::cin.ignore(INT_MAX); //to prevent random input registration
+        discardAllInput(); //just to be sure we discard every input registered during the game running
         //OH MY GOD WHY THIS SHIT IS HERE IT BURNS MY EYES (while waiting for an elegant solution since i'm bored to death this will stay hardcoded here
         window->create(sf::VideoMode(1920, 1080), "Enea", sf::Style::Fullscreen); //creating the actual window
         window->setFramerateLimit(25); //25 frames are really more than enough (we could switch this to 20 so this won't save some precious electrical power)

@@ -28,6 +28,7 @@ class InputManager : public Signaler {
 
         //various
         void checkInputs(sf::RenderWindow* win); //emits the corresponding signal if one of the COMMANDS has been registered
+        void discardAllInputs(sf::RenderWindow* win); //it picks every event occurred in a frame and throws them away
 };
 
 #endif // _INPUTMANAGER_HPP_

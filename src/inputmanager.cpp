@@ -13,3 +13,8 @@ void InputManager::checkInputs(sf::RenderWindow* win) {
         }
     }
 }
+
+void InputManager::discardAllInputs(sf::RenderWindow* win) {
+    sf::Event event;
+    while (win->pollEvent(event)) {}
+}
