@@ -165,7 +165,7 @@ void RemovableDisk::hotplugDetection() {
 
         FD_ZERO(&fds);
         FD_SET(fd, &fds);
-        tv.tv_sec = 1;
+        tv.tv_sec = 1; //change this parameter to change wait time of this thread
         tv.tv_usec = 0;
 
         ret = select(fd+1, &fds, NULL, NULL, &tv); //did something happen?

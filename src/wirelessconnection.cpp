@@ -1,0 +1,235 @@
+#include "wirelessconnection.hpp"
+
+#include "filesystem.hpp"
+
+wpa_ctrl* WirelessConnection::control_interface = nullptr;
+wpa_ctrl* WirelessConnection::control_interface_events = nullptr;
+bool WirelessConnection::wireless_active = false;
+std::thread WirelessConnection::wireless_thread;
+std::atomic<bool> WirelessConnection::wireless_exit(false);
+
+WirelessConnection::WirelessConnection(const std::string& theSSID) {
+    ssid = theSSID;
+}
+
+Result WirelessConnection::getInterfaceNameFromWireless(std::string& theOutput) {
+    //clear the output buffer;
+    theOutput.clear();
+
+    //open proc/net/wireless in order to parse it
+    std::fstream stream;
+    if( !FileSystem::openStream(stream, "/proc/net/wireless", FileSystem::INPUT) ) return Result(ERR_OPEN_WIRELESS_TABLE);
+
+    //discard two useless lines
+    std::string buffer;
+    std::getline(stream, buffer);
+    std::getline(stream, buffer);
+
+    //parse the correct lines
+    std::size_t separator_pos;
+    if( std::getline(stream, buffer) && (separator_pos = buffer.find(":")) != std::string::npos ) {
+        theOutput = buffer.substr(0, separator_pos);
+        stream.close();
+        return Result(Result::SUCCESS);
+    }
+
+    else { stream.close(); return Result(ERR_PARSE_WIRELESS_TABLE); }
+}
+
+Result WirelessConnection::getInterfaceNameFromNet(std::string& theOutput) {
+    //clear the output buffer;
+    theOutput.clear();
+
+    //open proc/net/wireless in order to parse it
+    std::ifstream stream("/proc/net/dev");
+    if( !stream.is_open() ) return Result(ERR_OPEN_WIRELESS_TABLE);
+
+    //discard two useless lines
+    std::string buffer;
+    std::getline(stream, buffer);
+    std::getline(stream, buffer);
+
+    //parse the correct line
+    bool found = false;
+    std::size_t separator_pos;
+    while( std::getline(stream, buffer) ) {
+        if( buffer.find("w") == 0 && (separator_pos = buffer.find(":")) != std::string::npos ) {
+            theOutput = buffer.substr(0, separator_pos);
+            found = true;
+        }
+    }
+
+    if( found ) return Result(Result::SUCCESS);
+    else return Result(ERR_PARSE_WIRELESS_TABLE);
+}
+
+std::string WirelessConnection::getInterfaceName() {
+    std::string buffer;
+    //try from /proc/net/wireless first
+    if( getInterfaceNameFromWireless(buffer) ) return buffer;
+    //if it fails try from /proc/net/dev
+    else if( getInterfaceNameFromNet(buffer) ) return buffer;
+    //return an empty string if everything fails
+    else return "";
+}
+
+Result WirelessConnection::enableWireless() {
+    if( wireless_active ) {
+        writeToLog("Trying to enable wireless connectivity while it is already enabled", LogWriter::Type::WARNING);
+        return Result(Result::SUCCESS);
+    }
+
+    else {
+        Result temp_res;
+
+        writeToLog("Enabling wireless communication...");
+
+        //getting the wireless interface name
+        writeToLog("Getting the wireless interface name...");
+        std::string if_name = getInterfaceName();
+        if( if_name.empty() ) {
+            temp_res.setErrorNumber(ERR_OPEN_SOCKET);
+            temp_res.setDescription("Unable to get the interface name");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
+        //opening the communication with wpa supplicant
+        writeToLog("Opening a socket to communicate with wireless "+if_name+"...");
+        if( (control_interface = wpa_ctrl_open(("/var/run/wpa_supplicant/"+if_name).c_str())) == nullptr ) {
+            temp_res.setErrorNumber(ERR_OPEN_SOCKET);
+            temp_res.setDescription("Unable to open a socket with the wireless daemon");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
+        //opening another socket to comunicate in a separate thread
+        writeToLog("Opening an external socket to communicate with wireless "+if_name+"...");
+        if( (control_interface_events = wpa_ctrl_open(("/var/run/wpa_supplicant/"+if_name).c_str())) == nullptr ) {
+            temp_res.setErrorNumber(ERR_OPEN_SOCKET);
+            temp_res.setDescription("Unable to open a socket with the wireless daemon");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
+        //checking if the communication is active & reliable
+        if( sendRequest("PING") != "PONG" ) {
+            temp_res.setErrorNumber(ERR_OPEN_SOCKET);
+            temp_res.setDescription("Opened socket is unreliable");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
+        //starting the thread to monitor external events
+        writeToLog("Starting a new thread to start monitoring external wireless events...");
+        wireless_thread = std::thread(&wirelessThread);
+
+        //Now that everything is ok we set the flag on
+        wireless_active = true;
+        return Result(Result::SUCCESS);
+    }
+}
+
+Result WirelessConnection::disableWireless() {
+    if( !wireless_active ) {
+        writeToLog("Trying to disable wireless but it is already off...", LogWriter::Type::WARNING);
+        return Result(Result::SUCCESS);
+    }
+
+    //setting this off will terminate the thread
+    wireless_exit = true;
+
+    //waiting for the thread to effectively terminate
+    writeToLog("Waiting for the wireless thread to terminate...");
+    wireless_thread.join(); //we wait for the thread to close
+
+    //reverting back the variables
+    writeToLog("Disabling wireless...");
+    wpa_ctrl_close(control_interface);
+    wpa_ctrl_close(control_interface_events);
+    control_interface = nullptr;
+    control_interface_events = nullptr;
+    wireless_exit = false;
+    wireless_active = false;
+    return Result(Result::SUCCESS);
+}
+
+std::string WirelessConnection::receiveCommand() {
+    char msg_buffer[4096]; //we need a large buffer
+    std::size_t response_size;
+    std::string final_string;
+
+    if( wpa_ctrl_recv(control_interface_events, msg_buffer, &response_size) == -1 ) return ""; //if we fail to receive we return an empty string
+    else { final_string.append(msg_buffer, response_size+1); return final_string; } //a coherentrly built string instead
+}
+
+std::string WirelessConnection::sendRequest(const std::string& theRequest) {
+    char msg_buffer[4096]; //we need a large buffer
+    std::size_t response_size = sizeof(msg_buffer);
+    std::string final_string;
+
+    if( wpa_ctrl_request(control_interface, theRequest.c_str(), theRequest.size(), msg_buffer, &response_size, nullptr) == -1 )
+        return "";
+
+
+    else {
+        final_string.append(msg_buffer, response_size-1);
+        return final_string;
+    }
+}
+
+std::vector<WirelessConnection> WirelessConnection::scan() {
+    std::vector<WirelessConnection> to_return;
+
+    if( !wireless_active ) { writeToLog("Scan requested but wireless is inactive", LogWriter::Type::WARNING); return to_return; } //if wireless is not active why even bother?
+
+    writeToLog("Scanning for wireless networks...");
+
+    //requesting an actual scan
+    Result scan_result;
+    if( sendRequest("SCAN") != "OK" ) {
+        scan_result.setErrorNumber(ERR_SCAN);
+        scan_result.setDescription("Unable to scan for wireless networks");
+        writeToLog(scan_result, LogWriter::Type::ERROR);
+        return to_return;
+    }
+
+    std::string res;
+    if( (res = sendRequest("SCAN_RESULTS")).empty() ) {
+        scan_result.setErrorNumber(ERR_SCAN);
+        scan_result.setDescription("Unable to retrieve scan results");
+        writeToLog(scan_result, LogWriter::Type::ERROR);
+        return to_return; //if for some reason we have no results
+    }
+
+    //and now the complicated algorithm to parse the results
+    //erasing the useless first line
+    res.erase(0, res.find("\n")+1);
+
+    std::size_t newline_pos = 0;
+    std::size_t start_pos = 0;
+    while( newline_pos != std::string::npos ) {
+        //iterating through every row
+        newline_pos = res.find("\n", start_pos);
+        if( newline_pos != std::string::npos ) { //if the list is ended
+            std::string current_row = res.substr(start_pos, newline_pos-start_pos);
+
+            //extracting the ssid from the row
+            std::string temp_ssid = current_row.substr(current_row.find_last_of("\t")+1, std::string::npos);
+
+            //building the vector
+            to_return.push_back(WirelessConnection(temp_ssid));
+
+            //scrolling to the next one
+            start_pos = newline_pos + 1;
+        }
+    }
+
+    return to_return;
+}
+
+void WirelessConnection::wirelessThread() {
+    while( !wireless_exit.load() ) {
+    //INSTRUCTIONS WILL GO HERE
+    }
+}

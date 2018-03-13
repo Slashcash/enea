@@ -1,7 +1,12 @@
 #include "gui.hpp"
+#include "wirelessconnection.hpp"
 
 int main() {
-    Gui gui;
-    gui.run();
+    WirelessConnection::enableWireless();
+    WirelessConnection::scan();
+    WirelessConnection::disableWireless();
+
+    /*Gui gui;
+    gui.run();*/
 }
 

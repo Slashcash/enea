@@ -11,11 +11,11 @@ AR = ar
 LD = g++
 WINDRES = windres
 
-INC = -Iinclude
-CFLAGS = -Wall
+INC = -Iinclude -Iext/include
+CFLAGS = -Wall -DCONFIG_CTRL_IFACE -DCONFIG_CTRL_IFACE_UNIX
 RESINC = 
 LIBDIR = 
-LIB = -ludev -lpthread -lstdc++fs -ltinyxml2 -lminiz -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio
+LIB = -ludev -lpthread -lstdc++fs -ltinyxml2 -lminiz -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio ext/utils/libutils.a
 LDFLAGS = 
 
 INC_DEBUG = $(INC)
@@ -40,9 +40,9 @@ OBJDIR_RELEASE = obj/Release
 DEP_RELEASE = 
 OUT_RELEASE = ./enea
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/src/gui.o $(OBJDIR_DEBUG)/src/menu.o $(OBJDIR_DEBUG)/src/mainstate.o $(OBJDIR_DEBUG)/src/main.o $(OBJDIR_DEBUG)/src/logwriter.o $(OBJDIR_DEBUG)/src/list.o $(OBJDIR_DEBUG)/src/layer.o $(OBJDIR_DEBUG)/src/langfile.o $(OBJDIR_DEBUG)/src/inputmanager.o $(OBJDIR_DEBUG)/src/node.o $(OBJDIR_DEBUG)/src/generalemulator.o $(OBJDIR_DEBUG)/src/fontmanager.o $(OBJDIR_DEBUG)/src/filesystem.o $(OBJDIR_DEBUG)/src/errorstate.o $(OBJDIR_DEBUG)/src/emulator.o $(OBJDIR_DEBUG)/src/database.o $(OBJDIR_DEBUG)/src/cfgfile.o $(OBJDIR_DEBUG)/src/row.o $(OBJDIR_DEBUG)/src/xmldatabase.o $(OBJDIR_DEBUG)/src/texturemanager.o $(OBJDIR_DEBUG)/src/text.o $(OBJDIR_DEBUG)/src/state.o $(OBJDIR_DEBUG)/src/sprite.o $(OBJDIR_DEBUG)/src/soundmanager.o $(OBJDIR_DEBUG)/src/signaler.o $(OBJDIR_DEBUG)/src/scene.o $(OBJDIR_DEBUG)/src/advmame.o $(OBJDIR_DEBUG)/src/rompart.o $(OBJDIR_DEBUG)/src/rom.o $(OBJDIR_DEBUG)/src/result.o $(OBJDIR_DEBUG)/src/removabledisk.o $(OBJDIR_DEBUG)/src/rectangle.o $(OBJDIR_DEBUG)/src/popup.o $(OBJDIR_DEBUG)/src/observer.o
+OBJ_DEBUG = $(OBJDIR_DEBUG)/src/gui.o $(OBJDIR_DEBUG)/src/menu.o $(OBJDIR_DEBUG)/src/mainstate.o $(OBJDIR_DEBUG)/src/main.o $(OBJDIR_DEBUG)/src/logwriter.o $(OBJDIR_DEBUG)/src/list.o $(OBJDIR_DEBUG)/src/layer.o $(OBJDIR_DEBUG)/src/langfile.o $(OBJDIR_DEBUG)/src/inputmanager.o $(OBJDIR_DEBUG)/src/node.o $(OBJDIR_DEBUG)/src/generalemulator.o $(OBJDIR_DEBUG)/src/fontmanager.o $(OBJDIR_DEBUG)/src/filesystem.o $(OBJDIR_DEBUG)/src/errorstate.o $(OBJDIR_DEBUG)/src/emulator.o $(OBJDIR_DEBUG)/src/database.o $(OBJDIR_DEBUG)/src/cfgfile.o $(OBJDIR_DEBUG)/src/advmame.o $(OBJDIR_DEBUG)/src/scene.o $(OBJDIR_DEBUG)/src/xmldatabase.o $(OBJDIR_DEBUG)/src/wirelessconnection.o $(OBJDIR_DEBUG)/src/texturemanager.o $(OBJDIR_DEBUG)/src/text.o $(OBJDIR_DEBUG)/src/state.o $(OBJDIR_DEBUG)/src/sprite.o $(OBJDIR_DEBUG)/src/soundmanager.o $(OBJDIR_DEBUG)/src/signaler.o $(OBJDIR_DEBUG)/src/row.o $(OBJDIR_DEBUG)/src/rompart.o $(OBJDIR_DEBUG)/src/rom.o $(OBJDIR_DEBUG)/src/result.o $(OBJDIR_DEBUG)/src/removabledisk.o $(OBJDIR_DEBUG)/src/rectangle.o $(OBJDIR_DEBUG)/src/popup.o $(OBJDIR_DEBUG)/src/observer.o $(OBJDIR_DEBUG)/ext/wpa_ctrl.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/src/gui.o $(OBJDIR_RELEASE)/src/menu.o $(OBJDIR_RELEASE)/src/mainstate.o $(OBJDIR_RELEASE)/src/main.o $(OBJDIR_RELEASE)/src/logwriter.o $(OBJDIR_RELEASE)/src/list.o $(OBJDIR_RELEASE)/src/layer.o $(OBJDIR_RELEASE)/src/langfile.o $(OBJDIR_RELEASE)/src/inputmanager.o $(OBJDIR_RELEASE)/src/node.o $(OBJDIR_RELEASE)/src/generalemulator.o $(OBJDIR_RELEASE)/src/fontmanager.o $(OBJDIR_RELEASE)/src/filesystem.o $(OBJDIR_RELEASE)/src/errorstate.o $(OBJDIR_RELEASE)/src/emulator.o $(OBJDIR_RELEASE)/src/database.o $(OBJDIR_RELEASE)/src/cfgfile.o $(OBJDIR_RELEASE)/src/row.o $(OBJDIR_RELEASE)/src/xmldatabase.o $(OBJDIR_RELEASE)/src/texturemanager.o $(OBJDIR_RELEASE)/src/text.o $(OBJDIR_RELEASE)/src/state.o $(OBJDIR_RELEASE)/src/sprite.o $(OBJDIR_RELEASE)/src/soundmanager.o $(OBJDIR_RELEASE)/src/signaler.o $(OBJDIR_RELEASE)/src/scene.o $(OBJDIR_RELEASE)/src/advmame.o $(OBJDIR_RELEASE)/src/rompart.o $(OBJDIR_RELEASE)/src/rom.o $(OBJDIR_RELEASE)/src/result.o $(OBJDIR_RELEASE)/src/removabledisk.o $(OBJDIR_RELEASE)/src/rectangle.o $(OBJDIR_RELEASE)/src/popup.o $(OBJDIR_RELEASE)/src/observer.o
+OBJ_RELEASE = $(OBJDIR_RELEASE)/src/gui.o $(OBJDIR_RELEASE)/src/menu.o $(OBJDIR_RELEASE)/src/mainstate.o $(OBJDIR_RELEASE)/src/main.o $(OBJDIR_RELEASE)/src/logwriter.o $(OBJDIR_RELEASE)/src/list.o $(OBJDIR_RELEASE)/src/layer.o $(OBJDIR_RELEASE)/src/langfile.o $(OBJDIR_RELEASE)/src/inputmanager.o $(OBJDIR_RELEASE)/src/node.o $(OBJDIR_RELEASE)/src/generalemulator.o $(OBJDIR_RELEASE)/src/fontmanager.o $(OBJDIR_RELEASE)/src/filesystem.o $(OBJDIR_RELEASE)/src/errorstate.o $(OBJDIR_RELEASE)/src/emulator.o $(OBJDIR_RELEASE)/src/database.o $(OBJDIR_RELEASE)/src/cfgfile.o $(OBJDIR_RELEASE)/src/advmame.o $(OBJDIR_RELEASE)/src/scene.o $(OBJDIR_RELEASE)/src/xmldatabase.o $(OBJDIR_RELEASE)/src/wirelessconnection.o $(OBJDIR_RELEASE)/src/texturemanager.o $(OBJDIR_RELEASE)/src/text.o $(OBJDIR_RELEASE)/src/state.o $(OBJDIR_RELEASE)/src/sprite.o $(OBJDIR_RELEASE)/src/soundmanager.o $(OBJDIR_RELEASE)/src/signaler.o $(OBJDIR_RELEASE)/src/row.o $(OBJDIR_RELEASE)/src/rompart.o $(OBJDIR_RELEASE)/src/rom.o $(OBJDIR_RELEASE)/src/result.o $(OBJDIR_RELEASE)/src/removabledisk.o $(OBJDIR_RELEASE)/src/rectangle.o $(OBJDIR_RELEASE)/src/popup.o $(OBJDIR_RELEASE)/src/observer.o $(OBJDIR_RELEASE)/ext/wpa_ctrl.o
 
 all: before_build build_debug build_release after_build
 
@@ -56,6 +56,7 @@ after_build:
 before_debug: 
 	test -d . || mkdir -p .
 	test -d $(OBJDIR_DEBUG)/src || mkdir -p $(OBJDIR_DEBUG)/src
+	test -d $(OBJDIR_DEBUG)/ext || mkdir -p $(OBJDIR_DEBUG)/ext
 
 after_debug: 
 
@@ -117,11 +118,17 @@ $(OBJDIR_DEBUG)/src/database.o: src/database.cpp
 $(OBJDIR_DEBUG)/src/cfgfile.o: src/cfgfile.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/cfgfile.cpp -o $(OBJDIR_DEBUG)/src/cfgfile.o
 
-$(OBJDIR_DEBUG)/src/row.o: src/row.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/row.cpp -o $(OBJDIR_DEBUG)/src/row.o
+$(OBJDIR_DEBUG)/src/advmame.o: src/advmame.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/advmame.cpp -o $(OBJDIR_DEBUG)/src/advmame.o
+
+$(OBJDIR_DEBUG)/src/scene.o: src/scene.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/scene.cpp -o $(OBJDIR_DEBUG)/src/scene.o
 
 $(OBJDIR_DEBUG)/src/xmldatabase.o: src/xmldatabase.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/xmldatabase.cpp -o $(OBJDIR_DEBUG)/src/xmldatabase.o
+
+$(OBJDIR_DEBUG)/src/wirelessconnection.o: src/wirelessconnection.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/wirelessconnection.cpp -o $(OBJDIR_DEBUG)/src/wirelessconnection.o
 
 $(OBJDIR_DEBUG)/src/texturemanager.o: src/texturemanager.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/texturemanager.cpp -o $(OBJDIR_DEBUG)/src/texturemanager.o
@@ -141,11 +148,8 @@ $(OBJDIR_DEBUG)/src/soundmanager.o: src/soundmanager.cpp
 $(OBJDIR_DEBUG)/src/signaler.o: src/signaler.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/signaler.cpp -o $(OBJDIR_DEBUG)/src/signaler.o
 
-$(OBJDIR_DEBUG)/src/scene.o: src/scene.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/scene.cpp -o $(OBJDIR_DEBUG)/src/scene.o
-
-$(OBJDIR_DEBUG)/src/advmame.o: src/advmame.cpp
-	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/advmame.cpp -o $(OBJDIR_DEBUG)/src/advmame.o
+$(OBJDIR_DEBUG)/src/row.o: src/row.cpp
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/row.cpp -o $(OBJDIR_DEBUG)/src/row.o
 
 $(OBJDIR_DEBUG)/src/rompart.o: src/rompart.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/rompart.cpp -o $(OBJDIR_DEBUG)/src/rompart.o
@@ -168,14 +172,19 @@ $(OBJDIR_DEBUG)/src/popup.o: src/popup.cpp
 $(OBJDIR_DEBUG)/src/observer.o: src/observer.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c src/observer.cpp -o $(OBJDIR_DEBUG)/src/observer.o
 
+$(OBJDIR_DEBUG)/ext/wpa_ctrl.o: ext/wpa_ctrl.c
+	$(CC) $(CFLAGS_DEBUG) $(INC_DEBUG) -c ext/wpa_ctrl.c -o $(OBJDIR_DEBUG)/ext/wpa_ctrl.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf .
 	rm -rf $(OBJDIR_DEBUG)/src
+	rm -rf $(OBJDIR_DEBUG)/ext
 
 before_release: 
 	test -d . || mkdir -p .
 	test -d $(OBJDIR_RELEASE)/src || mkdir -p $(OBJDIR_RELEASE)/src
+	test -d $(OBJDIR_RELEASE)/ext || mkdir -p $(OBJDIR_RELEASE)/ext
 
 after_release: 
 
@@ -237,11 +246,17 @@ $(OBJDIR_RELEASE)/src/database.o: src/database.cpp
 $(OBJDIR_RELEASE)/src/cfgfile.o: src/cfgfile.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/cfgfile.cpp -o $(OBJDIR_RELEASE)/src/cfgfile.o
 
-$(OBJDIR_RELEASE)/src/row.o: src/row.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/row.cpp -o $(OBJDIR_RELEASE)/src/row.o
+$(OBJDIR_RELEASE)/src/advmame.o: src/advmame.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/advmame.cpp -o $(OBJDIR_RELEASE)/src/advmame.o
+
+$(OBJDIR_RELEASE)/src/scene.o: src/scene.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/scene.cpp -o $(OBJDIR_RELEASE)/src/scene.o
 
 $(OBJDIR_RELEASE)/src/xmldatabase.o: src/xmldatabase.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/xmldatabase.cpp -o $(OBJDIR_RELEASE)/src/xmldatabase.o
+
+$(OBJDIR_RELEASE)/src/wirelessconnection.o: src/wirelessconnection.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/wirelessconnection.cpp -o $(OBJDIR_RELEASE)/src/wirelessconnection.o
 
 $(OBJDIR_RELEASE)/src/texturemanager.o: src/texturemanager.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/texturemanager.cpp -o $(OBJDIR_RELEASE)/src/texturemanager.o
@@ -261,11 +276,8 @@ $(OBJDIR_RELEASE)/src/soundmanager.o: src/soundmanager.cpp
 $(OBJDIR_RELEASE)/src/signaler.o: src/signaler.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/signaler.cpp -o $(OBJDIR_RELEASE)/src/signaler.o
 
-$(OBJDIR_RELEASE)/src/scene.o: src/scene.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/scene.cpp -o $(OBJDIR_RELEASE)/src/scene.o
-
-$(OBJDIR_RELEASE)/src/advmame.o: src/advmame.cpp
-	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/advmame.cpp -o $(OBJDIR_RELEASE)/src/advmame.o
+$(OBJDIR_RELEASE)/src/row.o: src/row.cpp
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/row.cpp -o $(OBJDIR_RELEASE)/src/row.o
 
 $(OBJDIR_RELEASE)/src/rompart.o: src/rompart.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/rompart.cpp -o $(OBJDIR_RELEASE)/src/rompart.o
@@ -288,10 +300,14 @@ $(OBJDIR_RELEASE)/src/popup.o: src/popup.cpp
 $(OBJDIR_RELEASE)/src/observer.o: src/observer.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c src/observer.cpp -o $(OBJDIR_RELEASE)/src/observer.o
 
+$(OBJDIR_RELEASE)/ext/wpa_ctrl.o: ext/wpa_ctrl.c
+	$(CC) $(CFLAGS_RELEASE) $(INC_RELEASE) -c ext/wpa_ctrl.c -o $(OBJDIR_RELEASE)/ext/wpa_ctrl.o
+
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)
 	rm -rf .
 	rm -rf $(OBJDIR_RELEASE)/src
+	rm -rf $(OBJDIR_RELEASE)/ext
 
 .PHONY: before_build after_build before_debug after_debug clean_debug before_release after_release clean_release
 

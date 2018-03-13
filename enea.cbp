@@ -5,7 +5,7 @@
 		<Option title="enea" />
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
-		<Option virtualFolders="core/;core/emulator/;core/various/;core/usb/;core/filesystem/;core/emulator/advmame/;gui/;gui/states/;gui/graphic/;gui/input/;gui/various/;gui/elements/;gui/sound/;" />
+		<Option virtualFolders="core/;core/emulator/;core/various/;core/usb/;core/filesystem/;core/emulator/advmame/;gui/;gui/states/;gui/graphic/;gui/input/;gui/various/;gui/elements/;gui/sound/;core/wireless/;" />
 		<Build>
 			<Target title="Debug">
 				<Option output="./enea_debug" prefix_auto="1" extension_auto="1" />
@@ -32,7 +32,10 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-DCONFIG_CTRL_IFACE" />
+			<Add option="-DCONFIG_CTRL_IFACE_UNIX" />
 			<Add directory="include" />
+			<Add directory="ext/include" />
 		</Compiler>
 		<Linker>
 			<Add library="udev" />
@@ -44,11 +47,16 @@
 			<Add library="sfml-window" />
 			<Add library="sfml-system" />
 			<Add library="sfml-audio" />
+			<Add library="ext/utils/libutils.a" />
 		</Linker>
 		<ExtraCommands>
 			<Add after="cbp2make -in enea.cbp -out Makefile" />
 			<Mode after="always" />
 		</ExtraCommands>
+		<Unit filename="ext/wpa_ctrl.c">
+			<Option compilerVar="CC" />
+			<Option virtualFolder="core/wireless/" />
+		</Unit>
 		<Unit filename="include/advmame.hpp">
 			<Option virtualFolder="core/emulator/advmame/" />
 		</Unit>
@@ -147,6 +155,9 @@
 		</Unit>
 		<Unit filename="include/texturemanager.hpp">
 			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="include/wirelessconnection.hpp">
+			<Option virtualFolder="core/wireless/" />
 		</Unit>
 		<Unit filename="include/xmldatabase.hpp">
 			<Option virtualFolder="core/emulator/" />
@@ -247,6 +258,9 @@
 		</Unit>
 		<Unit filename="src/texturemanager.cpp">
 			<Option virtualFolder="gui/graphic/" />
+		</Unit>
+		<Unit filename="src/wirelessconnection.cpp">
+			<Option virtualFolder="core/wireless/" />
 		</Unit>
 		<Unit filename="src/xmldatabase.cpp">
 			<Option virtualFolder="core/emulator/" />
