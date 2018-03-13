@@ -5,11 +5,13 @@
 wpa_ctrl* WirelessConnection::control_interface = nullptr;
 wpa_ctrl* WirelessConnection::control_interface_events = nullptr;
 bool WirelessConnection::wireless_active = false;
+bool WirelessConnection::wireless_connected = false;
 std::thread WirelessConnection::wireless_thread;
 std::atomic<bool> WirelessConnection::wireless_exit(false);
 
-WirelessConnection::WirelessConnection(const std::string& theSSID) {
+WirelessConnection::WirelessConnection(const std::string& theSSID, const int theSignalStrength) {
     ssid = theSSID;
+    signal_strength = theSignalStrength;
 }
 
 Result WirelessConnection::getInterfaceNameFromWireless(std::string& theOutput) {
@@ -120,6 +122,27 @@ Result WirelessConnection::enableWireless() {
             return temp_res;
         }
 
+        //checking if we are already connected to a network (A LOT OF STRING MAGIC)
+        std::size_t state_pos;
+        std::string to_search_for = "wpa_state=";
+        std::string state;
+        if( (state = sendRequest("STATUS")).empty() ) {
+            temp_res.setErrorNumber(ERR_OPEN_SOCKET);
+            temp_res.setDescription("Opened socket is unreliable");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
+        if( (state_pos = state.find(to_search_for)) == std::string::npos ) {
+            temp_res.setErrorNumber(ERR_OPEN_SOCKET);
+            temp_res.setDescription("Opened socket is unreliable");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
+        if( state.substr(state.find("=", state_pos)+1, state.find("\n", state_pos)-state_pos-to_search_for.size()) == "COMPLETED" ) wireless_connected = true;
+        else wireless_connected = false;
+
         //starting the thread to monitor external events
         writeToLog("Starting a new thread to start monitoring external wireless events...");
         wireless_thread = std::thread(&wirelessThread);
@@ -214,11 +237,20 @@ std::vector<WirelessConnection> WirelessConnection::scan() {
         if( newline_pos != std::string::npos ) { //if the list is ended
             std::string current_row = res.substr(start_pos, newline_pos-start_pos);
 
-            //extracting the ssid from the row
-            std::string temp_ssid = current_row.substr(current_row.find_last_of("\t")+1, std::string::npos);
+            //extracting the ssid from the row (from now on we use obnoxious string magic to parse)
+            std::size_t last_tab_pos;
+            std::string temp_ssid = current_row.substr(last_tab_pos = current_row.find_last_of("\t")+1, std::string::npos);
+
+            //extracting the tags (currently not used)
+            std::size_t tag_tab_pos = current_row.substr(0, last_tab_pos-1).find_last_of("\t");
+            current_row.substr(tag_tab_pos+1, last_tab_pos-tag_tab_pos-2);
+
+            //extracting the signal level
+            std::size_t signal_tab_pos = current_row.substr(0, tag_tab_pos-1).find_last_of("\t");
+            int temp_signal_int = std::atoi(current_row.substr(signal_tab_pos+1, tag_tab_pos-signal_tab_pos-1).c_str());
 
             //building the vector
-            to_return.push_back(WirelessConnection(temp_ssid));
+            to_return.push_back(WirelessConnection(temp_ssid, temp_signal_int));
 
             //scrolling to the next one
             start_pos = newline_pos + 1;
@@ -226,6 +258,29 @@ std::vector<WirelessConnection> WirelessConnection::scan() {
     }
 
     return to_return;
+}
+
+int WirelessConnection::getSignalStrengthAsPercentage() const {
+    //the algorithm (improvable) is taken from https://stackoverflow.com/questions/15797920/how-to-convert-wifi-signal-strength-from-quality-percent-to-rssi-dbm
+    if( signal_strength <= -100 ) return 0;
+    else if( signal_strength >= -50 ) return 100;
+    else return (signal_strength / 2) - 100;
+
+}
+
+void WirelessConnection::disconnect() {
+    if( !wireless_active ) writeToLog("Trying to disconnect to a wireless network but wireless is inactive", LogWriter::Type::WARNING);
+
+    else if( !wireless_connected ) writeToLog("Trying to disconnect to a wireless network but wireless is not connected", LogWriter::Type::WARNING);
+
+    else {
+        writeToLog("Discconecting to wifi network...");
+
+        if( sendRequest("DISCONNECT") != "OK" ) {
+            Result temp_res(ERR_DISCONNECT, "Disconnect request failed");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+        }
+    }
 }
 
 void WirelessConnection::wirelessThread() {

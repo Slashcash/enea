@@ -3,7 +3,7 @@
 
 int main() {
     WirelessConnection::enableWireless();
-    WirelessConnection::scan();
+    WirelessConnection::disconnect();
     WirelessConnection::disableWireless();
 
     /*Gui gui;

@@ -18,16 +18,18 @@ class WirelessConnection : public virtual LogWriter {
     private:
         //members
         std::string ssid; //the ssid for this connection
+        int signal_strength; //signal strength in dbm
 
         //static members
         static std::thread wireless_thread; //the thread which will check autonomously for wireless events
         static std::atomic<bool> wireless_exit; //a variable which will be used to signal the exit to wireless_thread
-        static bool wireless_active;
+        static bool wireless_active; //true if wireless is active
+        static bool wireless_connected; //true if wireless is connected to a network
         static wpa_ctrl* control_interface; //the control interface for wpa_supplicant
         static wpa_ctrl* control_interface_events; //this interface is used to retrieve external event in a separate thread
 
         //ctor
-        WirelessConnection(const std::string& theSSID); //used privately (ie: by the scan function)
+        WirelessConnection(const std::string& theSSID, const int theSignalStrength); //used privately (ie: by the scan function)
 
         //static functions
         static Result getInterfaceNameFromWireless(std::string& theOutput); //it parses /proc/net/wireless to get the interface name
@@ -44,15 +46,22 @@ class WirelessConnection : public virtual LogWriter {
             ERR_OPEN_WIRELESS_TABLE,
             ERR_PARSE_WIRELESS_TABLE,
             ERR_SCAN,
+            ERR_DISCONNECT,
         };
 
         //ctor
         WirelessConnection() = delete; //why someone would construct a connection, it is better to retrieve already constructed connections from scan()
 
+        //getters
+        std::string getSSID() const { return ssid; }
+        int getSignalStrength() const { return signal_strength; } //returns signal strength in dbm
+        int getSignalStrengthAsPercentage() const;
+
         //static functions
         static Result enableWireless(); //call this before using every function of this wireless interface
         static Result disableWireless(); //call this to disable wireless operations
         static std::vector<WirelessConnection> scan();
+        static void disconnect(); //this returns void because calling this doesn't effectively disconnects, it just asks for a disconnection that will be handled by wpa_supplicant (if something fails it writes to log)
 };
 
 #endif // _WIRELESSCONNECTION_HPP_
