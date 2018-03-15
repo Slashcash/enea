@@ -174,6 +174,7 @@ Result WirelessConnection::disableWireless() {
     control_interface_events = nullptr;
     wireless_exit = false;
     wireless_active = false;
+    wireless_connected = false;
     return Result(Result::SUCCESS);
 }
 

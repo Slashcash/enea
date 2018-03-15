@@ -2,6 +2,7 @@
 #include "wirelessconnection.hpp"
 
 int main() {
+    //TEST PURPOSES
     WirelessConnection::enableWireless();
     WirelessConnection::disconnect();
     WirelessConnection::disableWireless();
