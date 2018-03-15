@@ -24,7 +24,9 @@ class WirelessConnection : public virtual LogWriter {
         static std::thread wireless_thread; //the thread which will check autonomously for wireless events
         static std::atomic<bool> wireless_exit; //a variable which will be used to signal the exit to wireless_thread
         static bool wireless_active; //true if wireless is active
-        static bool wireless_connected; //true if wireless is connected to a network
+        static std::atomic<bool> wireless_connected; //true if wireless is connected to a network
+        static std::atomic<bool> scan_requested;
+        static std::atomic<bool> scan_ready; //two control variables that regulates the scanning function
         static wpa_ctrl* control_interface; //the control interface for wpa_supplicant
         static wpa_ctrl* control_interface_events; //this interface is used to retrieve external event in a separate thread
 

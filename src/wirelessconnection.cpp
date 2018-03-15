@@ -1,13 +1,17 @@
 #include "wirelessconnection.hpp"
 
+#include <unistd.h>
+
 #include "filesystem.hpp"
 
 wpa_ctrl* WirelessConnection::control_interface = nullptr;
 wpa_ctrl* WirelessConnection::control_interface_events = nullptr;
 bool WirelessConnection::wireless_active = false;
-bool WirelessConnection::wireless_connected = false;
+std::atomic<bool> WirelessConnection::wireless_connected(false);
 std::thread WirelessConnection::wireless_thread;
 std::atomic<bool> WirelessConnection::wireless_exit(false);
+std::atomic<bool> WirelessConnection::scan_requested(false);
+std::atomic<bool> WirelessConnection::scan_ready(false);
 
 WirelessConnection::WirelessConnection(const std::string& theSSID, const int theSignalStrength) {
     ssid = theSSID;
@@ -114,6 +118,15 @@ Result WirelessConnection::enableWireless() {
             return temp_res;
         }
 
+        //attaching the external socket to retrieve unsolicited message
+        writeToLog("Attaching the external socket to retrieve unsolicited message...");
+        if( wpa_ctrl_attach(control_interface_events) != 0 ) {
+            temp_res.setErrorNumber(ERR_OPEN_SOCKET);
+            temp_res.setDescription("Unable to attach the external socket");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
         //checking if the communication is active & reliable
         if( sendRequest("PING") != "PONG" ) {
             temp_res.setErrorNumber(ERR_OPEN_SOCKET);
@@ -180,11 +193,11 @@ Result WirelessConnection::disableWireless() {
 
 std::string WirelessConnection::receiveCommand() {
     char msg_buffer[4096]; //we need a large buffer
-    std::size_t response_size;
+    std::size_t response_size = sizeof(msg_buffer);
     std::string final_string;
 
-    if( wpa_ctrl_recv(control_interface_events, msg_buffer, &response_size) == -1 ) return ""; //if we fail to receive we return an empty string
-    else { final_string.append(msg_buffer, response_size+1); return final_string; } //a coherentrly built string instead
+    if( wpa_ctrl_recv(control_interface_events, msg_buffer, &response_size) != 0 ) return ""; //if we fail to receive we return an empty string
+    else { final_string.append(msg_buffer, response_size-1); return final_string; } //a coherentrly built string instead
 }
 
 std::string WirelessConnection::sendRequest(const std::string& theRequest) {
@@ -192,7 +205,7 @@ std::string WirelessConnection::sendRequest(const std::string& theRequest) {
     std::size_t response_size = sizeof(msg_buffer);
     std::string final_string;
 
-    if( wpa_ctrl_request(control_interface, theRequest.c_str(), theRequest.size(), msg_buffer, &response_size, nullptr) == -1 )
+    if( wpa_ctrl_request(control_interface, theRequest.c_str(), theRequest.size(), msg_buffer, &response_size, nullptr) != 0 )
         return "";
 
 
@@ -210,6 +223,7 @@ std::vector<WirelessConnection> WirelessConnection::scan() {
     writeToLog("Scanning for wireless networks...");
 
     //requesting an actual scan
+    scan_requested = true;
     Result scan_result;
     if( sendRequest("SCAN") != "OK" ) {
         scan_result.setErrorNumber(ERR_SCAN);
@@ -217,6 +231,11 @@ std::vector<WirelessConnection> WirelessConnection::scan() {
         writeToLog(scan_result, LogWriter::Type::ERROR);
         return to_return;
     }
+
+    //waiting till wpa_supplicant responds to us
+    while( !scan_ready ) {}
+    scan_requested = false;
+    scan_ready = false;
 
     std::string res;
     if( (res = sendRequest("SCAN_RESULTS")).empty() ) {
@@ -286,6 +305,13 @@ void WirelessConnection::disconnect() {
 
 void WirelessConnection::wirelessThread() {
     while( !wireless_exit.load() ) {
-    //INSTRUCTIONS WILL GO HERE
+        while( wpa_ctrl_pending(control_interface_events) ){
+            std::string msg = receiveCommand();
+
+            //react to scan results
+            if( msg.find("CTRL-EVENT-SCAN-RESULTS") != std::string::npos && scan_requested.load() ) scan_ready = true; //signaling that the scan is ready
+        }
+
+        usleep(250*1000); //this thread will sleep since we don't want to pollute the cpu too much and this does not need to be highly responsive
     }
 }

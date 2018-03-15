@@ -4,7 +4,7 @@
 int main() {
     //TEST PURPOSES
     WirelessConnection::enableWireless();
-    WirelessConnection::disconnect();
+    WirelessConnection::scan();
     WirelessConnection::disableWireless();
 
     /*Gui gui;
