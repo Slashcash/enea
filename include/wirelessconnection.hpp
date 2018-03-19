@@ -5,6 +5,8 @@
 #include <wpa_ctrl.h>
 #include <thread>
 #include <atomic>
+#include <queue>
+#include <mutex>
 
 #include "logwriter.hpp"
 #include "result.hpp"
@@ -15,12 +17,20 @@ TODO: Would it be better to enable/disable radio in enable/disable functions?
 */
 
 class WirelessConnection : public virtual LogWriter {
+    public:
+        enum Event { //these are the events that can occur to the wireless connection externally to this software
+            CONNECTION,
+            DISCONNECTION
+        };
+
     private:
         //members
         std::string ssid; //the ssid for this connection
         int signal_strength; //signal strength in dbm
 
         //static members
+        static std::queue<Event> event_queue; //here we will stores all the connection events occured
+        static std::mutex event_mutex; //this protects the event_queue
         static std::thread wireless_thread; //the thread which will check autonomously for wireless events
         static std::atomic<bool> wireless_exit; //a variable which will be used to signal the exit to wireless_thread
         static bool wireless_active; //true if wireless is active
@@ -63,6 +73,7 @@ class WirelessConnection : public virtual LogWriter {
         static Result enableWireless(); //call this before using every function of this wireless interface
         static Result disableWireless(); //call this to disable wireless operations
         static std::vector<WirelessConnection> scan();
+        static std::vector<Event> getConnectionEvents(); //call this to have a vector of connection events occured since the last call of this function
         static void disconnect(); //this returns void because calling this doesn't effectively disconnects, it just asks for a disconnection that will be handled by wpa_supplicant (if something fails it writes to log)
 };
 

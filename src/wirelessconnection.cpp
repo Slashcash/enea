@@ -12,6 +12,8 @@ std::thread WirelessConnection::wireless_thread;
 std::atomic<bool> WirelessConnection::wireless_exit(false);
 std::atomic<bool> WirelessConnection::scan_requested(false);
 std::atomic<bool> WirelessConnection::scan_ready(false);
+std::queue<WirelessConnection::Event> WirelessConnection::event_queue;
+std::mutex WirelessConnection::event_mutex;
 
 WirelessConnection::WirelessConnection(const std::string& theSSID, const int theSignalStrength) {
     ssid = theSSID;
@@ -308,10 +310,39 @@ void WirelessConnection::wirelessThread() {
         while( wpa_ctrl_pending(control_interface_events) ){
             std::string msg = receiveCommand();
 
-            //react to scan results
+            //react to scan results (sending a signal to the scan function that results are available)
             if( msg.find("CTRL-EVENT-SCAN-RESULTS") != std::string::npos && scan_requested.load() ) scan_ready = true; //signaling that the scan is ready
+
+            //react to a disconnection (signaling the class that connection is off and adding the event to the queue)
+            if( msg.find("CTRL-EVENT-DISCONNECTED") != std::string::npos ) {
+                wireless_connected = false;
+                event_mutex.lock();
+                event_queue.push(DISCONNECTION);
+                event_mutex.unlock();
+            }
+
+            if( msg.find("CTRL-EVENT-CONNECTED ") != std::string::npos ) {
+                wireless_connected = true;
+                event_mutex.lock();
+                event_queue.push(CONNECTION);
+                event_mutex.unlock();
+            }
         }
 
         usleep(250*1000); //this thread will sleep since we don't want to pollute the cpu too much and this does not need to be highly responsive
     }
+}
+
+std::vector<WirelessConnection::Event> WirelessConnection::getConnectionEvents() {
+    std::vector<Event> to_return;
+    if( !wireless_active ) return to_return; //if it is not active why even bother?
+
+    event_mutex.lock(); //CRITICAL
+    while( !event_queue.empty() ) {
+        to_return.push_back(event_queue.front());
+        event_queue.pop();
+    }
+    event_mutex.unlock();
+
+    return to_return;
 }
