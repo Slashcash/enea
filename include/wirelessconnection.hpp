@@ -14,6 +14,7 @@
 /*this class implements the wireless communication for this software, it provides some basic connect/disconnect/scan functionality
 on wireless networks using wpa_supplicant
 TODO: Would it be better to enable/disable radio in enable/disable functions?
+TODO: Add a function that returns informations on the currently enabled network
 */
 
 class WirelessConnection : public virtual LogWriter {
@@ -59,6 +60,8 @@ class WirelessConnection : public virtual LogWriter {
             ERR_PARSE_WIRELESS_TABLE,
             ERR_SCAN,
             ERR_DISCONNECT,
+            ERR_WIRELESS_INACTIVE,
+            ERR_CONNECT
         };
 
         //ctor
@@ -69,12 +72,17 @@ class WirelessConnection : public virtual LogWriter {
         int getSignalStrength() const { return signal_strength; } //returns signal strength in dbm
         int getSignalStrengthAsPercentage() const;
 
+        //functions
+        Result requestConnection(const std::string& thePassword, const bool toBeSaved = true); //request a connection to this network using a password (WPA2)
+
         //static functions
         static Result enableWireless(); //call this before using every function of this wireless interface
         static Result disableWireless(); //call this to disable wireless operations
         static std::vector<WirelessConnection> scan();
         static std::vector<Event> getConnectionEvents(); //call this to have a vector of connection events occured since the last call of this function
-        static void disconnect(); //this returns void because calling this doesn't effectively disconnects, it just asks for a disconnection that will be handled by wpa_supplicant (if something fails it writes to log)
+        static Result requestDisconnection(); //this returns void because calling this doesn't effectively disconnects, it just asks for a disconnection that will be handled by wpa_supplicant (if something fails it writes to log)
+        static void dhcpRequest(); //makes a dhcp request in case it is needed
+        static Result requestConnection(); //this connects to saved networks
 };
 
 #endif // _WIRELESSCONNECTION_HPP_

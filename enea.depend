@@ -1,0 +1,401 @@
+# depslib dependency file v1.0
+1522158555 source:/home/gennaro/Scrivania/enea/src/cfgfile.cpp
+	"cfgfile.hpp"
+	<fstream>
+	<unistd.h>
+	<sys/types.h>
+	<pwd.h>
+
+1522158555 /home/gennaro/Scrivania/enea/include/cfgfile.hpp
+	<map>
+	<string>
+	"result.hpp"
+	"filesystem.hpp"
+	"logwriter.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/result.hpp
+	<string>
+
+1522158555 /home/gennaro/Scrivania/enea/include/filesystem.hpp
+	<fstream>
+	<experimental/filesystem>
+	"result.hpp"
+	"logwriter.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/logwriter.hpp
+	<iostream>
+	<experimental/filesystem>
+	<string>
+	<mutex>
+	"result.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/database.cpp
+	"database.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/database.hpp
+	"filesystem.hpp"
+	"logwriter.hpp"
+	"rompart.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/rompart.hpp
+	<string>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/emulator.cpp
+	"emulator.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/emulator.hpp
+	<string>
+	<memory>
+	<miniz.h>
+	"result.hpp"
+	"filesystem.hpp"
+	"logwriter.hpp"
+	"database.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/errorstate.cpp
+	"errorstate.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/errorstate.hpp
+	"state.hpp"
+	"text.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/state.hpp
+	<SFML/Graphics/RenderWindow.hpp>
+	<queue>
+	"result.hpp"
+	"observer.hpp"
+	"inputmanager.hpp"
+	"scene.hpp"
+	"fontmanager.hpp"
+	"texturemanager.hpp"
+	"signaler.hpp"
+	"soundmanager.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/observer.hpp
+	"signal.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/signal.hpp
+	<string>
+
+1522158555 /home/gennaro/Scrivania/enea/include/inputmanager.hpp
+	<vector>
+	<SFML/Graphics/RenderWindow.hpp>
+	<SFML/Window/Keyboard.hpp>
+	"signaler.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/signaler.hpp
+	<vector>
+	"observer.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/scene.hpp
+	"layer.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/layer.hpp
+	<SFML/Graphics/View.hpp>
+	"node.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/node.hpp
+	<SFML/Graphics/Drawable.hpp>
+	<SFML/Graphics/Transformable.hpp>
+	<SFML/System/Time.hpp>
+	<vector>
+
+1522158555 /home/gennaro/Scrivania/enea/include/fontmanager.hpp
+	<map>
+	<SFML/Graphics/Font.hpp>
+	"filesystem.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/texturemanager.hpp
+	<map>
+	<SFML/Graphics/Texture.hpp>
+	"filesystem.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/soundmanager.hpp
+	<string>
+	<map>
+	<utility>
+	<SFML/Audio/SoundBuffer.hpp>
+	<SFML/Audio/Sound.hpp>
+	"filesystem.hpp"
+	"signal.hpp"
+	"observer.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/text.hpp
+	<SFML/Graphics/Text.hpp>
+	"node.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/filesystem.cpp
+	"filesystem.hpp"
+	<unistd.h>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/fontmanager.cpp
+	<utility>
+	"fontmanager.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/generalemulator.cpp
+	"generalemulator.hpp"
+	<algorithm>
+	"advmame.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/generalemulator.hpp
+	<vector>
+	<memory>
+	"logwriter.hpp"
+	"emulator.hpp"
+	"xmldatabase.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/xmldatabase.hpp
+	<tinyxml2.h>
+	"database.hpp"
+	"result.hpp"
+	"filesystem.hpp"
+	"rompart.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/advmame.hpp
+	"emulator.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/gui.cpp
+	"gui.hpp"
+	"mainstate.hpp"
+	"filesystem.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/gui.hpp
+	<SFML/Graphics/RenderWindow.hpp>
+	<stack>
+	"state.hpp"
+	"logwriter.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/mainstate.hpp
+	<vector>
+	<map>
+	"state.hpp"
+	"sprite.hpp"
+	"cfgfile.hpp"
+	"sprite.hpp"
+	"rom.hpp"
+	"removabledisk.hpp"
+	"list.hpp"
+	"langfile.hpp"
+	"popup.hpp"
+	"menu.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/sprite.hpp
+	<SFML/Graphics/Sprite.hpp>
+	<SFML/Graphics/Texture.hpp>
+	"node.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/rom.hpp
+	<vector>
+	"filesystem.hpp"
+	"generalemulator.hpp"
+	"logwriter.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/removabledisk.hpp
+	<string>
+	<libudev.h>
+	<thread>
+	<atomic>
+	<queue>
+	<mutex>
+	"result.hpp"
+	"logwriter.hpp"
+	"filesystem.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/list.hpp
+	<vector>
+	"node.hpp"
+	"row.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/row.hpp
+	"text.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/langfile.hpp
+	<map>
+	"result.hpp"
+	"filesystem.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/popup.hpp
+	"rectangle.hpp"
+	"row.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/rectangle.hpp
+	<SFML/Graphics/RectangleShape.hpp>
+	"node.hpp"
+
+1522158555 /home/gennaro/Scrivania/enea/include/menu.hpp
+	"rectangle.hpp"
+	"list.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/inputmanager.cpp
+	<SFML/Window/Event.hpp>
+	<string>
+	"inputmanager.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/langfile.cpp
+	"langfile.hpp"
+	<fstream>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/layer.cpp
+	"layer.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/list.cpp
+	"list.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+	<iostream>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/logwriter.cpp
+	"logwriter.hpp"
+	<fstream>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/mainstate.cpp
+	"mainstate.hpp"
+	"errorstate.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/menu.cpp
+	"menu.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/node.cpp
+	"node.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+	<SFML/Graphics/RectangleShape.hpp>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/observer.cpp
+	"observer.hpp"
+	"signaler.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/popup.cpp
+	"popup.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/rectangle.cpp
+	"rectangle.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/result.cpp
+	"result.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/rom.cpp
+	"rom.hpp"
+	<algorithm>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/rompart.cpp
+	"rompart.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/row.cpp
+	"row.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/scene.cpp
+	"scene.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/signaler.cpp
+	"signaler.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/soundmanager.cpp
+	"soundmanager.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/sprite.cpp
+	"sprite.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/state.cpp
+	"state.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/text.cpp
+	"text.hpp"
+	<SFML/Graphics/RenderTarget.hpp>
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/texturemanager.cpp
+	<utility>
+	"texturemanager.hpp"
+
+1522158555 source:/home/gennaro/Scrivania/enea/src/xmldatabase.cpp
+	"xmldatabase.hpp"
+	<string>
+
+1522159420 source:/home/gennaro/Scrivania/enea/ext/wpa_ctrl.c
+	"includes.h"
+	<sys/un.h>
+	<unistd.h>
+	<fcntl.h>
+	<netdb.h>
+	<dirent.h>
+	<sys/stat.h>
+	<cutils/sockets.h>
+	"private/android_filesystem_config.h"
+	<net/if.h>
+	"wpa_ctrl.h"
+	"common.h"
+
+1522159420 /home/gennaro/Scrivania/enea/ext/include/includes.h
+	"build_config.h"
+	<stdlib.h>
+	<stddef.h>
+	<stdio.h>
+	<stdarg.h>
+	<string.h>
+	<signal.h>
+	<sys/types.h>
+	<errno.h>
+	<ctype.h>
+	<unistd.h>
+	<sys/socket.h>
+	<netinet/in.h>
+	<arpa/inet.h>
+	<sys/uio.h>
+	<sys/time.h>
+
+1522159420 /home/gennaro/Scrivania/enea/ext/include/build_config.h
+
+1522159420 /home/gennaro/Scrivania/enea/ext/include/wpa_ctrl.h
+
+1522159420 /home/gennaro/Scrivania/enea/ext/include/common.h
+	"os.h"
+	<endian.h>
+	<byteswap.h>
+	<sys/types.h>
+	<sys/endian.h>
+	<sys/types.h>
+	<machine/endian.h>
+	<winsock.h>
+	<inttypes.h>
+	<stdint.h>
+	"wpa_debug.h"
+	<valgrind/memcheck.h>
+
+1522159420 /home/gennaro/Scrivania/enea/ext/include/os.h
+
+1522159420 /home/gennaro/Scrivania/enea/ext/include/wpa_debug.h
+	"wpabuf.h"
+
+1522159420 /home/gennaro/Scrivania/enea/ext/include/wpabuf.h
+
+1522159420 source:/home/gennaro/Scrivania/enea/src/advmame.cpp
+	"advmame.hpp"
+	<xmldatabase.hpp>
+
+1522169806 source:/home/gennaro/Scrivania/enea/src/main.cpp
+	"gui.hpp"
+	"wirelessconnection.hpp"
+
+1522170868 /home/gennaro/Scrivania/enea/include/wirelessconnection.hpp
+	<cstddef>
+	<wpa_ctrl.h>
+	<thread>
+	<atomic>
+	<queue>
+	<mutex>
+	"logwriter.hpp"
+	"result.hpp"
+
+1522159420 source:/home/gennaro/Scrivania/enea/src/removabledisk.cpp
+	"removabledisk.hpp"
+	<cstring>
+	"filesystem.hpp"
+
+1522169325 source:/home/gennaro/Scrivania/enea/src/wirelessconnection.cpp
+	"wirelessconnection.hpp"
+	<unistd.h>
+	"filesystem.hpp"
+

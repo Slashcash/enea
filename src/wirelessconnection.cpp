@@ -220,7 +220,11 @@ std::string WirelessConnection::sendRequest(const std::string& theRequest) {
 std::vector<WirelessConnection> WirelessConnection::scan() {
     std::vector<WirelessConnection> to_return;
 
-    if( !wireless_active ) { writeToLog("Scan requested but wireless is inactive", LogWriter::Type::WARNING); return to_return; } //if wireless is not active why even bother?
+    if( !wireless_active ) {
+        Result temp_res(ERR_WIRELESS_INACTIVE, "Trying to scan for wireless networks but wireless is inactive");
+        writeToLog(temp_res, LogWriter::Type::ERROR);
+        return to_return;
+    } //if wireless is not active why even bother?
 
     writeToLog("Scanning for wireless networks...");
 
@@ -290,10 +294,17 @@ int WirelessConnection::getSignalStrengthAsPercentage() const {
 
 }
 
-void WirelessConnection::disconnect() {
-    if( !wireless_active ) writeToLog("Trying to disconnect to a wireless network but wireless is inactive", LogWriter::Type::WARNING);
+Result WirelessConnection::requestDisconnection() {
+    if( !wireless_active ) {
+        Result temp_res(ERR_WIRELESS_INACTIVE, "Trying to disconnect to a wireless network but wireless is inactive");
+        writeToLog(temp_res, LogWriter::Type::ERROR);
+        return temp_res;
+    }
 
-    else if( !wireless_connected ) writeToLog("Trying to disconnect to a wireless network but wireless is not connected", LogWriter::Type::WARNING);
+    else if( !wireless_connected ) {
+        writeToLog("Trying to disconnect to a wireless network but wireless is not connected", LogWriter::Type::WARNING);
+        return Result(Result::SUCCESS);
+    }
 
     else {
         writeToLog("Discconecting to wifi network...");
@@ -301,7 +312,10 @@ void WirelessConnection::disconnect() {
         if( sendRequest("DISCONNECT") != "OK" ) {
             Result temp_res(ERR_DISCONNECT, "Disconnect request failed");
             writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
         }
+
+        return Result(Result::SUCCESS);
     }
 }
 
@@ -345,4 +359,38 @@ std::vector<WirelessConnection::Event> WirelessConnection::getConnectionEvents()
     event_mutex.unlock();
 
     return to_return;
+}
+
+Result WirelessConnection::requestConnection(const std::string& thePassword, const bool toBeSaved) {
+    if( !wireless_active ) {
+        Result temp_res(ERR_WIRELESS_INACTIVE, "Trying to connect to a wireless network but wireless is inactive");
+        writeToLog(temp_res, LogWriter::Type::ERROR);
+        return temp_res;
+    }
+
+    else {
+        writeToLog("Connecting to "+ssid+"...");
+        std::string connection_number = sendRequest("ADD_NETWORK"); //adding a new network (we don't consider the case in which it is already added because we're lazy)
+        if( connection_number == "FAIL" ) {
+            Result temp_res(ERR_CONNECT, "Unable to add the new network");
+            writeToLog(temp_res, LogWriter::Type::ERROR);
+            return temp_res;
+        }
+
+        sendRequest("SET_NETWORK "+connection_number+" ssid \""+ssid+"\""); //setting ssid
+        sendRequest("SET_NETWORK "+connection_number+" psk \""+thePassword+"\""); //pwd
+        sendRequest("ENABLE_NETWORK "+connection_number); //connecting to the new network
+        if( toBeSaved ) std::cout << sendRequest("SAVE_CONFIG") << "\n"; //saving the configuration if needed
+        return Result(Result::SUCCESS);
+    }
+}
+
+void WirelessConnection::dhcpRequest() {
+    writeToLog("Requesting an ip with dhcp...");
+    system(("dhclient -v "+getInterfaceName()).c_str()); //issuing a dhcp
+}
+
+static Result WirelessConnection::requestConnection() {
+    sendRequest("RECONNECT");
+    return Result(Result::SUCCESS);
 }

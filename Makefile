@@ -15,7 +15,7 @@ INC = -Iinclude -Iext/include
 CFLAGS = -Wall -DCONFIG_CTRL_IFACE -DCONFIG_CTRL_IFACE_UNIX
 RESINC = 
 LIBDIR = 
-LIB = -ludev -lpthread -lstdc++fs -ltinyxml2 -lminiz -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio ext/utils/libutils.a
+LIB = -ludev -lpthread -lstdc++fs -ltinyxml2 -lminiz -lsfml-graphics -lsfml-window -lsfml-system -lsfml-audio libutils.a
 LDFLAGS = 
 
 INC_DEBUG = $(INC)

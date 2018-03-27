@@ -47,7 +47,7 @@
 			<Add library="sfml-window" />
 			<Add library="sfml-system" />
 			<Add library="sfml-audio" />
-			<Add library="ext/utils/libutils.a" />
+			<Add library="libutils.a" />
 		</Linker>
 		<ExtraCommands>
 			<Add after="cbp2make -in enea.cbp -out Makefile" />
