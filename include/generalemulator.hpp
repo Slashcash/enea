@@ -26,7 +26,7 @@ class GeneralEmulator : public virtual LogWriter {
         fs::path emulators_folder; //the folder which contains every emulator
 
         //functions
-        emulator_pair chooseEmulator(const std::vector<fs::path>& theRomsPath) const; //this functions takes a series of rom paths (representing same roms in different paths) and chooses which one of the supported emulators is best suited to run it
+        emulator_pair chooseEmulator(const std::vector<fs::path>& theRomsPath, const fs::path& theBasePath) const; //this functions takes a series of rom paths (representing same roms in different paths) and chooses which one of the supported emulators is best suited to run it
 
     public:
         //enum
@@ -57,8 +57,8 @@ class GeneralEmulator : public virtual LogWriter {
         std::string getRomParent(const std::string& theRom) const { return general_database.getRomParent(theRom); }
         bool isRomSupported(const std::string& theRom) const { return general_database.isRomSupported(theRom); }
         bool isRomRunnable(const std::string& theRom) const { return general_database.isRomRunnable(theRom); }
-        Result checkRomLaunchability(const std::vector<fs::path>& theRomsPath) const; //this checks if the rom is launchable but doesn't launch it
-        Result runRom(const std::vector<fs::path>& theRomsPath) const; //this checks and launches it instead
+        Result checkRomLaunchability(const std::vector<fs::path>& theRomsPath, const fs::path& theBasePath) const; //this checks if the rom is launchable but doesn't launch it
+        Result runRom(const std::vector<fs::path>& theRomsPath, const fs::path& theBasePath) const; //this checks and launches it instead, see emulator.hpp for information about theBasePath
 };
 
 #endif // _GENERALEMULATOR_HPP_

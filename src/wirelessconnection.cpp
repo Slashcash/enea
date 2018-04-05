@@ -390,7 +390,7 @@ void WirelessConnection::dhcpRequest() {
     system(("dhclient -v "+getInterfaceName()).c_str()); //issuing a dhcp
 }
 
-static Result WirelessConnection::requestConnection() {
+Result WirelessConnection::requestConnection() {
     sendRequest("RECONNECT");
     return Result(Result::SUCCESS);
 }

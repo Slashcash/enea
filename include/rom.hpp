@@ -40,8 +40,8 @@ class Rom : virtual public LogWriter {
         std::vector<fs::path> getPaths() const { return rom_paths; }
 
         //functions
-        Result launch() const { return emulator.runRom(rom_paths); }
-        Result checkLaunchability() const { return emulator.checkRomLaunchability(rom_paths); }
+        Result launch(const fs::path& theBasePath) const { return emulator.runRom(rom_paths, theBasePath); } //see emulator.hpp for information about theBasePath
+        Result checkLaunchability(const fs::path& theBasePath) const { return emulator.checkRomLaunchability(rom_paths, theBasePath); }
         void merge(const Rom& theRom); //what does this means? if we find the same rom in different paths since they are the same we merge them in the same structure (so when we launch it the emulator can choose the best one to use among them)
         Result move(const fs::path& theNewLocation) const;
         Result remove() const;

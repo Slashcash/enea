@@ -25,7 +25,7 @@ class Emulator : public virtual LogWriter {
         virtual bool validatePartInArchive(mz_zip_archive& theArchive, const RomPart& thePart) const final;
 
         //pure virtual functions
-        virtual Result runEffectively(const fs::path& theRomPath) const = 0;
+        virtual Result runEffectively(const fs::path& theRomPath, const fs::path& theBasePath) const = 0; //theBasePath is a path you can additionaly specify for where to search for additional informations on that rom (ie if you store bios or parents in different folders)
 
     protected:
         //members
@@ -49,10 +49,10 @@ class Emulator : public virtual LogWriter {
         fs::path getPath() const { return emulator_path; }
         virtual std::string getRomOrigin(const std::string& theRom) const final { if( emulator_database != nullptr ) return emulator_database->getRomOrigin(theRom); else return ""; }
         virtual bool isRomSupported(const std::string& theRom) const final { if( emulator_database != nullptr ) return emulator_database->isRomSupported(theRom); else return false; }
-        virtual bool validateRom(const fs::path& theRomPath) const final;
+        virtual bool validateRom(const fs::path& theRomPath, const fs::path& theBasePath) const final;
 
         //functions
-        virtual Result runRom(const fs::path& theRomPath) const final;
+        virtual Result runRom(const fs::path& theRomPath, const fs::path& theBasePath) const final;
         virtual Result loadDB(const fs::path& theDBPath) final { if( emulator_database != nullptr ) return emulator_database->loadFromFile(theDBPath); else return Result(15); }
 
 };

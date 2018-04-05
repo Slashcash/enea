@@ -27,7 +27,7 @@ Result GeneralEmulator::loadDB() {
     return Result(Result::SUCCESS);
 }
 
-GeneralEmulator::emulator_pair GeneralEmulator::chooseEmulator(const std::vector<fs::path>& theRomsPath) const {
+GeneralEmulator::emulator_pair GeneralEmulator::chooseEmulator(const std::vector<fs::path>& theRomsPath, const fs::path& theBasePath) const {
     std::string rom_name;
     if( !theRomsPath.empty() ) rom_name = theRomsPath[0].stem().string(); //getting the actual rom name
     std::vector<std::shared_ptr<Emulator>> emulator_choices;
@@ -41,7 +41,7 @@ GeneralEmulator::emulator_pair GeneralEmulator::chooseEmulator(const std::vector
     std::vector<emulator_pair> best_pairs;
     for(auto it_path = theRomsPath.begin(); it_path < theRomsPath.end(); it_path++)
             for(auto it_emu = emulator_choices.begin(); it_emu < emulator_choices.end(); it_emu++)
-                if( it_emu->get()->validateRom(*it_path) )
+                if( it_emu->get()->validateRom(*it_path, theBasePath) )
                     best_pairs.push_back(std::make_pair(*it_emu, *it_path));
 
     //this should be the algorithm which chooses the best emulator among all the suitable one, as of now it just makes the most conservative choice
@@ -55,7 +55,7 @@ GeneralEmulator::emulator_pair GeneralEmulator::chooseEmulator(const std::vector
     else return std::make_pair(std::shared_ptr<Emulator>(), fs::path()); //if no one is suited we return an empty pair
 }
 
-Result GeneralEmulator::checkRomLaunchability(const std::vector<fs::path>& theRomsPath) const {
+Result GeneralEmulator::checkRomLaunchability(const std::vector<fs::path>& theRomsPath, const fs::path& theBasePath) const {
     std::string rom_name;
     if( !theRomsPath.empty() ) rom_name = theRomsPath[0].stem().string(); //getting the actual rom name
     else return(ERR_INVALID_VECTOR);
@@ -64,7 +64,7 @@ Result GeneralEmulator::checkRomLaunchability(const std::vector<fs::path>& theRo
 
     if( !isRomRunnable(rom_name) ) return Result(ERR_ROM_NOT_RUNNABLE); //if the rom is not a runnable one why even bother?
 
-    emulator_pair best_pair = chooseEmulator(theRomsPath); //we choose the best emulator to run the rom
+    emulator_pair best_pair = chooseEmulator(theRomsPath, theBasePath); //we choose the best emulator to run the rom
 
     if( best_pair.first == nullptr ) return ERR_ROM_NOT_VALID; //if we didn't find any suitable emulator to launch it
 
@@ -73,7 +73,7 @@ Result GeneralEmulator::checkRomLaunchability(const std::vector<fs::path>& theRo
     return Result(Result::SUCCESS);
 }
 
-Result GeneralEmulator::runRom(const std::vector<fs::path>& theRomsPath) const {
+Result GeneralEmulator::runRom(const std::vector<fs::path>& theRomsPath, const fs::path& theBasePath) const {
     std::string rom_name;
     if( !theRomsPath.empty() ) rom_name = theRomsPath[0].stem().string(); //getting the actual rom name
     else return(ERR_INVALID_VECTOR);
@@ -82,7 +82,7 @@ Result GeneralEmulator::runRom(const std::vector<fs::path>& theRomsPath) const {
 
     if( !isRomRunnable(rom_name) ) return Result(ERR_ROM_NOT_RUNNABLE); //if the rom is not a runnable one why even bother?
 
-    emulator_pair best_pair = chooseEmulator(theRomsPath); //we choose the best emulator to run the rom
+    emulator_pair best_pair = chooseEmulator(theRomsPath, theBasePath); //we choose the best emulator to run the rom
 
     if( best_pair.first == nullptr ) return ERR_ROM_NOT_VALID; //if we didn't find any suitable emulator to launch it
 
@@ -90,7 +90,7 @@ Result GeneralEmulator::runRom(const std::vector<fs::path>& theRomsPath) const {
 
     writeToLog("Preparing to launch the rom with "+best_pair.first.get()->getName()+"...");
 
-    if( !best_pair.first.get()->runRom(best_pair.second) ) return Result(ERR_EMULATOR);
+    if( !best_pair.first.get()->runRom(best_pair.second, theBasePath) ) return Result(ERR_EMULATOR);
 
     return Result(Result::SUCCESS);
 }

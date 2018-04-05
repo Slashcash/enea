@@ -6,12 +6,12 @@ Emulator::Emulator(const fs::path& theEmulatorPath, const std::string& theEmulat
     emulator_romset = theEmulatorRomset;
 }
 
-Result Emulator::runRom(const fs::path& theRomPath) const {
+Result Emulator::runRom(const fs::path& theRomPath, const fs::path& theBasePath) const {
     writeToLog("Running "+theRomPath.string()+"...");
-    return runEffectively(theRomPath);
+    return runEffectively(theRomPath, theBasePath);
 }
 
-bool Emulator::validateRom(const fs::path& theRomPath) const {
+bool Emulator::validateRom(const fs::path& theRomPath, const fs::path& theBasePath) const {
     std::string rom_name = theRomPath.stem();
 
     std::vector<RomPart> parts = getRomParts(rom_name); //asking the database for all the different parts of a rom
@@ -31,6 +31,10 @@ bool Emulator::validateRom(const fs::path& theRomPath) const {
         fs::path path_rom_to_merge = theRomPath;
         path_rom_to_merge.replace_filename(rom_to_merge+".zip");
         if( mz_zip_reader_init_file(&merged_zip, path_rom_to_merge.string().c_str(), 0) ) rom_to_merge_found = true;
+        else { //we check in the additional specified path as a last resort
+            path_rom_to_merge = theBasePath / (rom_to_merge + ".zip");
+            if( mz_zip_reader_init_file(&merged_zip, path_rom_to_merge.string().c_str(), 0) ) rom_to_merge_found = true;
+        }
     }
 
     for(unsigned int i = 0; i < parts.size(); i++) { //we check, for every part of the rom, if it exists in the rom or in its parent

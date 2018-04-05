@@ -11,7 +11,7 @@ class AdvMAME : public Emulator {
         fs::path configuration_file_path;
 
         //functions
-        virtual Result runEffectively(const fs::path& theRomPath) const;
+        virtual Result runEffectively(const fs::path& theRomPath, const fs::path& theBasePath) const;
 
     public:
         //ctor
