@@ -1,0 +1,6 @@
+build*
+TODO.txt
+.vscode
+pythonenv
+CMakeUserPresets.json
+TODO.md

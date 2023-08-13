@@ -1,0 +1,14 @@
+# spdlog
+find_package(spdlog 1.12.0 REQUIRED)
+
+# magic_enum
+find_package(magic_enum 0.9.3 REQUIRED)
+
+# sfml
+find_package(
+  SFML 2.6.0
+  COMPONENTS graphic window system
+  REQUIRED)
+
+# rocket
+find_package(rocket 2.0 REQUIRED)

@@ -1,0 +1,5 @@
+[settings]
+build_type=Release
+
+[buildenv]
+SPDLOG_LEVEL=info

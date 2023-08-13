@@ -1,0 +1,6 @@
+[tool_requires]
+cmake/3.27.0
+
+[conf]
+tools.system.package_manager:mode=install
+tools.system.package_manager:sudo=True

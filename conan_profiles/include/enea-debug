@@ -1,0 +1,5 @@
+[settings]
+build_type=Debug
+
+[buildenv]
+SPDLOG_LEVEL=trace
