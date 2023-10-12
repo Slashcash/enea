@@ -5,8 +5,8 @@
 #include <list>
 #include <optional>
 #include <system_error>
-#include <variant>
-#include <vector>
+
+#include <rocket.hpp>
 
 class Rom;
 
@@ -29,9 +29,11 @@ class RomSource
 
     [[nodiscard]] std::filesystem::path path() const;
 
-    [[nodiscard]] std::variant<std::vector<Rom>, Error> scan() const;
+    [[nodiscard]] std::optional<Error> monitor() const;
 
     virtual ~RomSource() = default;
+
+    rocket::signal<void(const Rom& rom)> romAdded;
 };
 
 #endif // ROMSOURCE_HPP

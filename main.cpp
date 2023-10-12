@@ -31,31 +31,16 @@ int main()
     auto romPath = Configuration::get().romDirectory();
     spdlog::info("Scanning for roms in: {}", romPath.string());
     RomSource romSource(romPath);
-
-    // Scan succesful
     std::vector<Rom> romList;
-    if (auto scanResult = romSource.scan(); std::holds_alternative<std::vector<Rom>>(scanResult))
+    romSource.romAdded.connect([&romList](const Rom& rom) {
+        spdlog::debug("Found rom: {}", rom.name());
+        romList.push_back(rom);
+    });
+
+    // Scanning rom folder failed
+    if (auto monitorError = romSource.monitor(); monitorError.has_value())
     {
-        romList = std::get<std::vector<Rom>>(scanResult);
-
-        if (romList.empty())
-        {
-            spdlog::warn("Scan successful but folder is empty");
-        }
-
-        else
-        {
-            for (const auto& rom : romList)
-            {
-                spdlog::debug("Found rom: {}", rom.name());
-            }
-        }
-    }
-
-    // Scan failed
-    else
-    {
-        spdlog::error("Scanning folder failed: {}", magic_enum::enum_name(std::get<RomSource::Error>(scanResult)));
+        spdlog::error("Scanning folder failed: {}", magic_enum::enum_name(monitorError.value()));
         return 1;
     }
 

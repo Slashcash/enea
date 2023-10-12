@@ -36,26 +36,24 @@ std::filesystem::path RomSource::path() const
     return mPath;
 }
 
-std::variant<std::vector<Rom>, RomSource::Error> RomSource::scan() const
+std::optional<RomSource::Error> RomSource::monitor() const
 {
-    std::vector<Rom> result;
 
     if (folderExists(mPath).has_value())
     {
         return Error::DIRECTORY_NOT_EXISTING;
     }
 
-    auto paths = scanFolder(mPath);
-    for (const auto path : paths)
+    for (auto paths = scanFolder(mPath); const auto& path : paths)
     {
         std::error_code ec;
         auto absolutePath = std::filesystem::absolute(path);
 
         if (!ec)
         {
-            result.emplace_back(Rom(absolutePath));
+            romAdded(Rom(absolutePath));
         }
     }
 
-    return result;
+    return std::nullopt;
 }

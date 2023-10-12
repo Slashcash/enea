@@ -21,11 +21,10 @@ TEST(romsource, scan)
     EXPECT_CALL(romSource, folderExists(ROM_FOLDER)).WillOnce(testing::Return(std::nullopt));
     EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
 
-    auto error = romSource.scan();
-    ASSERT_TRUE(std::holds_alternative<std::vector<Rom>>(error));
-    auto romList = std::get<std::vector<Rom>>(error);
-    ASSERT_EQ(romList.size(), folderMock.size());
-    EXPECT_EQ(romList.begin()->path(), ROM_PATH);
+    romSource.romAdded.connect([](const Rom& rom) { EXPECT_EQ(rom.path(), ROM_PATH); });
+
+    auto error = romSource.monitor();
+    EXPECT_FALSE(error.has_value());
 }
 
 TEST(romsource, scan_nonExistantFolder)
@@ -34,7 +33,7 @@ TEST(romsource, scan_nonExistantFolder)
     RomSourceMock romSource(ROM_FOLDER);
     EXPECT_CALL(romSource, folderExists(ROM_FOLDER)).WillOnce(testing::Return(std::error_code()));
 
-    auto error = romSource.scan();
-    ASSERT_TRUE(std::holds_alternative<RomSourceMock::Error>(error));
-    EXPECT_EQ(std::get<RomSourceMock::Error>(error), RomSourceMock::Error::DIRECTORY_NOT_EXISTING);
+    auto error = romSource.monitor();
+    ASSERT_TRUE(error.has_value());
+    EXPECT_EQ(error.value(), RomSourceMock::Error::DIRECTORY_NOT_EXISTING);
 }
