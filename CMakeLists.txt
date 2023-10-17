@@ -34,6 +34,7 @@ target_link_libraries(
          sfml-window
          sfml-graphics
          rocket::rocket
+         nlohmann_json::nlohmann_json
          ${RESOURCE_LIBRARY})
 
 add_executable(${EXECUTABLE} main.cpp)
