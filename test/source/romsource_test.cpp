@@ -2,38 +2,42 @@
 
 #include "rom.hpp"
 
-static const std::filesystem::path ROM_FOLDER = "/home";
-static const std::filesystem::path ROM_NAME = "sf2.zip";
-static const std::filesystem::path ROM_PATH = ROM_FOLDER / ROM_NAME;
-
-TEST(romsource, path)
+class RomSourceFixture : public ::testing::Test
 {
-    RomSourceMock romSource(ROM_FOLDER);
+ protected:
+    RomSourceMock romSource{ROM_FOLDER};
+
+    static const std::filesystem::path ROM_FOLDER;
+    static const std::string ROM_NAME;
+    static const std::filesystem::path ROM_PATH;
+};
+
+const std::filesystem::path RomSourceFixture::ROM_FOLDER = "/home";
+const std::string RomSourceFixture::ROM_NAME = "sf2.zip";
+const std::filesystem::path RomSourceFixture::ROM_PATH = RomSourceFixture::ROM_FOLDER / RomSourceFixture::ROM_NAME;
+
+TEST_F(RomSourceFixture, path)
+{
     EXPECT_EQ(romSource.path(), ROM_FOLDER);
 }
 
-TEST(romsource, scan)
+TEST_F(RomSourceFixture, monitor)
 {
     std::list<std::filesystem::path> folderMock;
     folderMock.push_back(ROM_PATH);
 
-    RomSourceMock romSource(ROM_FOLDER);
-    EXPECT_CALL(romSource, folderExists(ROM_FOLDER)).WillOnce(testing::Return(std::nullopt));
     EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
+    EXPECT_CALL(romSource, addRom(::testing::_)).WillOnce(testing::Return());
 
-    romSource.romAdded.connect([](const Rom& rom) { EXPECT_EQ(rom.path(), ROM_PATH); });
-
-    auto error = romSource.monitor();
-    EXPECT_FALSE(error.has_value());
+    auto monitorError = romSource.monitor();
+    EXPECT_FALSE(monitorError.has_value());
 }
 
-TEST(romsource, scan_nonExistantFolder)
+TEST_F(RomSourceFixture, monitorNonExistantFolder)
 {
-    // Scanning a non existant folder should fail
-    RomSourceMock romSource(ROM_FOLDER);
     EXPECT_CALL(romSource, folderExists(ROM_FOLDER)).WillOnce(testing::Return(std::error_code()));
 
-    auto error = romSource.monitor();
-    ASSERT_TRUE(error.has_value());
-    EXPECT_EQ(error.value(), RomSourceMock::Error::DIRECTORY_NOT_EXISTING);
+    auto monitorError = romSource.monitor();
+    ASSERT_TRUE(monitorError.has_value());
+    EXPECT_EQ(monitorError.value(), RomSource::Error::INVALID_PATH);
 }

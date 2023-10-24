@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <list>
 #include <optional>
+#include <stdexcept>
 #include <system_error>
 
 #include <rocket.hpp>
@@ -17,17 +18,29 @@ class RomSource
 
     [[nodiscard]] virtual std::optional<std::error_code> folderExists(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::list<std::filesystem::path> scanFolder(const std::filesystem::path& path) const;
+    inline virtual void addRom(const Rom& rom) const
+    {
+        romAdded(rom);
+    }
 
  public:
     enum class Error
     {
-        DIRECTORY_NOT_EXISTING
+        INVALID_PATH
+    };
+
+    class Exception : public std::runtime_error
+    {
+        using std::runtime_error::runtime_error;
     };
 
     RomSource() = delete;
     explicit RomSource(const std::filesystem::path& path);
 
-    [[nodiscard]] std::filesystem::path path() const;
+    [[nodiscard]] inline std::filesystem::path path() const
+    {
+        return mPath;
+    };
 
     [[nodiscard]] std::optional<Error> monitor() const;
 

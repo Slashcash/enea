@@ -4,6 +4,10 @@
 
 RomSource::RomSource(const std::filesystem::path& path) : mPath(path)
 {
+    if (mPath.is_relative())
+    {
+        throw Exception("Rom source built with relative path");
+    }
 }
 
 std::optional<std::error_code> RomSource::folderExists(const std::filesystem::path& path) const
@@ -31,28 +35,16 @@ std::list<std::filesystem::path> RomSource::scanFolder(const std::filesystem::pa
     return result;
 }
 
-std::filesystem::path RomSource::path() const
-{
-    return mPath;
-}
-
 std::optional<RomSource::Error> RomSource::monitor() const
 {
-
-    if (folderExists(mPath).has_value())
+    if (auto err = folderExists(mPath); err.has_value())
     {
-        return Error::DIRECTORY_NOT_EXISTING;
+        return Error::INVALID_PATH;
     }
 
     for (auto paths = scanFolder(mPath); const auto& path : paths)
     {
-        std::error_code ec;
-        auto absolutePath = std::filesystem::absolute(path);
-
-        if (!ec)
-        {
-            romAdded(Rom(absolutePath));
-        }
+        addRom(Rom(path));
     }
 
     return std::nullopt;

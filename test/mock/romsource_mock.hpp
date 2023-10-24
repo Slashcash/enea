@@ -5,13 +5,15 @@
 
 #include <gmock/gmock.h>
 
+#include "rom_mock.hpp"
+
 class RomSourceMock : public RomSource
 {
  public:
     using RomSource::RomSource;
-
     MOCK_METHOD(std::optional<std::error_code>, folderExists, (const std::filesystem::path& path), (const override));
     MOCK_METHOD(std::list<std::filesystem::path>, scanFolder, (const std::filesystem::path& path), (const override));
+    MOCK_METHOD(void, addRom, (const Rom& rom), (const override));
 };
 
 #endif // ROMSOURCEMOCK_HPP

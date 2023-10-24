@@ -37,11 +37,9 @@ int main()
         romList.push_back(rom);
     });
 
-    // Scanning rom folder failed
-    if (auto monitorError = romSource.monitor(); monitorError.has_value())
+    if (auto ec = romSource.monitor(); ec.has_value())
     {
-        spdlog::error("Scanning folder failed: {}", magic_enum::enum_name(monitorError.value()));
-        return 1;
+        spdlog::error("Error while scanning rom in {} Err: {}", romPath.string(), magic_enum::enum_name(ec.value()));
     }
 
     // Searching for a suitable video mode
