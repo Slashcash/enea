@@ -44,7 +44,14 @@ std::optional<RomSource::Error> RomSource::monitor() const
 
     for (auto paths = scanFolder(mPath); const auto& path : paths)
     {
-        addRom(Rom(path));
+        try
+        {
+            addRom(Rom(path));
+        }
+        catch ([[maybe_unused]] const Rom::Exception& e)
+        {
+            continue;
+        }
     }
 
     return std::nullopt;
