@@ -37,15 +37,15 @@ class Rom
     explicit Rom(const std::filesystem::path& path);
     explicit Rom(const nlohmann::json& j);
 
-    [[nodiscard]] inline std::filesystem::path path() const noexcept
+    [[nodiscard]] inline std::filesystem::path path() const
     {
         return mPath;
     }
-    [[nodiscard]] inline std::string fileName() const noexcept
+    [[nodiscard]] inline std::string fileName() const
     {
         return mPath.filename();
     }
-    [[nodiscard]] inline std::string name() const noexcept
+    [[nodiscard]] inline std::string name() const
     {
         return mName.has_value() ? mName.value() : mPath.stem().string();
     }
