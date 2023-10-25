@@ -109,16 +109,10 @@ int main()
     });
 
     InputManager::get().select.connect([&selected, &romList, &romPath]() {
-        std::string advMameCmd = "advmame";
-        std::string advMameRom = romList[selected].name();
-
-        std::stringstream cmd;
-        cmd << advMameCmd << " --dir_rom " << romPath << " " << advMameRom;
-
-        spdlog::info("Launching {} from {}", advMameRom, romPath.string());
-        if (auto advMameError = std::system(cmd.str().c_str()) != 0)
+        if (auto error = romList[selected].launch(); error.has_value())
         {
-            spdlog::error("AdvanceMAME failed to launch with exit code {}", advMameError);
+            spdlog::error("Failed to launch {}. Err: {}", romList[selected].name(),
+                          magic_enum::enum_name(error.value()));
         }
     });
 
