@@ -24,7 +24,8 @@ add_library(
   source/configuration.cpp
   include/configuration.hpp
   source/inputmanager.cpp
-  include/inputmanager.hpp)
+  include/inputmanager.hpp
+  include/resourcemanager.hpp)
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
 target_link_libraries(
   ${EXECUTABLE}Lib

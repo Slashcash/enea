@@ -37,10 +37,14 @@ function(add_resource)
 
   file(DOWNLOAD "${RESOURCE_URL}/${RESOURCE_NAME}"
        "${RESOURCE_DOWNLOAD_LOCATION}/${RESOURCE_NAME}")
+
+  cmake_path(GET RESOURCE_NAME PARENT_PATH PARENT)
+
   cmrc_add_resources(
-    ${RESOURCE_LIBRARY} WHENCE ${RESOURCE_DOWNLOAD_LOCATION} PREFIX
+    ${RESOURCE_LIBRARY} WHENCE ${RESOURCE_DOWNLOAD_LOCATION}/${PARENT} PREFIX
     ${RESOURCE_FOLDER} ${RESOURCE_DOWNLOAD_LOCATION}/${RESOURCE_NAME})
 endfunction()
 
 # Download resources
-add_resource(NAME "inter.ttf" FOLDER "fonts")
+add_resource(NAME "fonts/inter.ttf" FOLDER "fonts")
+add_resource(NAME "fonts/default" FOLDER "fonts")

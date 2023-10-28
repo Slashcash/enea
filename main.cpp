@@ -6,11 +6,10 @@
 
 #include "configuration.hpp"
 #include "inputmanager.hpp"
+#include "resourcemanager.hpp"
 #include "rom.hpp"
 #include "romsource.hpp"
 #include "version.hpp"
-
-CMRC_DECLARE(resources);
 
 int main()
 {
@@ -59,20 +58,17 @@ int main()
     sf::View view(sf::FloatRect(0, 0, 1920, 1080));
     window.setView(view);
 
-    // Getting font
-    auto embeddedFS = cmrc::resources::get_filesystem();
     sf::Font font;
-    cmrc::file fontFile;
     try
     {
-        fontFile = embeddedFS.open("fonts/inter.ttf");
+        FontManager fontManager;
+        font = fontManager.get("fonts/inter.ttf");
     }
-    catch (const std::system_error& exception)
+    catch (const FontManager::Exception& exception)
     {
-        spdlog::error("Loading font file failed: {}", exception.what());
+        spdlog::error("Failed to get a valid font file: {}", exception.what());
         return 1;
     }
-    font.loadFromMemory(fontFile.begin(), std::distance(fontFile.begin(), fontFile.end()));
 
     // Constructing drawable rom list
     std::vector<sf::Text> romMenu;
