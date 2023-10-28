@@ -37,6 +37,11 @@ class Rom
     explicit Rom(const std::filesystem::path& path);
     explicit Rom(const nlohmann::json& j);
 
+    [[nodiscard]] inline bool operator==(const Rom& rom) const
+    {
+        return this->mPath == rom.mPath;
+    }
+
     [[nodiscard]] inline std::filesystem::path path() const
     {
         return mPath;

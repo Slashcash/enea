@@ -7,28 +7,42 @@
 #include <stdexcept>
 #include <system_error>
 
+#include <nlohmann/json.hpp>
 #include <rocket.hpp>
 
 class Rom;
 
 class RomSource
 {
+ public:
+    enum class Error
+    {
+        INVALID_PATH,
+        INVALID_CACHE_FILE,
+        ERROR_WRITE_FILE,
+        DESYNCED_CACHE_FILE,
+        UNABLE_TO_READ_LAST_EDIT_TIME
+    };
+
  private:
     std::filesystem::path mPath;
+    nlohmann::json mCache;
 
     [[nodiscard]] virtual std::optional<std::error_code> folderExists(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::list<std::filesystem::path> scanFolder(const std::filesystem::path& path) const;
+    [[nodiscard]] virtual std::optional<std::error_code> createFolders(const std::filesystem::path& path) const;
     inline virtual void addRom(const Rom& rom) const
     {
         romAdded(rom);
     }
+    [[nodiscard]] virtual std::pair<std::optional<Error>, nlohmann::json>
+    readCache(const std::filesystem::path& path) const;
+    [[nodiscard]] virtual std::optional<Error> writeCache(const nlohmann::json& j,
+                                                          const std::filesystem::path& path) const;
+    [[nodiscard]] virtual std::pair<std::optional<Error>, std::string>
+    lastCacheModification(const std::filesystem::path& path) const;
 
  public:
-    enum class Error
-    {
-        INVALID_PATH
-    };
-
     class Exception : public std::runtime_error
     {
         using std::runtime_error::runtime_error;
@@ -42,7 +56,7 @@ class RomSource
         return mPath;
     };
 
-    [[nodiscard]] std::optional<Error> monitor() const;
+    [[nodiscard]] std::optional<Error> monitor();
 
     virtual ~RomSource() = default;
 

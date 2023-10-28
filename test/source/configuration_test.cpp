@@ -15,6 +15,14 @@ TEST(configuration, romDirectory)
     EXPECT_EQ(config.romDirectory(), home / ("." + static_cast<std::string>(executableName)) / "roms");
 }
 
+TEST(configuration, cacheDirectory)
+{
+    ConfigurationMock config;
+    EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
+
+    EXPECT_EQ(config.cacheDirectory(), home / ("." + static_cast<std::string>(executableName)) / "cache");
+}
+
 TEST(configuration, romDirectory_noHomeEnv)
 {
     ConfigurationMock config;

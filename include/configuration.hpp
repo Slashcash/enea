@@ -14,6 +14,7 @@ class Configuration
     };
 
     [[nodiscard]] std::filesystem::path romDirectory() const;
+    [[nodiscard]] std::filesystem::path cacheDirectory() const;
 
     [[nodiscard]] inline static Configuration& get()
     {

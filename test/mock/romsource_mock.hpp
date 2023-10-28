@@ -14,6 +14,12 @@ class RomSourceMock : public RomSource
     MOCK_METHOD(std::optional<std::error_code>, folderExists, (const std::filesystem::path& path), (const override));
     MOCK_METHOD(std::list<std::filesystem::path>, scanFolder, (const std::filesystem::path& path), (const override));
     MOCK_METHOD(void, addRom, (const Rom& rom), (const override));
+    MOCK_METHOD((std::pair<std::optional<RomSource::Error>, nlohmann::json>), readCache,
+                (const std::filesystem::path& path), (const override));
+    MOCK_METHOD(std::optional<RomSource::Error>, writeCache,
+                (const nlohmann::json& j, const std::filesystem::path& path), (const override));
+    MOCK_METHOD((std::pair<std::optional<RomSource::Error>, std::string>), lastCacheModification,
+                (const std::filesystem::path& path), (const override));
 };
 
 #endif // ROMSOURCEMOCK_HPP

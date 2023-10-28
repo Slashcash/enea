@@ -43,3 +43,8 @@ std::filesystem::path Configuration::romDirectory() const
 {
     return baseDirectory() / "roms";
 }
+
+std::filesystem::path Configuration::cacheDirectory() const
+{
+    return baseDirectory() / "cache";
+}
