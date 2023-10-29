@@ -71,3 +71,17 @@ TEST_F(RomSourceFixture, monitorNonExistantFolder)
     ASSERT_TRUE(monitorError.has_value());
     EXPECT_EQ(monitorError.value(), RomSource::Error::INVALID_PATH);
 }
+
+TEST_F(RomSourceFixture, alreadyMonitoring)
+{
+    EXPECT_CALL(romSource, readCache(CACHE_FOLDER))
+        .WillOnce(testing::Return(std::make_pair(RomSourceMock::Error::INVALID_CACHE_FILE, "")));
+    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
+
+    auto monitorError = romSource.monitor();
+    EXPECT_FALSE(monitorError.has_value());
+
+    monitorError = romSource.monitor();
+    ASSERT_TRUE(monitorError.has_value());
+    EXPECT_EQ(monitorError.value(), RomSource::Error::ALREADY_MONITORED);
+}

@@ -21,12 +21,14 @@ class RomSource
         INVALID_CACHE_FILE,
         ERROR_WRITE_FILE,
         DESYNCED_CACHE_FILE,
-        UNABLE_TO_READ_LAST_EDIT_TIME
+        UNABLE_TO_READ_LAST_EDIT_TIME,
+        ALREADY_MONITORED
     };
 
  private:
     std::filesystem::path mPath;
     nlohmann::json mCache;
+    bool mMonitored = false;
 
     [[nodiscard]] virtual std::optional<std::error_code> folderExists(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::list<std::filesystem::path> scanFolder(const std::filesystem::path& path) const;

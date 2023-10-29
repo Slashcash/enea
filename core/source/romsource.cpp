@@ -49,6 +49,11 @@ std::optional<RomSource::Error> RomSource::monitor()
         return Error::INVALID_PATH;
     }
 
+    if (mMonitored)
+    {
+        return Error::ALREADY_MONITORED;
+    }
+
     // Looking for a cache instead of scanning the folder
     auto cacheDir = Configuration::get().cacheDirectory() / std::to_string(std::filesystem::hash_value(mPath));
     auto cacheFile = cacheDir / "cache.json";
@@ -89,22 +94,26 @@ std::optional<RomSource::Error> RomSource::monitor()
         mCache["roms"] = romArray;
 
         // Reading folder last modified time, if we fail we do not write the cache file
-        auto [lastModifiedError, lastModified] = lastCacheModification(mPath);
-        if (lastModifiedError.has_value())
+        bool toWrite = true;
+        if (auto [lastModifiedError, lastModified] = lastCacheModification(mPath); lastModifiedError.has_value())
         {
             spdlog::warn("Failed to create cache file at {}, Error: {}", cacheFile.string(),
                          magic_enum::enum_name(lastModifiedError.value()));
 
-            return std::nullopt;
+            toWrite = false;
         }
-        mCache["lastModified"] = lastModified;
-
-        if (auto writeError = writeCache(mCache, cacheFile); writeError.has_value())
+        else
         {
-            spdlog::warn("Failed to create cache file at {}, Error: {}", cacheFile.string(),
-                         magic_enum::enum_name(writeError.value()));
+            mCache["lastModified"] = lastModified;
+        }
 
-            return std::nullopt;
+        if (toWrite)
+        {
+            if (auto writeError = writeCache(mCache, cacheFile); writeError.has_value())
+            {
+                spdlog::warn("Failed to create cache file at {}, Error: {}", cacheFile.string(),
+                             magic_enum::enum_name(writeError.value()));
+            }
         }
     }
 
@@ -118,6 +127,7 @@ std::optional<RomSource::Error> RomSource::monitor()
         }
     }
 
+    mMonitored = true;
     return std::nullopt;
 }
 
