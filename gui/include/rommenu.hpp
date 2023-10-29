@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <SFML/Graphics/Drawable.hpp>
-#include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/RenderStates.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 
@@ -24,7 +23,6 @@ class RomMenu : public sf::Drawable, public sf::Transformable
     mutable std::mutex mMutex;
     unsigned int mSelected = 0;
     std::vector<Rom> mRomList; // ACCESS TO THIS SHOULD BE THREAD SAFE
-    sf::Font mFont;
     rocket::connection mAddedConnection;
     rocket::connection mDeletedConnection;
 
@@ -34,7 +32,7 @@ class RomMenu : public sf::Drawable, public sf::Transformable
 
  public:
     RomMenu() = delete;
-    explicit RomMenu(RomSource& romSource, const sf::Font& font);
+    explicit RomMenu(RomSource& romSource);
 
     [[nodiscard]] std::optional<Rom> selectedRom() const;
     [[nodiscard]] inline bool selectedUp()

@@ -50,9 +50,7 @@ int main()
     window.setView(view);
 
     // Constructing drawable rom list
-    FontManager fontManager;
-    auto font = fontManager.get("fonts/inter.ttf");
-    RomMenu romMenu(romSource, font);
+    RomMenu romMenu(romSource);
     romMenu.setPosition(view.getSize().x / 5, view.getSize().y / 6);
 
     // Scanning rom folder
@@ -65,7 +63,8 @@ int main()
     }
 
     // Constructing project name and version
-    sf::Text versionText(std::string(projectName) + std::string(" v") + std::string(projectVersion), font, 16);
+    sf::Text versionText(std::string(projectName) + std::string(" v") + std::string(projectVersion),
+                         FontManager::get().getResource("fonts/inter.ttf"), 16);
     constexpr unsigned int versionSpacing = 20;
     versionText.setFillColor(sf::Color::Red);
     versionText.setOrigin(versionText.getGlobalBounds().getSize().x, versionText.getGlobalBounds().getSize().y);

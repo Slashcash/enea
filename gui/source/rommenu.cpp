@@ -14,9 +14,10 @@
 #include <SFML/System/String.hpp>
 #include <SFML/System/Vector2.hpp>
 
+#include "resourcemanager.hpp"
 #include "romsource.hpp"
 
-RomMenu::RomMenu(RomSource& romSource, const sf::Font& font) : mFont(font)
+RomMenu::RomMenu(RomSource& romSource)
 {
     mAddedConnection = romSource.romAdded.connect([this](const Rom& rom) { romAdded(rom); });
     mDeletedConnection = romSource.romDeleted.connect([this](const Rom& rom) { romDeleted(rom); });
@@ -48,10 +49,11 @@ void RomMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
             std::min(static_cast<std::size_t>((mSelected / menuRows) * menuRows + menuRows), mRomList.size());
 
         std::vector<sf::Text> textVector;
+        auto font = FontManager::get().getResource("fonts/inter.ttf");
         for (unsigned int i = start; i < stop; i++)
         {
             // Set text, font and size
-            sf::Text text(mRomList[i].name(), mFont, 36);
+            sf::Text text(mRomList[i].name(), font, 36);
 
             // Set color
             i == mSelected ? text.setFillColor(sf::Color::White) : text.setFillColor(sf::Color::Red);

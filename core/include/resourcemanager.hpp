@@ -24,6 +24,9 @@ template <Loadable T> class ResourceManager
  private:
     std::map<const std::filesystem::path, const T> mResourceMap;
 
+    ResourceManager() = default;
+    ~ResourceManager() = default;
+
     [[nodiscard]] inline const T& loadFromFile(const std::filesystem::path& path)
     {
         auto embeddedFS = cmrc::resources::get_filesystem();
@@ -51,7 +54,13 @@ template <Loadable T> class ResourceManager
         using std::runtime_error::runtime_error;
     };
 
-    [[nodiscard]] inline const T& get(const std::filesystem::path& path)
+    [[nodiscard]] inline static ResourceManager& get()
+    {
+        static ResourceManager manager;
+        return manager;
+    }
+
+    [[nodiscard]] inline const T& getResource(const std::filesystem::path& path)
     {
         // Searching for resource in cache
         if (auto resourceInMap = mResourceMap.find(path); resourceInMap != mResourceMap.end())

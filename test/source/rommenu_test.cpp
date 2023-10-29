@@ -8,7 +8,7 @@ class RomMenuFixture : public ::testing::Test
     RomMenu romMenu;
     std::list<std::filesystem::path> folderMock;
 
-    inline RomMenuFixture() : romSource(ROM_FOLDER), romMenu(romSource, sf::Font())
+    inline RomMenuFixture() : romSource(ROM_FOLDER), romMenu(romSource)
     {
         folderMock.push_back(ROM_PATH1);
         folderMock.push_back(ROM_PATH2);
