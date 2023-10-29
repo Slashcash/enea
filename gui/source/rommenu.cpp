@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <ext/alloc_traits.h>
 #include <filesystem>
+#include <list>
 #include <memory>
 
 #include <SFML/Graphics/Color.hpp>
@@ -21,6 +22,12 @@ RomMenu::RomMenu(RomSource& romSource)
 {
     mAddedConnection = romSource.romAdded.connect([this](const Rom& rom) { romAdded(rom); });
     mDeletedConnection = romSource.romDeleted.connect([this](const Rom& rom) { romDeleted(rom); });
+
+    auto romList = romSource.romList();
+    for (const auto& rom : romList)
+    {
+        mRomList.push_back(rom);
+    }
 }
 
 bool RomMenu::setSelected(const unsigned int selected)

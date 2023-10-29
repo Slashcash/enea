@@ -53,6 +53,9 @@ TEST_F(RomSourceFixture, monitorWithoutCache)
 
     auto monitorError = romSource.monitor();
     EXPECT_FALSE(monitorError.has_value());
+    auto romList = romSource.romList();
+    ASSERT_FALSE(romList.empty());
+    ASSERT_EQ(*(romList.begin()), Rom(ROM_PATH));
 }
 
 TEST_F(RomSourceFixture, monitorWithCache)
@@ -61,6 +64,9 @@ TEST_F(RomSourceFixture, monitorWithCache)
 
     auto monitorError = romSource.monitor();
     EXPECT_FALSE(monitorError.has_value());
+    auto romList = romSource.romList();
+    ASSERT_FALSE(romList.empty());
+    ASSERT_EQ(*(romList.begin()), Rom(ROM_PATH));
 }
 
 TEST_F(RomSourceFixture, monitorNonExistantFolder)
@@ -70,6 +76,8 @@ TEST_F(RomSourceFixture, monitorNonExistantFolder)
     auto monitorError = romSource.monitor();
     ASSERT_TRUE(monitorError.has_value());
     EXPECT_EQ(monitorError.value(), RomSource::Error::INVALID_PATH);
+    auto romList = romSource.romList();
+    EXPECT_TRUE(romList.empty());
 }
 
 TEST_F(RomSourceFixture, alreadyMonitoring)

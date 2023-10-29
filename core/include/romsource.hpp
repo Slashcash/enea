@@ -27,7 +27,7 @@ class RomSource
 
  private:
     std::filesystem::path mPath;
-    nlohmann::json mCache;
+    std::list<Rom> mRoms;
     bool mMonitored = false;
 
     [[nodiscard]] virtual std::optional<std::error_code> folderExists(const std::filesystem::path& path) const;
@@ -52,6 +52,11 @@ class RomSource
     [[nodiscard]] inline std::filesystem::path path() const
     {
         return mPath;
+    };
+
+    [[nodiscard]] inline std::list<Rom> romList() const
+    {
+        return mRoms;
     };
 
     [[nodiscard]] std::optional<Error> monitor();

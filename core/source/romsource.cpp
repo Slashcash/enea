@@ -78,8 +78,9 @@ std::optional<RomSource::Error> RomSource::monitor()
             try
             {
                 Rom rom{path};
-                romAdded(rom);
+                mRoms.push_back(rom);
                 romArray.push_back(rom);
+                romAdded(rom);
             }
             catch ([[maybe_unused]] const Rom::Exception& e)
             {
@@ -88,10 +89,10 @@ std::optional<RomSource::Error> RomSource::monitor()
         }
 
         // Creating cache
-        mCache.clear();
-        mCache["path"] = mPath.string();
-        mCache["version"] = projectVersion;
-        mCache["roms"] = romArray;
+        nlohmann::json cache;
+        cache["path"] = mPath.string();
+        cache["version"] = projectVersion;
+        cache["roms"] = romArray;
 
         // Reading folder last modified time, if we fail we do not write the cache file
         bool toWrite = true;
@@ -104,12 +105,12 @@ std::optional<RomSource::Error> RomSource::monitor()
         }
         else
         {
-            mCache["lastModified"] = lastModified;
+            cache["lastModified"] = lastModified;
         }
 
         if (toWrite)
         {
-            if (auto writeError = writeCache(mCache, cacheFile); writeError.has_value())
+            if (auto writeError = writeCache(cache, cacheFile); writeError.has_value())
             {
                 spdlog::warn("Failed to create cache file at {}, Error: {}", cacheFile.string(),
                              magic_enum::enum_name(writeError.value()));
@@ -123,7 +124,9 @@ std::optional<RomSource::Error> RomSource::monitor()
         auto roms = result["roms"];
         for (const auto& rom : roms)
         {
-            romAdded(Rom{rom});
+            Rom add{rom};
+            mRoms.push_back(add);
+            romAdded(add);
         }
     }
 
@@ -226,11 +229,8 @@ RomSource::lastCacheModification(const std::filesystem::path& path) const
 
 RomSource::~RomSource()
 {
-    if (auto roms = mCache.find("roms"); roms != mCache.end())
+    for (const auto& rom : mRoms)
     {
-        for (const auto& rom : *roms)
-        {
-            romDeleted(Rom(rom));
-        }
+        romDeleted(rom);
     }
 }
