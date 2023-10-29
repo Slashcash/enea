@@ -38,7 +38,8 @@ int main()
 
     if (auto ec = romSource.monitor(); ec.has_value())
     {
-        spdlog::error("Error while scanning rom in {} Err: {}", romPath.string(), magic_enum::enum_name(ec.value()));
+        spdlog::error("Error while scanning rom in {} Error: {}", romPath.string(), magic_enum::enum_name(ec.value()));
+        return 1;
     }
 
     // Searching for a suitable video mode
