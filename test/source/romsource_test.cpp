@@ -47,7 +47,6 @@ TEST_F(RomSourceFixture, monitorWithoutCache)
     EXPECT_CALL(romSource, readCache(CACHE_FOLDER))
         .WillOnce(testing::Return(std::make_pair(RomSourceMock::Error::INVALID_CACHE_FILE, "")));
     EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
-    EXPECT_CALL(romSource, addRom(Rom(ROM_PATH))).WillOnce(testing::Return());
     EXPECT_CALL(romSource, writeCache(readJson, CACHE_FOLDER)).WillOnce(testing::Return(std::nullopt));
     EXPECT_CALL(romSource, lastCacheModification(ROM_FOLDER))
         .WillOnce(testing::Return(std::make_pair(std::nullopt, CACHE_MODIFIED_TIME)));
@@ -59,7 +58,6 @@ TEST_F(RomSourceFixture, monitorWithoutCache)
 TEST_F(RomSourceFixture, monitorWithCache)
 {
     EXPECT_CALL(romSource, readCache(CACHE_FOLDER)).WillOnce(testing::Return(std::make_pair(std::nullopt, readJson)));
-    EXPECT_CALL(romSource, addRom(Rom(ROM_PATH))).WillOnce(testing::Return());
 
     auto monitorError = romSource.monitor();
     EXPECT_FALSE(monitorError.has_value());

@@ -31,10 +31,6 @@ class RomSource
     [[nodiscard]] virtual std::optional<std::error_code> folderExists(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::list<std::filesystem::path> scanFolder(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::optional<std::error_code> createFolders(const std::filesystem::path& path) const;
-    inline virtual void addRom(const Rom& rom) const
-    {
-        romAdded(rom);
-    }
     [[nodiscard]] virtual std::pair<std::optional<Error>, nlohmann::json>
     readCache(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::optional<Error> writeCache(const nlohmann::json& j,
@@ -58,9 +54,10 @@ class RomSource
 
     [[nodiscard]] std::optional<Error> monitor();
 
-    virtual ~RomSource() = default;
+    virtual ~RomSource();
 
     rocket::signal<void(const Rom& rom)> romAdded;
+    rocket::signal<void(const Rom& rom)> romDeleted;
 };
 
 #endif // ROMSOURCE_HPP

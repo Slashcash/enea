@@ -11,10 +11,11 @@ add_executable(
   source/configuration_test.cpp
   mock/configuration_mock.hpp
   source/inputmanager_test.cpp
-  mock/inputmanager_mock.hpp)
+  mock/inputmanager_mock.hpp
+  source/rommenu_test.cpp)
 
 target_link_libraries(${EXECUTABLE}Test GTest::gtest_main GTest::gmock
-                      ${EXECUTABLE}Lib)
+                      ${EXECUTABLE}Lib ${EXECUTABLE}Gui)
 target_include_directories(${EXECUTABLE}Test PRIVATE mock)
 include(GoogleTest)
 gtest_discover_tests(${EXECUTABLE}Test)

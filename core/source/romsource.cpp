@@ -73,7 +73,7 @@ std::optional<RomSource::Error> RomSource::monitor()
             try
             {
                 Rom rom{path};
-                addRom(rom);
+                romAdded(rom);
                 romArray.push_back(rom);
             }
             catch ([[maybe_unused]] const Rom::Exception& e)
@@ -114,7 +114,7 @@ std::optional<RomSource::Error> RomSource::monitor()
         auto roms = result["roms"];
         for (const auto& rom : roms)
         {
-            addRom(Rom{rom});
+            romAdded(Rom{rom});
         }
     }
 
@@ -212,4 +212,15 @@ RomSource::lastCacheModification(const std::filesystem::path& path) const
     timess << std::put_time(gmt, "%Y-%m-%d %H:%M:%S");
 
     return std::make_pair(std::nullopt, timess.str());
+}
+
+RomSource::~RomSource()
+{
+    if (auto roms = mCache.find("roms"); roms != mCache.end())
+    {
+        for (const auto& rom : *roms)
+        {
+            romDeleted(Rom(rom));
+        }
+    }
 }

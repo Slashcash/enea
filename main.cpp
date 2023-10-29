@@ -8,6 +8,7 @@
 #include "inputmanager.hpp"
 #include "resourcemanager.hpp"
 #include "rom.hpp"
+#include "rommenu.hpp"
 #include "romsource.hpp"
 #include "version.hpp"
 
@@ -26,21 +27,10 @@ int main()
         return 1;
     }
 
-    // Scanning rom folder
+    // Constructing rom source
     auto romPath = Configuration::get().romDirectory();
-    spdlog::info("Scanning for roms in: {}", romPath.string());
     RomSource romSource(romPath);
-    std::vector<Rom> romList;
-    romSource.romAdded.connect([&romList](const Rom& rom) {
-        spdlog::debug("Found rom: {}", rom.name());
-        romList.push_back(rom);
-    });
-
-    if (auto ec = romSource.monitor(); ec.has_value())
-    {
-        spdlog::error("Error while scanning rom in {} Error: {}", romPath.string(), magic_enum::enum_name(ec.value()));
-        return 1;
-    }
+    romSource.romAdded.connect([](const Rom& rom) { spdlog::debug("Found rom: {}", rom.name()); });
 
     // Searching for a suitable video mode
     auto availableVideoModes = sf::VideoMode::getFullscreenModes();
@@ -59,30 +49,19 @@ int main()
     sf::View view(sf::FloatRect(0, 0, 1920, 1080));
     window.setView(view);
 
-    sf::Font font;
-    try
-    {
-        FontManager fontManager;
-        font = fontManager.get("fonts/inter.ttf");
-    }
-    catch (const FontManager::Exception& exception)
-    {
-        spdlog::error("Failed to get a valid font file: {}", exception.what());
-        return 1;
-    }
-
     // Constructing drawable rom list
-    std::vector<sf::Text> romMenu;
-    unsigned int selected = 0;
-    for (const auto& rom : romList)
+    FontManager fontManager;
+    auto font = fontManager.get("fonts/inter.ttf");
+    RomMenu romMenu(romSource, font);
+    romMenu.setPosition(view.getSize().x / 5, view.getSize().y / 6);
+
+    // Scanning rom folder
+    spdlog::info("Scanning for roms in: {}", romPath.string());
+
+    if (auto ec = romSource.monitor(); ec.has_value())
     {
-        auto& text = romMenu.emplace_back(rom.name(), font, 36);
-        text.setFillColor(sf::Color::Red);
-        text.setOrigin(text.getGlobalBounds().width / 2, 0);
-    }
-    if (!romMenu.empty())
-    {
-        romMenu.begin()->setFillColor(sf::Color::White);
+        spdlog::error("Error while scanning rom in {} Error: {}", romPath.string(), magic_enum::enum_name(ec.value()));
+        return 1;
     }
 
     // Constructing project name and version
@@ -94,22 +73,16 @@ int main()
 
     // Connecting signals
     InputManager::get().closeWindow.connect([&window]() { window.close(); });
-
-    InputManager::get().goUp.connect([&selected]() {
-        if (selected != 0)
-            selected--;
-    });
-
-    InputManager::get().goDown.connect([&selected, &romMenu]() {
-        if (selected < romMenu.size() - 1)
-            selected++;
-    });
-
-    InputManager::get().select.connect([&selected, &romList, &romPath]() {
-        if (auto error = romList[selected].launch(); error.has_value())
+    InputManager::get().goUp.connect([&romMenu]() { [[maybe_unused]] auto result = romMenu.selectedUp(); });
+    InputManager::get().goDown.connect([&romMenu]() { [[maybe_unused]] auto result = romMenu.selectedDown(); });
+    InputManager::get().select.connect([&romMenu]() {
+        if (auto rom = romMenu.selectedRom(); rom.has_value())
         {
-            spdlog::error("Failed to launch {}. Err: {}", romList[selected].name(),
-                          magic_enum::enum_name(error.value()));
+            if (auto error = rom.value().launch(); error.has_value())
+            {
+                spdlog::error("Failed to launch {}. Error: {}", rom.value().name(),
+                              magic_enum::enum_name(error.value()));
+            }
         }
     });
 
@@ -119,19 +92,7 @@ int main()
 
         window.clear();
 
-        constexpr unsigned int menuRows = 15;
-        constexpr unsigned int spacing = 16;
-        const float topSpacing = view.getSize().y / 5;
-        for (unsigned int i = (selected / menuRows) * menuRows;
-             i < std::min(static_cast<std::size_t>((selected / menuRows) * menuRows + menuRows), romMenu.size()); i++)
-        {
-            auto yOffset = i % menuRows == 0
-                               ? topSpacing
-                               : romMenu[i - 1].getPosition().y + romMenu[i - 1].getGlobalBounds().height + spacing;
-            romMenu[i].setPosition(view.getSize().x / 2, yOffset);
-            i == selected ? romMenu[i].setFillColor(sf::Color::White) : romMenu[i].setFillColor(sf::Color::Red);
-            window.draw(romMenu[i]);
-        }
+        window.draw(romMenu);
         window.draw(versionText);
 
         window.display();
