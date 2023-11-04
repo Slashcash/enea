@@ -83,6 +83,12 @@ int main()
     versionText.setOrigin(versionText.getGlobalBounds().getSize().x, versionText.getGlobalBounds().getSize().y);
     versionText.setPosition(view.getSize().x - versionSpacing, view.getSize().y - versionSpacing);
 
+    // Constructing "No Rom Found" text
+    sf::Text noRomText("No rom found", FontManager::get().getResource("fonts/inter.ttf"), 24);
+    noRomText.setFillColor(sf::Color::Red);
+    noRomText.setOrigin(noRomText.getGlobalBounds().getSize().x / 2, noRomText.getGlobalBounds().getSize().y / 2);
+    noRomText.setPosition(view.getSize().x / 2, view.getSize().y / 2);
+
     // Connecting signals
     InputManager::get().closeWindow.connect([&window]() { window.close(); });
     InputManager::get().goUp.connect([&romMenu]() { [[maybe_unused]] auto result = romMenu.selectedUp(); });
@@ -104,9 +110,17 @@ int main()
 
         window.clear();
 
-        window.draw(romMenu);
+        if (romSource.romList().empty())
+        {
+            window.draw(noRomText);
+        }
+        else
+        {
+            window.draw(romMenu);
+            window.draw(romInfo);
+        }
+
         window.draw(versionText);
-        window.draw(romInfo);
 
         window.display();
     }
