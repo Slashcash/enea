@@ -19,6 +19,7 @@ class RomSourceMock : public RomSource
                 (const nlohmann::json& j, const std::filesystem::path& path), (const override));
     MOCK_METHOD((std::pair<std::optional<RomSource::Error>, std::string>), lastCacheModification,
                 (const std::filesystem::path& path), (const override));
+    MOCK_METHOD(std::optional<std::error_code>, createFolders, (const std::filesystem::path& path), (const override));
 };
 
 #endif // ROMSOURCEMOCK_HPP
