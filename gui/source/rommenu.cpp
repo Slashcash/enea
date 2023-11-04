@@ -19,7 +19,7 @@
 #include "resourcemanager.hpp"
 #include "romsource.hpp"
 
-RomMenu::RomMenu(RomSource& romSource)
+RomMenu::RomMenu(const RomSource& romSource)
 {
     mAddedConnection = romSource.romAdded.connect([this](const Rom& rom) { romAdded(rom); });
     mDeletedConnection = romSource.romDeleted.connect([this](const Rom& rom) { romDeleted(rom); });
@@ -33,15 +33,24 @@ RomMenu::RomMenu(RomSource& romSource)
 
 bool RomMenu::setSelected(const unsigned int selected)
 {
-    std::scoped_lock lock(mMutex);
-
-    if (selected < mRomList.size())
+    bool didSelectionChange = false;
     {
-        mSelected = selected;
-        return true;
+        std::scoped_lock lock(mMutex);
+
+        if (selected < mRomList.size())
+        {
+            mSelected = selected;
+            didSelectionChange = true;
+        }
     }
 
-    return false;
+    if (didSelectionChange)
+    {
+        auto newSelection = selectedRom();
+        selectionChanged(newSelection);
+    }
+
+    return didSelectionChange;
 }
 
 void RomMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
@@ -95,6 +104,10 @@ void RomMenu::romAdded(const Rom& rom)
 {
     std::scoped_lock lock(mMutex);
     mRomList.push_back(rom);
+    if (mRomList.size() == 1)
+    {
+        selectionChanged(rom);
+    }
 }
 
 void RomMenu::romDeleted(const Rom& rom)
@@ -102,4 +115,9 @@ void RomMenu::romDeleted(const Rom& rom)
     mRomList.erase(
         std::remove_if(mRomList.begin(), mRomList.end(), [&rom](const Rom& r) { return rom.path() == r.path(); }),
         mRomList.end());
+
+    if (mSelected >= mRomList.size() - 1)
+    {
+        [[maybe_unused]] auto error = setSelected(mRomList.size() - 1);
+    }
 }

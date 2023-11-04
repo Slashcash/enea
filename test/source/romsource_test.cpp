@@ -21,6 +21,8 @@ class RomSourceFixture : public ::testing::Test
         nlohmann::json roms;
         RomDB::RomInfo info;
         info.name = "Street Fighter II - The World Warrior (World 910522)";
+        info.year = "1991";
+        info.manufacturer = "Capcom";
         roms.emplace_back(RomMock{ROM_PATH, info});
         readJson["roms"] = roms;
     }

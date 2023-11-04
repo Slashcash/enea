@@ -23,8 +23,8 @@ class RomMenu : public sf::Drawable, public sf::Transformable
     mutable std::mutex mMutex;
     unsigned int mSelected = 0;
     std::vector<Rom> mRomList; // ACCESS TO THIS SHOULD BE THREAD SAFE
-    rocket::connection mAddedConnection;
-    rocket::connection mDeletedConnection;
+    rocket::scoped_connection mAddedConnection;
+    rocket::scoped_connection mDeletedConnection;
 
     void romAdded(const Rom& rom);
     void romDeleted(const Rom& rom);
@@ -32,7 +32,7 @@ class RomMenu : public sf::Drawable, public sf::Transformable
 
  public:
     RomMenu() = delete;
-    explicit RomMenu(RomSource& romSource);
+    explicit RomMenu(const RomSource& romSource);
 
     [[nodiscard]] std::optional<Rom> selectedRom() const;
     [[nodiscard]] inline bool selectedUp()
@@ -46,11 +46,7 @@ class RomMenu : public sf::Drawable, public sf::Transformable
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override;
 
-    inline ~RomMenu() override
-    {
-        mAddedConnection.disconnect();
-        mDeletedConnection.disconnect();
-    };
+    mutable rocket::signal<void(const std::optional<Rom>& rom)> selectionChanged;
 };
 
 #endif // ROMMENU_HPP

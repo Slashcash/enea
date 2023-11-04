@@ -8,6 +8,7 @@
 #include "inputmanager.hpp"
 #include "resourcemanager.hpp"
 #include "rom.hpp"
+#include "rominfo.hpp"
 #include "rommenu.hpp"
 #include "romsource.hpp"
 #include "version.hpp"
@@ -49,10 +50,6 @@ int main()
     sf::View view(sf::FloatRect(0, 0, 1920, 1080));
     window.setView(view);
 
-    // Constructing drawable rom list
-    RomMenu romMenu(romSource);
-    romMenu.setPosition(view.getSize().x / 5, view.getSize().y / 6);
-
     // Scanning rom folder
     spdlog::info("Scanning for roms in: {}", romPath.string());
 
@@ -61,6 +58,14 @@ int main()
         spdlog::error("Error while scanning rom in {} Error: {}", romPath.string(), magic_enum::enum_name(ec.value()));
         return 1;
     }
+
+    // Constructing drawable rom list
+    RomMenu romMenu(romSource);
+    romMenu.setPosition(view.getSize().x / 7, view.getSize().y / 6);
+
+    // Constructing drawable rom info
+    RomInfo romInfo{romMenu};
+    romInfo.setPosition(view.getSize().x / 1.75f, view.getSize().y / 2.5f);
 
     // Constructing project name and version
     sf::Text versionText(std::string(projectName) + std::string(" v") + std::string(projectVersion),
@@ -93,6 +98,7 @@ int main()
 
         window.draw(romMenu);
         window.draw(versionText);
+        window.draw(romInfo);
 
         window.display();
     }

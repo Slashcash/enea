@@ -55,6 +55,14 @@ class Rom
     {
         return mRomInfo.name.has_value() ? mRomInfo.name.value() : mPath.stem().string();
     }
+    [[nodiscard]] inline std::optional<std::string> year() const
+    {
+        return mRomInfo.year;
+    }
+    [[nodiscard]] inline std::optional<std::string> manufacturer() const
+    {
+        return mRomInfo.manufacturer;
+    }
 
     inline void setRomInfo(const RomDB::RomInfo& romInfo)
     {

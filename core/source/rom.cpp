@@ -76,6 +76,14 @@ void to_json(nlohmann::json& j, const Rom& rom)
     {
         j["name"] = rom.mRomInfo.name.value();
     }
+    if (rom.mRomInfo.year.has_value())
+    {
+        j["year"] = rom.mRomInfo.year.value();
+    }
+    if (rom.mRomInfo.manufacturer.has_value())
+    {
+        j["manufacturer"] = rom.mRomInfo.manufacturer.value();
+    }
 }
 
 void from_json(const nlohmann::json& j, Rom& rom)
@@ -89,6 +97,7 @@ void from_json(const nlohmann::json& j, Rom& rom)
         throw Rom::Exception("Rom constructed from invalid json");
     }
 
+    // Finding rom name
     if (auto it = j.find("name"); it != j.end())
     {
         try
@@ -98,6 +107,32 @@ void from_json(const nlohmann::json& j, Rom& rom)
         catch (const std::exception& e)
         {
             rom.mRomInfo.name.reset();
+        }
+    }
+
+    // Finding rom year
+    if (auto it = j.find("year"); it != j.end())
+    {
+        try
+        {
+            rom.mRomInfo.year = *it;
+        }
+        catch (const std::exception& e)
+        {
+            rom.mRomInfo.year.reset();
+        }
+    }
+
+    // Finding rom manufacturer
+    if (auto it = j.find("manufacturer"); it != j.end())
+    {
+        try
+        {
+            rom.mRomInfo.manufacturer = *it;
+        }
+        catch (const std::exception& e)
+        {
+            rom.mRomInfo.manufacturer.reset();
         }
     }
 }

@@ -14,6 +14,8 @@ class RomDB
     struct RomInfo
     {
         std::optional<std::string> name;
+        std::optional<std::string> year;
+        std::optional<std::string> manufacturer;
     };
 
     enum class Error
@@ -35,7 +37,7 @@ class RomDB
 
  public:
     RomDB() = delete;
-    inline RomDB(const std::filesystem::path& path) : mPath(path){};
+    inline explicit RomDB(const std::filesystem::path& path) : mPath(path){};
 
     [[nodiscard]] std::optional<Error> load();
     [[nodiscard]] std::optional<RomInfo> find(const std::string& rom) const;

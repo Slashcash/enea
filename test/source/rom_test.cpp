@@ -16,11 +16,15 @@ class RomFixture : public ::testing::Test
     {
         RomDB::RomInfo info;
         info.name = ROM_NAME_COMPLETE;
+        info.year = ROM_YEAR;
+        info.manufacturer = ROM_MANUFACTURER;
         romFromInfo.setRomInfo(info);
     }
 
     static const std::filesystem::path ROM_FOLDER;
     static const std::string ROM_NAME;
+    static const std::string ROM_YEAR;
+    static const std::string ROM_MANUFACTURER;
     static const std::string ROM_NAME_COMPLETE;
     static const std::string ROM_EXTENSION;
     static const std::filesystem::path ROM_PATH;
@@ -30,6 +34,8 @@ class RomFixture : public ::testing::Test
 
 const std::filesystem::path RomFixture::ROM_FOLDER = "/home";
 const std::string RomFixture::ROM_NAME = "sf2";
+const std::string RomFixture::ROM_YEAR = "1991";
+const std::string RomFixture::ROM_MANUFACTURER = "Capcom";
 const std::string RomFixture::ROM_NAME_COMPLETE = "Street Fighter II";
 const std::string RomFixture::ROM_EXTENSION = ".zip";
 const std::filesystem::path RomFixture::ROM_PATH =
@@ -39,7 +45,9 @@ using namespace nlohmann::literals;
 const nlohmann::json RomFixture::COMPLETE_JSON = R"(
     {
         "path": "/sf2.zip",
-        "name": "Street Fighter II"
+        "name": "Street Fighter II",
+        "year": "1991",
+        "manufacturer": "Capcom"
     }
     )"_json;
 
@@ -71,6 +79,26 @@ TEST_F(RomFixture, name)
     EXPECT_EQ(romCompleteJson.name(), "Street Fighter II");
     EXPECT_EQ(romIncompleteJson.name(), "sf2");
     EXPECT_EQ(romFromInfo.name(), ROM_NAME_COMPLETE);
+}
+
+TEST_F(RomFixture, year)
+{
+    EXPECT_FALSE(rom.year().has_value());
+    ASSERT_TRUE(romCompleteJson.year().has_value());
+    EXPECT_EQ(romCompleteJson.year().value(), "1991");
+    EXPECT_FALSE(romIncompleteJson.year().has_value());
+    ASSERT_TRUE(romFromInfo.year().has_value());
+    EXPECT_EQ(romFromInfo.year().value(), ROM_YEAR);
+}
+
+TEST_F(RomFixture, manufacturer)
+{
+    EXPECT_FALSE(rom.manufacturer().has_value());
+    ASSERT_TRUE(romCompleteJson.manufacturer().has_value());
+    EXPECT_EQ(romCompleteJson.manufacturer().value(), "Capcom");
+    EXPECT_FALSE(romIncompleteJson.manufacturer().has_value());
+    ASSERT_TRUE(romFromInfo.manufacturer().has_value());
+    EXPECT_EQ(romFromInfo.manufacturer().value(), ROM_MANUFACTURER);
 }
 
 TEST_F(RomFixture, launch)

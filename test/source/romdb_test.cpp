@@ -71,6 +71,10 @@ TEST_F(RomDBFixture, info)
     ASSERT_TRUE(rom.has_value());
     ASSERT_TRUE(rom->name.has_value());
     EXPECT_EQ(rom->name.value(), "Street Fighter II - The World Warrior (World 910522)");
+    ASSERT_TRUE(rom->year.has_value());
+    EXPECT_EQ(rom->year.value(), "1991");
+    ASSERT_TRUE(rom->manufacturer.has_value());
+    EXPECT_EQ(rom->manufacturer.value(), "Capcom");
 }
 
 TEST_F(RomDBFixture, infoNonExistantRom)

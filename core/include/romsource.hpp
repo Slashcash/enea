@@ -63,8 +63,8 @@ class RomSource
 
     virtual ~RomSource();
 
-    rocket::signal<void(const Rom& rom)> romAdded;
-    rocket::signal<void(const Rom& rom)> romDeleted;
+    mutable rocket::signal<void(const Rom& rom)> romAdded;
+    mutable rocket::signal<void(const Rom& rom)> romDeleted;
 };
 
 #endif // ROMSOURCE_HPP

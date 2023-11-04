@@ -91,5 +91,18 @@ std::optional<RomDB::RomInfo> RomDB::find(const std::string& rom) const
         result.name = name->GetText();
     }
 
+    // Finding the rom year
+    if (auto year = info->FirstChildElement("year"); year != nullptr)
+    {
+        result.year = year->GetText();
+    }
+
+    // Finding the rom manufacturer
+    // Finding the rom year
+    if (auto manufacturer = info->FirstChildElement("manufacturer"); manufacturer != nullptr)
+    {
+        result.manufacturer = manufacturer->GetText();
+    }
+
     return result;
 }
