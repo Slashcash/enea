@@ -8,7 +8,7 @@
 #include <nlohmann/json.hpp>
 #include <sstream>
 
-Rom::Rom(const std::filesystem::path& path) : mPath(path)
+Rom::Rom(const std::filesystem::path& path, const RomDB::RomInfo& romInfo) : mPath(path), mRomInfo(romInfo)
 {
     checkPathValidity();
 }
@@ -72,9 +72,9 @@ void to_json(nlohmann::json& j, const Rom& rom)
 {
     j.clear();
     j["path"] = rom.mPath;
-    if (rom.mName.has_value())
+    if (rom.mRomInfo.name.has_value())
     {
-        j["name"] = rom.mName.value();
+        j["name"] = rom.mRomInfo.name.value();
     }
 }
 
@@ -93,11 +93,11 @@ void from_json(const nlohmann::json& j, Rom& rom)
     {
         try
         {
-            rom.mName = *it;
+            rom.mRomInfo.name = *it;
         }
         catch (const std::exception& e)
         {
-            rom.mName.reset();
+            rom.mRomInfo.name.reset();
         }
     }
 }

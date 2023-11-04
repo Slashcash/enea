@@ -6,6 +6,7 @@
 #include <filesystem>
 #include <list>
 #include <memory>
+#include <string>
 
 #include <SFML/Graphics/Color.hpp>
 #include <SFML/Graphics/Rect.hpp>
@@ -60,7 +61,9 @@ void RomMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
         for (unsigned int i = start; i < stop; i++)
         {
             // Set text, font and size
-            sf::Text text(mRomList[i].name(), font, 36);
+            auto romName = mRomList[i].name();
+            auto romNameShortened = romName.substr(0, romName.find_first_of('(')).substr(0, 25);
+            sf::Text text(romNameShortened, font, 36);
 
             // Set color
             i == mSelected ? text.setFillColor(sf::Color::White) : text.setFillColor(sf::Color::Red);

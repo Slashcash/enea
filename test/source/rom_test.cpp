@@ -10,9 +10,18 @@ class RomFixture : public ::testing::Test
     RomMock rom{ROM_PATH};
     RomMock romCompleteJson{COMPLETE_JSON};
     RomMock romIncompleteJson{INCOMPLETE_JSON};
+    RomMock romFromInfo{ROM_PATH};
+
+    inline RomFixture()
+    {
+        RomDB::RomInfo info;
+        info.name = ROM_NAME_COMPLETE;
+        romFromInfo.setRomInfo(info);
+    }
 
     static const std::filesystem::path ROM_FOLDER;
     static const std::string ROM_NAME;
+    static const std::string ROM_NAME_COMPLETE;
     static const std::string ROM_EXTENSION;
     static const std::filesystem::path ROM_PATH;
     static const nlohmann::json COMPLETE_JSON;
@@ -21,6 +30,7 @@ class RomFixture : public ::testing::Test
 
 const std::filesystem::path RomFixture::ROM_FOLDER = "/home";
 const std::string RomFixture::ROM_NAME = "sf2";
+const std::string RomFixture::ROM_NAME_COMPLETE = "Street Fighter II";
 const std::string RomFixture::ROM_EXTENSION = ".zip";
 const std::filesystem::path RomFixture::ROM_PATH =
     RomFixture::ROM_FOLDER / (RomFixture::ROM_NAME + RomFixture::ROM_EXTENSION);
@@ -44,6 +54,7 @@ TEST_F(RomFixture, path)
     EXPECT_EQ(rom.path(), ROM_PATH);
     EXPECT_EQ(romCompleteJson.path(), "/sf2.zip");
     EXPECT_EQ(romIncompleteJson.path(), "/sf2.zip");
+    EXPECT_EQ(romFromInfo.path(), ROM_PATH);
 }
 
 TEST_F(RomFixture, fileName)
@@ -51,6 +62,7 @@ TEST_F(RomFixture, fileName)
     EXPECT_EQ(rom.fileName(), ROM_NAME + ROM_EXTENSION);
     EXPECT_EQ(romCompleteJson.fileName(), "sf2.zip");
     EXPECT_EQ(romIncompleteJson.fileName(), "sf2.zip");
+    EXPECT_EQ(romFromInfo.fileName(), "sf2.zip");
 }
 
 TEST_F(RomFixture, name)
@@ -58,6 +70,7 @@ TEST_F(RomFixture, name)
     EXPECT_EQ(rom.name(), ROM_NAME);
     EXPECT_EQ(romCompleteJson.name(), "Street Fighter II");
     EXPECT_EQ(romIncompleteJson.name(), "sf2");
+    EXPECT_EQ(romFromInfo.name(), ROM_NAME_COMPLETE);
 }
 
 TEST_F(RomFixture, launch)

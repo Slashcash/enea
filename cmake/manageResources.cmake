@@ -48,3 +48,4 @@ endfunction()
 # Download resources
 add_resource(NAME "fonts/inter.ttf" FOLDER "fonts")
 add_resource(NAME "fonts/default" FOLDER "fonts")
+add_resource(NAME "romdb/romdb.xml" FOLDER "romdb")

@@ -12,7 +12,9 @@ add_executable(
   mock/configuration_mock.hpp
   source/inputmanager_test.cpp
   mock/inputmanager_mock.hpp
-  source/rommenu_test.cpp)
+  source/rommenu_test.cpp
+  mock/romdb_mock.hpp
+  source/romdb_test.cpp)
 
 target_link_libraries(${EXECUTABLE}Test GTest::gtest_main GTest::gmock
                       ${EXECUTABLE}Lib ${EXECUTABLE}Gui)

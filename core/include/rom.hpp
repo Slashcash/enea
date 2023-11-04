@@ -8,11 +8,13 @@
 #include <string>
 #include <system_error>
 
+#include "romdb.hpp"
+
 class Rom
 {
  private:
     std::filesystem::path mPath;
-    std::optional<std::string> mName;
+    RomDB::RomInfo mRomInfo;
 
     [[nodiscard]] virtual int runEmulator(const std::filesystem::path& romPath) const;
     [[nodiscard]] virtual std::optional<std::error_code> fileExists(const std::filesystem::path& path) const;
@@ -34,14 +36,13 @@ class Rom
     };
 
     Rom() = delete;
-    explicit Rom(const std::filesystem::path& path);
+    explicit Rom(const std::filesystem::path& path, const RomDB::RomInfo& romInfo = RomDB::RomInfo());
     explicit Rom(const nlohmann::json& j);
 
     [[nodiscard]] inline bool operator==(const Rom& rom) const
     {
         return this->mPath == rom.mPath;
     }
-
     [[nodiscard]] inline std::filesystem::path path() const
     {
         return mPath;
@@ -52,7 +53,12 @@ class Rom
     }
     [[nodiscard]] inline std::string name() const
     {
-        return mName.has_value() ? mName.value() : mPath.stem().string();
+        return mRomInfo.name.has_value() ? mRomInfo.name.value() : mPath.stem().string();
+    }
+
+    inline void setRomInfo(const RomDB::RomInfo& romInfo)
+    {
+        mRomInfo = romInfo;
     }
 
     [[nodiscard]] std::optional<Error> launch() const;

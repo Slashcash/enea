@@ -15,3 +15,6 @@ find_package(rocket 2.0 REQUIRED)
 
 # nlohmann_json
 find_package(nlohmann_json 3.11.2 REQUIRED)
+
+# tinyxml2
+find_package(tinyxml2 9.0.0 REQUIRED)

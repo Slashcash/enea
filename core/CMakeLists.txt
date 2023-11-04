@@ -8,6 +8,8 @@ add_library(
   include/configuration.hpp
   source/inputmanager.cpp
   include/inputmanager.hpp
+  source/romdb.cpp
+  include/romdb.hpp
   include/resourcemanager.hpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
@@ -21,6 +23,7 @@ target_link_libraries(
          sfml-graphics
          rocket::rocket
          nlohmann_json::nlohmann_json
+         tinyxml2::tinyxml2
          ${RESOURCE_LIBRARY})
 
 # Generating files
