@@ -20,6 +20,7 @@ RomInfo::RomInfo(const RomMenu& romMenu) : mRom(romMenu.selectedRom())
 
 void RomInfo::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
+    std::scoped_lock lock(mMutex);
     if (mRom.has_value())
     {
         auto year = mRom->year().has_value() ? mRom->year().value() : "Unknown Year";

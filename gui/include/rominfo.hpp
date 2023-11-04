@@ -1,6 +1,7 @@
 #ifndef ROMINFO_HPP
 #define ROMINFO_HPP
 
+#include <mutex>
 #include <optional>
 
 #include <SFML/Graphics/Drawable.hpp>
@@ -19,12 +20,14 @@ class RenderTarget;
 class RomInfo : public sf::Drawable, public sf::Transformable
 {
  private:
-    std::optional<Rom> mRom;
+    std::optional<Rom> mRom; // ACCESS TO THIS SHOULD BE THREAD SAFE
     rocket::scoped_connection mSelectionConnection;
     sf::Font mFont;
+    mutable std::mutex mMutex;
 
     inline void selectionChanged(const std::optional<Rom>& rom)
     {
+        std::scoped_lock lock(mMutex);
         mRom = rom;
     }
 
