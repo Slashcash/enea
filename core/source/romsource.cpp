@@ -7,14 +7,19 @@
 
 #include "configuration.hpp"
 #include "rom.hpp"
-#include "romdb.hpp"
 #include "version.hpp"
 
-RomSource::RomSource(const std::filesystem::path& path) : mPath(path)
+RomSource::RomSource(const std::filesystem::path& path) : mPath(path), romdb("romdb/romdb.xml")
 {
     if (mPath.is_relative())
     {
         throw Exception("Rom source built with relative path");
+    }
+
+    // Loading rom db to load information
+    if (romdb.load().has_value())
+    {
+        spdlog::warn("Failed to load rom db, will not provide rom information");
     }
 }
 
@@ -73,20 +78,13 @@ std::optional<RomSource::Error> RomSource::monitor()
         spdlog::debug("Unable to load cache file, will scan folder, Error: {}",
                       magic_enum::enum_name(readError.value()));
 
-        // Loading rom db to load information
-        RomDB romdb("romdb/romdb.xml");
-        if (romdb.load().has_value())
-        {
-            spdlog::warn("Failed to load rom db, will not provide rom information");
-        }
-
         nlohmann::json romArray;
         for (auto paths = scanFolder(mPath); const auto& path : paths)
         {
             try
             {
                 Rom rom{path};
-                if (auto romInfo = romdb.find(path.stem().string()); romInfo.has_value())
+                if (auto romInfo = findInDB(path.stem().string()); romInfo.has_value())
                 {
                     rom.setRomInfo(romInfo.value());
                 }
@@ -237,6 +235,11 @@ RomSource::lastCacheModification(const std::filesystem::path& path) const
     timess << std::put_time(gmt, "%Y-%m-%d %H:%M:%S");
 
     return std::make_pair(std::nullopt, timess.str());
+}
+
+std::optional<RomDB::RomInfo> RomSource::findInDB(const std::string& romName) const
+{
+    return romdb.find(romName);
 }
 
 RomSource::~RomSource()

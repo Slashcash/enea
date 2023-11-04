@@ -20,6 +20,7 @@ class RomSourceMock : public RomSource
     MOCK_METHOD((std::pair<std::optional<RomSource::Error>, std::string>), lastCacheModification,
                 (const std::filesystem::path& path), (const override));
     MOCK_METHOD(std::optional<std::error_code>, createFolders, (const std::filesystem::path& path), (const override));
+    MOCK_METHOD(std::optional<RomDB::RomInfo>, findInDB, (const std::string& romName), (const override));
 };
 
 #endif // ROMSOURCEMOCK_HPP

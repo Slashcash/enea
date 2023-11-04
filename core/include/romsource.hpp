@@ -10,6 +10,8 @@
 #include <nlohmann/json.hpp>
 #include <rocket.hpp>
 
+#include "romdb.hpp"
+
 class Rom;
 
 class RomSource
@@ -29,6 +31,7 @@ class RomSource
     std::filesystem::path mPath;
     std::list<Rom> mRoms;
     bool mMonitored = false;
+    RomDB romdb;
 
     [[nodiscard]] virtual std::optional<std::error_code> folderExists(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::list<std::filesystem::path> scanFolder(const std::filesystem::path& path) const;
@@ -39,6 +42,7 @@ class RomSource
                                                           const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::pair<std::optional<Error>, std::string>
     lastCacheModification(const std::filesystem::path& path) const;
+    [[nodiscard]] virtual std::optional<RomDB::RomInfo> findInDB(const std::string& romName) const;
 
  public:
     class Exception : public std::runtime_error

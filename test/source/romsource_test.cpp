@@ -19,11 +19,7 @@ class RomSourceFixture : public ::testing::Test
         readJson["lastModified"] = CACHE_MODIFIED_TIME;
 
         nlohmann::json roms;
-        RomDB::RomInfo info;
-        info.name = "Street Fighter II - The World Warrior (World 910522)";
-        info.year = "1991";
-        info.manufacturer = "Capcom";
-        roms.emplace_back(RomMock{ROM_PATH, info});
+        roms.emplace_back(RomMock{ROM_PATH});
         readJson["roms"] = roms;
     }
 
