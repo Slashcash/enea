@@ -43,6 +43,8 @@ class RomSource
     [[nodiscard]] virtual std::pair<std::optional<Error>, std::string>
     lastCacheModification(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::optional<RomDB::RomInfo> findInDB(const std::string& romName) const;
+    void fillFromFolder();
+    void produceCacheFile(const std::filesystem::path& cachePath) const;
 
  public:
     class Exception : public std::runtime_error

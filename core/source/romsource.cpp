@@ -78,54 +78,8 @@ std::optional<RomSource::Error> RomSource::monitor()
         spdlog::debug("Unable to load cache file, will scan folder, Error: {}",
                       magic_enum::enum_name(readError.value()));
 
-        nlohmann::json romArray;
-        for (auto paths = scanFolder(mPath); const auto& path : paths)
-        {
-            try
-            {
-                Rom rom{path};
-                if (auto romInfo = findInDB(path.stem().string()); romInfo.has_value())
-                {
-                    rom.setRomInfo(romInfo.value());
-                }
-                mRoms.push_back(rom);
-                romArray.push_back(rom);
-                romAdded(rom);
-            }
-            catch ([[maybe_unused]] const Rom::Exception& e)
-            {
-                continue;
-            }
-        }
-
-        // Creating cache
-        nlohmann::json cache;
-        cache["path"] = mPath.string();
-        cache["version"] = projectVersion;
-        cache["roms"] = romArray;
-
-        // Reading folder last modified time, if we fail we do not write the cache file
-        bool toWrite = true;
-        if (auto [lastModifiedError, lastModified] = lastCacheModification(mPath); lastModifiedError.has_value())
-        {
-            spdlog::warn("Failed to create cache file at {}, Error: {}", cacheFile.string(),
-                         magic_enum::enum_name(lastModifiedError.value()));
-
-            toWrite = false;
-        }
-        else
-        {
-            cache["lastModified"] = lastModified;
-        }
-
-        if (toWrite)
-        {
-            if (auto writeError = writeCache(cache, cacheFile); writeError.has_value())
-            {
-                spdlog::warn("Failed to create cache file at {}, Error: {}", cacheFile.string(),
-                             magic_enum::enum_name(writeError.value()));
-            }
-        }
+        fillFromFolder();
+        produceCacheFile(cacheFile);
     }
 
     else
@@ -240,6 +194,65 @@ RomSource::lastCacheModification(const std::filesystem::path& path) const
 std::optional<RomDB::RomInfo> RomSource::findInDB(const std::string& romName) const
 {
     return romdb.find(romName);
+}
+
+void RomSource::fillFromFolder()
+{
+    for (auto paths = scanFolder(mPath); const auto& path : paths)
+    {
+        try
+        {
+            Rom rom{path};
+            if (auto romInfo = findInDB(path.stem().string()); romInfo.has_value())
+            {
+                rom.setRomInfo(romInfo.value());
+            }
+            mRoms.push_back(rom);
+            romAdded(rom);
+        }
+        catch ([[maybe_unused]] const Rom::Exception& e)
+        {
+            continue;
+        }
+    }
+}
+
+void RomSource::produceCacheFile(const std::filesystem::path& cachePath) const
+{
+    nlohmann::json romArray;
+    for (const auto& rom : mRoms)
+    {
+        romArray.push_back(rom);
+    }
+
+    // Creating cache
+    nlohmann::json cache;
+    cache["path"] = mPath.string();
+    cache["version"] = projectVersion;
+    cache["roms"] = romArray;
+
+    // Reading folder last modified time, if we fail we do not write the cache file
+    bool toWrite = true;
+    if (auto [lastModifiedError, lastModified] = lastCacheModification(mPath); lastModifiedError.has_value())
+    {
+        spdlog::warn("Failed to create cache file at {}, Error: {}", cachePath.string(),
+                     magic_enum::enum_name(lastModifiedError.value()));
+
+        toWrite = false;
+    }
+    else
+    {
+        cache["lastModified"] = lastModified;
+    }
+
+    if (toWrite)
+    {
+        if (auto writeError = writeCache(cache, cachePath); writeError.has_value())
+        {
+            spdlog::warn("Failed to create cache file at {}, Error: {}", cachePath.string(),
+                         magic_enum::enum_name(writeError.value()));
+        }
+    }
 }
 
 RomSource::~RomSource()
