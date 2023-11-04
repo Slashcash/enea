@@ -30,6 +30,14 @@ int main()
 
     // Constructing rom source
     auto romPath = Configuration::get().romDirectory();
+
+    std::error_code createFolderEc;
+    std::filesystem::create_directories(romPath, createFolderEc);
+    if (createFolderEc)
+    {
+        spdlog::warn("Rom folder creation failed at {}", romPath.string());
+    }
+
     RomSource romSource(romPath);
     romSource.romAdded.connect([](const Rom& rom) { spdlog::debug("Found rom: {}", rom.name()); });
 
