@@ -3,7 +3,7 @@
 Enea is a WIP AdvMAME frontend written in C++ for x86_64 Linux.
 
 It currently looks like this:
-![enea](https://i.ibb.co/LryqRHX/enea.png)
+![enea](https://i.ibb.co/wWL9bWf/enea-v0-2-0.png)
 
 I know it is not much. But it will improve!
 

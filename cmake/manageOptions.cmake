@@ -15,7 +15,7 @@ string(TOUPPER ${SOFTWARE_NAME} OPT_PREFIX)
 string(TOLOWER ${SOFTWARE_NAME} EXECUTABLE)
 
 # Setting and validating project version
-set(SOFTWARE_VERSION "0.1.0")
+set(SOFTWARE_VERSION "0.2.0")
 
 if(NOT ${VERSION} MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$")
   message(
