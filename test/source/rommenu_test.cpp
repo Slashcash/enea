@@ -50,7 +50,7 @@ TEST_F(RomMenuFixture, selectedDown)
     EXPECT_CALL(romSource, scanFolder(::testing::_)).WillOnce(testing::Return(folderMock));
 
     auto error = romSource.monitor();
-    romMenu.selectedDown();
+    auto selected = romMenu.selectedDown();
     ASSERT_TRUE(romMenu.selectedRom().has_value());
     EXPECT_EQ(romMenu.selectedRom().value(), Rom(ROM_PATH2));
 }
@@ -62,8 +62,8 @@ TEST_F(RomMenuFixture, selectedUp)
     EXPECT_CALL(romSource, scanFolder(::testing::_)).WillOnce(testing::Return(folderMock));
 
     auto error = romSource.monitor();
-    romMenu.selectedDown();
-    romMenu.selectedUp();
+    auto selected = romMenu.selectedDown();
+    selected = romMenu.selectedUp();
     ASSERT_TRUE(romMenu.selectedRom().has_value());
     EXPECT_EQ(romMenu.selectedRom().value(), Rom(ROM_PATH1));
 }
