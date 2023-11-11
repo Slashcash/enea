@@ -14,7 +14,7 @@ Rom are searched in:
 `~/.enea/roms`
 
 ## Build
-You will need a Linux distribution that ships with glibc >= 2.35 in order to build and launch the project. Build commands are meant to be launched from the project's root directory
+You will need a Linux distribution in order to build and launch the project. Build commands are meant to be launched from the project's root directory
 
 Toolchain and dependencies are managed using [Conan](https://conan.io/).
 
@@ -40,7 +40,7 @@ Toolchain and dependencies are managed using [Conan](https://conan.io/).
 
 - We are ready to configure the project by doing:
 
-    `$ cd build && source conanbuild.sh && cmake .. -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release`
+    `$ cd build && source conanbuild.sh && cmake -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DENEA_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ..`
 
 - And then build it by doing:
 
