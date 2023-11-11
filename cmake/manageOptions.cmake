@@ -39,7 +39,7 @@ if(NOT SOFTWARE_URL)
   message(FATAL_ERROR "SOFTWARE_URL variable does not contain a valid url.")
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 # Managing project options
-set(${OPT_PREFIX}_BUILD_TESTS ON)
+option(${OPT_PREFIX}_BUILD_TESTS "Build project tests" ON)
+
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
