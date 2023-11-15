@@ -23,19 +23,11 @@ Toolchain and dependencies are managed using [Conan](https://conan.io/).
 
     `$ pip install conan`
 
-- The compilation toolchain can be set up using Conan by doing:
+- We provide some recipes that are unavailable on official remote, let's add our own remote to the list:
     
-    `$ conan create -pr:h conan_profiles/enea-release-linux-x86_64-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 conan_recipes/toolchain-linux-x86_64`
+    `$ conan remote add --index 0 https://conan.geniorio.it`
 
-- The [rocket](https://github.com/tripleslash/rocket) dependency is unavailable on official conan remote, we provide it via a self-written recipe:
-
-    `$ conan create -pr:h conan_profiles/enea-release-linux-x86_64-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 -tf "" conan_recipes/rocket`
-
-- The [SFML](https://www.sfml-dev.org/) dependency available on Conan remote is incompatible with our toolchain, we build a special version by doing:
-
-    `$ conan create -pr:h conan_profiles/enea-release-linux-x86_64-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 --build missing -o sfml*:network=False -o sfml*:audio=False conan_recipes/sfml`
-
-- We can now install all the other needed dependencies:
+- We can now install all the needed dependencies:
 
     `$ conan install -pr:h conan_profiles/enea-release-linux-x86_64-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 --build missing -of build .`
 
@@ -62,4 +54,4 @@ The project ships with a Docker container which can be used to containerize the 
 
 `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
-From now on you can launch build commands as if building in a native environment (shouldn't be needed to install conan as it is already shipped within the container)
+From now on you can launch build commands as if building in a native environment (shouldn't be needed to install conan and add the enea remote as they are already set within the container)

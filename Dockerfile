@@ -13,3 +13,6 @@ RUN apt update && apt install -y \
 
 # Install conan
 RUN pip install conan
+
+# Add our own remote
+RUN conan remote add --index 0 enea https://conan.geniorio.it
