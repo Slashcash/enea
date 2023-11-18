@@ -1,12 +1,12 @@
 #include "rom.hpp"
 
-#include <cstdlib>
 #include <exception>
 #include <map>
 #include <nlohmann/detail/iterators/iter_impl.hpp>
 #include <nlohmann/detail/json_pointer.hpp>
 #include <nlohmann/json.hpp>
-#include <sstream>
+
+#include "emulator.hpp"
 
 Rom::Rom(const std::filesystem::path& path, const RomDB::RomInfo& romInfo) : mPath(path), mRomInfo(romInfo)
 {
@@ -32,15 +32,9 @@ void Rom::checkPathValidity() const
     }
 }
 
-int Rom::runEmulator(const std::filesystem::path& romPath) const
+int Rom::runEmulator() const
 {
-    std::string advMameCmd = "advmame";
-    std::string advMameRom = romPath.stem();
-
-    std::stringstream cmd;
-    cmd << advMameCmd << " --dir_rom " << romPath.parent_path() << " " << advMameRom;
-
-    return std::system(cmd.str().c_str());
+    return Emulator::get().run(*this);
 }
 
 std::optional<std::error_code> Rom::fileExists(const std::filesystem::path& path) const
@@ -60,7 +54,7 @@ std::optional<Rom::Error> Rom::launch() const
         return Error::INVALID_ROM_FILE;
     }
 
-    if (int ec = runEmulator(mPath); ec != 0)
+    if (int ec = runEmulator(); ec != 0)
     {
         return Error::EMULATOR_ERROR;
     }

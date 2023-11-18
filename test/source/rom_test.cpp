@@ -103,7 +103,7 @@ TEST_F(RomFixture, manufacturer)
 
 TEST_F(RomFixture, launch)
 {
-    EXPECT_CALL(rom, runEmulator(ROM_PATH)).WillOnce(testing::Return(0));
+    EXPECT_CALL(rom, runEmulator()).WillOnce(testing::Return(0));
 
     auto error = rom.launch();
     EXPECT_FALSE(error.has_value());
@@ -111,7 +111,7 @@ TEST_F(RomFixture, launch)
 
 TEST_F(RomFixture, launchEmulatorError)
 {
-    EXPECT_CALL(rom, runEmulator(ROM_PATH)).WillOnce(testing::Return(1));
+    EXPECT_CALL(rom, runEmulator()).WillOnce(testing::Return(1));
 
     auto error = rom.launch();
     ASSERT_TRUE(error.has_value());

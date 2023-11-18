@@ -5,6 +5,7 @@
 #include <spdlog/spdlog.h>
 
 #include "configuration.hpp"
+#include "emulator.hpp"
 #include "inputmanager.hpp"
 #include "resourcemanager.hpp"
 #include "rom.hpp"
@@ -22,7 +23,8 @@ int main()
 
     // Searching for advmame
     spdlog::info("Searching for advanceMAME on the system");
-    if (std::system("advmame --version >/dev/null 2>&1") != 0)
+    std::optional<std::string> emulatorVersion;
+    if (emulatorVersion = Emulator::get().version(); !emulatorVersion.has_value())
     {
         spdlog::error("advanceMAME not found on the system");
         return 1;
@@ -80,8 +82,14 @@ int main()
                          FontManager::get().getResource("fonts/inter.ttf"), 16);
     constexpr unsigned int versionSpacing = 20;
     versionText.setFillColor(sf::Color::Red);
-    versionText.setOrigin(versionText.getGlobalBounds().getSize().x, versionText.getGlobalBounds().getSize().y);
-    versionText.setPosition(view.getSize().x - versionSpacing, view.getSize().y - versionSpacing);
+    versionText.setPosition(versionSpacing, view.getSize().y / 1.05f);
+
+    // Constructing emulator name and version
+    sf::Text emulatorText(emulatorVersion.value(), FontManager::get().getResource("fonts/inter.ttf"), 16);
+    constexpr unsigned int emulatorSpacing = 5;
+    emulatorText.setFillColor(sf::Color::Red);
+    emulatorText.setPosition(versionText.getPosition().x,
+                             versionText.getPosition().y + versionText.getGlobalBounds().getSize().y + emulatorSpacing);
 
     // Constructing "No Rom Found" text
     sf::Text noRomText("No rom found", FontManager::get().getResource("fonts/inter.ttf"), 24);
@@ -121,6 +129,7 @@ int main()
         }
 
         window.draw(versionText);
+        window.draw(emulatorText);
 
         window.display();
     }

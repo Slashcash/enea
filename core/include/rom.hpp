@@ -16,7 +16,7 @@ class Rom
     std::filesystem::path mPath;
     RomDB::RomInfo mRomInfo;
 
-    [[nodiscard]] virtual int runEmulator(const std::filesystem::path& romPath) const;
+    [[nodiscard]] virtual int runEmulator() const;
     [[nodiscard]] virtual std::optional<std::error_code> fileExists(const std::filesystem::path& path) const;
     void checkPathValidity() const;
 

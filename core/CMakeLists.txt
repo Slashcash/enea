@@ -10,6 +10,10 @@ add_library(
   include/inputmanager.hpp
   source/romdb.cpp
   include/romdb.hpp
+  source/systemcommand.cpp
+  include/systemcommand.hpp
+  source/emulator.cpp
+  include/emulator.hpp
   include/resourcemanager.hpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
