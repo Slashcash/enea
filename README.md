@@ -25,33 +25,25 @@ Toolchain and dependencies are managed using [Conan](https://conan.io/).
 
 - We provide some recipes that are unavailable on official remote, let's add our own remote to the list:
     
-    `$ conan remote add --index 0 https://conan.geniorio.it`
+    `$ conan remote add --index 0 enea https://conan.geniorio.it`
 
-- We can now install all the needed dependencies:
+- We are ready to build the project by doing:
 
-    `$ conan install -pr:h conan_profiles/enea-release-linux-x86_64-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 --build missing -of build .`
-
-- We are ready to configure the project by doing:
-
-    `$ cd build && source conanbuild.sh && cmake -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DENEA_BUILD_TESTS=OFF -DCMAKE_BUILD_TYPE=Release ..`
-
-- And then build it by doing:
-
-    `$ cmake --build .`
-
-- You can now launch *enea* by doing:
-
-    `$ ./enea`
+    `$ conan build -pr:h conan_profiles/enea-release-linux-x86_64-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 -o enea*:build_tests=False --build "*" -of build .`
 
 ### Build in a docker container
 The project ships with a Docker container which can be used to containerize the building process. Commands are meant to be launched from the project's root directory and assume a valid Docker installation is available within the system.
 
 - Build Docker container 
 
-`$ docker build --tag enea_build .`
+    `$ docker build --tag enea_build .`
 
 - Launch Docker container
 
-`$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
+    `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
-From now on you can launch build commands as if building in a native environment (shouldn't be needed to install conan and add the enea remote as they are already set within the container)
+- We are ready to build the project by doing:
+
+    `$ conan build -pr:h conan_profiles/enea-release-linux-x86_64-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 -o enea*:build_tests=False --build "*" -of build .`
+
+
