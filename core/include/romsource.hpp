@@ -12,6 +12,7 @@
 #include <rocket.hpp>
 
 #include "romdb.hpp"
+#include "version.hpp"
 
 class Rom;
 
@@ -22,6 +23,7 @@ class RomSource
     {
         INVALID_PATH,
         INVALID_CACHE_FILE,
+        INVALID_CACHE_FILE_VERSION,
         ERROR_WRITE_FILE,
         DESYNCED_CACHE_FILE,
         UNABLE_TO_READ_LAST_EDIT_TIME,
