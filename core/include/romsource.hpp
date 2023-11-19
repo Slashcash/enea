@@ -6,6 +6,7 @@
 #include <optional>
 #include <stdexcept>
 #include <system_error>
+#include <thread>
 
 #include <nlohmann/json.hpp>
 #include <rocket.hpp>
@@ -28,10 +29,12 @@ class RomSource
     };
 
  private:
+    std::unique_ptr<std::jthread> mScanThread;
+    mutable std::mutex mListMutex;
     std::filesystem::path mPath;
-    std::list<Rom> mRoms;
+    std::list<Rom> mRoms; // ACCESSING THIS SHOULD BE THREAD SAFE
     bool mMonitored = false;
-    RomDB romdb;
+    RomDB mRomdb;
 
     [[nodiscard]] virtual std::optional<std::error_code> folderExists(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::list<std::filesystem::path> scanFolder(const std::filesystem::path& path) const;
@@ -43,7 +46,7 @@ class RomSource
     [[nodiscard]] virtual std::pair<std::optional<Error>, std::string>
     lastCacheModification(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::optional<RomDB::RomInfo> findInDB(const std::string& romName) const;
-    void fillFromFolder();
+    void fillFromFolder(const std::filesystem::path& cachePath);
     void produceCacheFile(const std::filesystem::path& cachePath) const;
 
  public:
@@ -62,9 +65,11 @@ class RomSource
 
     [[nodiscard]] inline std::list<Rom> romList() const
     {
+        std::scoped_lock lock(mListMutex);
         return mRoms;
     };
 
+    void waitPendingOperations();
     [[nodiscard]] std::optional<Error> monitor();
 
     virtual ~RomSource();

@@ -9,7 +9,7 @@
 #include "rom.hpp"
 #include "version.hpp"
 
-RomSource::RomSource(const std::filesystem::path& path) : mPath(path), romdb("romdb/romdb.xml")
+RomSource::RomSource(const std::filesystem::path& path) : mPath(path), mRomdb("romdb/romdb.xml")
 {
     if (mPath.is_relative())
     {
@@ -17,7 +17,7 @@ RomSource::RomSource(const std::filesystem::path& path) : mPath(path), romdb("ro
     }
 
     // Loading rom db to load information
-    if (romdb.load().has_value())
+    if (mRomdb.load().has_value())
     {
         spdlog::warn("Failed to load rom db, will not provide rom information");
     }
@@ -78,12 +78,12 @@ std::optional<RomSource::Error> RomSource::monitor()
         spdlog::debug("Unable to load cache file, will scan folder, Error: {}",
                       magic_enum::enum_name(readError.value()));
 
-        fillFromFolder();
-        produceCacheFile(cacheFile);
+        mScanThread = std::make_unique<std::jthread>([cacheFile, this]() { fillFromFolder(cacheFile); });
     }
 
     else
     {
+        std::scoped_lock lock(mListMutex);
         spdlog::debug("Loaded cache file at {}", cacheFile.string());
         auto roms = result["roms"];
         for (const auto& rom : roms)
@@ -193,36 +193,45 @@ RomSource::lastCacheModification(const std::filesystem::path& path) const
 
 std::optional<RomDB::RomInfo> RomSource::findInDB(const std::string& romName) const
 {
-    return romdb.find(romName);
+    return mRomdb.find(romName);
 }
 
-void RomSource::fillFromFolder()
+void RomSource::fillFromFolder(const std::filesystem::path& cachePath)
 {
-    for (auto paths = scanFolder(mPath); const auto& path : paths)
     {
-        try
+        std::scoped_lock lock(mListMutex);
+        for (auto paths = scanFolder(mPath); const auto& path : paths)
         {
-            Rom rom{path};
-            if (auto romInfo = findInDB(path.stem().string()); romInfo.has_value())
+            try
             {
-                rom.setRomInfo(romInfo.value());
+                Rom rom{path};
+                if (auto romInfo = findInDB(path.stem().string()); romInfo.has_value())
+                {
+                    rom.setRomInfo(romInfo.value());
+                }
+                mRoms.push_back(rom);
+                romAdded(rom);
             }
-            mRoms.push_back(rom);
-            romAdded(rom);
-        }
-        catch ([[maybe_unused]] const Rom::Exception& e)
-        {
-            continue;
+            catch ([[maybe_unused]] const Rom::Exception& e)
+            {
+                continue;
+            }
         }
     }
+
+    produceCacheFile(cachePath);
 }
 
 void RomSource::produceCacheFile(const std::filesystem::path& cachePath) const
 {
+
     nlohmann::json romArray;
-    for (const auto& rom : mRoms)
     {
-        romArray.push_back(rom);
+        std::scoped_lock lock(mListMutex);
+        for (const auto& rom : mRoms)
+        {
+            romArray.push_back(rom);
+        }
     }
 
     // Creating cache
@@ -255,10 +264,23 @@ void RomSource::produceCacheFile(const std::filesystem::path& cachePath) const
     }
 }
 
+void RomSource::waitPendingOperations()
+{
+    if (mScanThread && mScanThread->joinable())
+    {
+        mScanThread->join();
+    }
+}
+
 RomSource::~RomSource()
 {
-    for (const auto& rom : mRoms)
+    waitPendingOperations();
+
     {
-        romDeleted(rom);
+        std::scoped_lock lock(mListMutex);
+        for (const auto& rom : mRoms)
+        {
+            romDeleted(rom);
+        }
     }
 }

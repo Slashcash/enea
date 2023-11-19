@@ -52,6 +52,7 @@ TEST_F(RomSourceFixture, monitorWithoutCache)
         .WillOnce(testing::Return(std::make_pair(std::nullopt, CACHE_MODIFIED_TIME)));
 
     auto monitorError = romSource.monitor();
+    romSource.waitPendingOperations();
     EXPECT_FALSE(monitorError.has_value());
     auto romList = romSource.romList();
     ASSERT_FALSE(romList.empty());
@@ -87,6 +88,7 @@ TEST_F(RomSourceFixture, alreadyMonitoring)
     EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
 
     auto monitorError = romSource.monitor();
+    romSource.waitPendingOperations();
     EXPECT_FALSE(monitorError.has_value());
 
     monitorError = romSource.monitor();
