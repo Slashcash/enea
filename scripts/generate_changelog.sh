@@ -12,6 +12,7 @@ else
 fi
 
 echo "# $last_tag"
+echo "Changelog:"
 
 # Generate changelog between the specified tags and sort by type
 git log --pretty=format:"- %s ([commit]($COMMIT_URL/%H))" $previous_tag..$last_tag | grep -E '^(- Feature|- Fix):' | \
