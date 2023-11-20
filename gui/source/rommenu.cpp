@@ -1,9 +1,11 @@
 #include "rommenu.hpp"
 
 #include <algorithm>
+#include <compare>
 #include <cstddef>
 #include <ext/alloc_traits.h>
 #include <filesystem>
+#include <functional>
 #include <list>
 #include <memory>
 #include <string>
@@ -21,14 +23,16 @@
 
 RomMenu::RomMenu(const RomSource& romSource)
 {
-    mAddedConnection = romSource.romAdded.connect([this](const Rom& rom) { romAdded(rom); });
-    mDeletedConnection = romSource.romDeleted.connect([this](const Rom& rom) { romDeleted(rom); });
-
     auto romList = romSource.romList();
     for (const auto& rom : romList)
     {
         mRomList.push_back(rom);
     }
+
+    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) { return a.name() < b.name(); });
+
+    mAddedConnection = romSource.romAdded.connect([this](const Rom& rom) { romAdded(rom); });
+    mDeletedConnection = romSource.romDeleted.connect([this](const Rom& rom) { romDeleted(rom); });
 }
 
 bool RomMenu::setSelected(const unsigned int selected)
@@ -104,6 +108,7 @@ void RomMenu::romAdded(const Rom& rom)
 {
     std::scoped_lock lock(mMutex);
     mRomList.push_back(rom);
+    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) { return a.name() < b.name(); });
     if (mRomList.size() == 1)
     {
         selectionChanged(rom);
@@ -115,6 +120,8 @@ void RomMenu::romDeleted(const Rom& rom)
     mRomList.erase(
         std::remove_if(mRomList.begin(), mRomList.end(), [&rom](const Rom& r) { return rom.path() == r.path(); }),
         mRomList.end());
+
+    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) { return a.name() < b.name(); });
 
     if (mSelected >= mRomList.size() - 1)
     {
