@@ -25,6 +25,7 @@ target_link_libraries(
          sfml-system
          sfml-window
          sfml-graphics
+         sfml-audio
          rocket::rocket
          nlohmann_json::nlohmann_json
          tinyxml2::tinyxml2

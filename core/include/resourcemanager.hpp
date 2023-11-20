@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <map>
 
+#include <SFML/Audio/SoundBuffer.hpp>
 #include <SFML/Graphics/Font.hpp>
 #include <cmrc/cmrc.hpp>
 #include <spdlog/spdlog.h>
@@ -88,5 +89,6 @@ template <Loadable T> class ResourceManager
 };
 
 using FontManager = ResourceManager<sf::Font>;
+using SoundManager = ResourceManager<sf::SoundBuffer>;
 
 #endif // RESOURCEMANAGER_HPP

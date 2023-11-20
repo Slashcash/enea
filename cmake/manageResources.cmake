@@ -46,6 +46,14 @@ function(add_resource)
 endfunction()
 
 # Download resources
+
+# Fonts
 add_resource(NAME "fonts/inter.ttf" FOLDER "fonts")
 add_resource(NAME "fonts/default" FOLDER "fonts")
+
+# Audio
+add_resource(NAME "audio/launch.wav" FOLDER "audio")
+add_resource(NAME "audio/move.wav" FOLDER "audio")
+
+# Rom database
 add_resource(NAME "romdb/romdb.xml" FOLDER "romdb")

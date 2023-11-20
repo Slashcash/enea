@@ -24,7 +24,6 @@ class EneaRecipe(ConanFile):
 
     def configure(self):
         self.options["sfml"].network = False
-        self.options["sfml"].audio = False
 
     def requirements(self):
         self.requires("spdlog/1.12.0")

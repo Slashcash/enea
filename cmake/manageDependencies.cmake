@@ -7,7 +7,7 @@ find_package(magic_enum 0.9.3 REQUIRED)
 # sfml
 find_package(
   SFML 2.6.0
-  COMPONENTS graphic window system
+  COMPONENTS graphic window system audio
   REQUIRED)
 
 # rocket

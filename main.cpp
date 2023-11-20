@@ -1,3 +1,4 @@
+#include <SFML/Audio.hpp>
 #include <SFML/Graphics.hpp>
 #include <cmrc/cmrc.hpp>
 #include <magic_enum.hpp>
@@ -69,9 +70,18 @@ int main()
         return 1;
     }
 
+    // Creating sounds
+    sf::Sound selectionSound;
+    selectionSound.setBuffer(SoundManager::get().getResource("audio/move.wav"));
+
+    sf::Sound launchSound;
+    launchSound.setBuffer(SoundManager::get().getResource("audio/launch.wav"));
+
     // Constructing drawable rom list
     RomMenu romMenu(romSource);
     romMenu.setPosition(view.getSize().x / 7, view.getSize().y / 6);
+    romMenu.selectionChanged.connect(
+        [&selectionSound]([[maybe_unused]] const std::optional<Rom>& rom) { selectionSound.play(); });
 
     // Constructing drawable rom info
     RomInfo romInfo{romMenu};
@@ -101,9 +111,11 @@ int main()
     InputManager::get().closeWindow.connect([&window]() { window.close(); });
     InputManager::get().goUp.connect([&romMenu]() { [[maybe_unused]] auto result = romMenu.selectedUp(); });
     InputManager::get().goDown.connect([&romMenu]() { [[maybe_unused]] auto result = romMenu.selectedDown(); });
-    InputManager::get().select.connect([&romMenu]() {
+    InputManager::get().select.connect([&romMenu, &launchSound]() {
         if (auto rom = romMenu.selectedRom(); rom.has_value())
         {
+            launchSound.play();
+
             if (auto error = rom.value().launch(); error.has_value())
             {
                 spdlog::error("Failed to launch {}. Error: {}", rom.value().name(),
