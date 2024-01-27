@@ -49,7 +49,7 @@ class EneaRecipe(ConanFile):
     def validate(self):
         if self.settings.os != "Linux":
             raise ConanInvalidConfiguration("Invalid OS as a build target: only Linux is supported")
-        if self.settings.arch != "x86_64":
-            raise ConanInvalidConfiguration("Invalid architecture as a build target: only x86_64 is supported")
+        if self.settings.arch != "x86_64" and self.settings.arch != "armv8":
+            raise ConanInvalidConfiguration("Invalid architecture as a build target: only x86_64 or armv8 is supported")
         if self.settings.compiler != "gcc" or self.settings.compiler.version != "11.3":
             raise ConanInvalidConfiguration("Invalid compiler detected: only gcc 11.3.0 is supported")

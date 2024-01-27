@@ -1,0 +1,12 @@
+include(enea)
+
+[settings]
+os=Linux
+arch=armv8
+compiler=gcc
+compiler.version=11.3
+compiler.libcxx=libstdc++11
+compiler.cppstd=gnu20
+
+[tool_requires]
+toolchain-linux-aarch64/11.3.0
