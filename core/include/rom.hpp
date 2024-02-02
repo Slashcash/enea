@@ -8,9 +8,9 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/json_fwd.hpp>
 #include <optional>
-#include <stdexcept>
 #include <string>
 
+#include "eneaexception.hpp"
 #include "romdb.hpp"
 
 class Rom
@@ -20,9 +20,9 @@ class Rom
     RomDB::RomInfo mInfo;
 
  public:
-    class Exception : public std::runtime_error
+    class Exception : public EneaException
     {
-        using std::runtime_error::runtime_error;
+        using EneaException::EneaException;
     };
 
     /**

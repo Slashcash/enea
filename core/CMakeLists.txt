@@ -14,7 +14,8 @@ add_library(
   include/systemcommand.hpp
   source/emulator.cpp
   include/emulator.hpp
-  include/resourcemanager.hpp)
+  include/resourcemanager.hpp
+  include/eneaexception.hpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
 
