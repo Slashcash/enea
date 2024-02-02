@@ -13,7 +13,7 @@ class RomDB
  public:
     struct RomInfo
     {
-        std::optional<std::string> name;
+        std::optional<std::string> title;
         std::optional<std::string> year;
         std::optional<std::string> manufacturer;
     };

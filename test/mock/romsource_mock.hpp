@@ -5,8 +5,6 @@
 
 #include <gmock/gmock.h>
 
-#include "rom_mock.hpp"
-
 class RomSourceMock : public RomSource
 {
  public:

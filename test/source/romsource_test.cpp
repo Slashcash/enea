@@ -19,7 +19,7 @@ class RomSourceFixture : public ::testing::Test
         readJson["lastModified"] = CACHE_MODIFIED_TIME;
 
         nlohmann::json roms;
-        roms.emplace_back(RomMock{ROM_PATH});
+        roms.emplace_back(Rom{ROM_PATH});
         readJson["roms"] = roms;
     }
 

@@ -2,38 +2,49 @@
 #define EMULATOR_HPP
 
 #include <optional>
-#include <stdexcept>
 #include <string>
 
-class Rom;
+#include "rom.hpp"
 
 class Emulator
 {
  public:
-    class Exception : public std::runtime_error
+    struct EmulatorInfo
     {
-        using std::runtime_error::runtime_error;
+        std::string name;
+        std::string version;
     };
 
-    [[nodiscard]] inline static Emulator& get()
-    {
-        static Emulator emulator;
-        return emulator;
-    }
-
- protected:
-    Emulator() = default;
-
-    ~Emulator() = default;
-
  private:
-    Emulator(Emulator& emulator) = delete;
-
-    void operator=(const Emulator&) = delete;
+    [[nodiscard]] virtual std::pair<int, std::string> launch(const std::string& arguments) const;
+    [[nodiscard]] virtual bool romExists(const Rom& rom) const;
+    [[nodiscard]] virtual bool romIsReadable(const Rom& rom) const;
 
  public:
-    [[nodiscard]] std::optional<std::string> version() const;
-    [[nodiscard]] int run(const Rom& rom) const;
+    enum class Error
+    {
+        ROM_FILE_NOT_FOUND,
+        ROM_FILE_NOT_READABLE,
+        ROM_PATH_INVALID,
+        EMULATOR_ERROR
+    };
+
+    /**
+     * @brief Get information about emulator (name and version).
+     *
+     * @return Emulator information.
+     */
+    [[nodiscard]] std::optional<EmulatorInfo> info() const;
+
+    /**
+     * @brief Launch a rom within this emulator. This will effectively call the emulator and start the game.
+     *
+     * @param rom The rom to launch.
+     * @return The result of the launch operation.
+     */
+    [[nodiscard]] std::optional<Error> run(const Rom& rom) const;
+
+    virtual ~Emulator() = default;
 };
 
-#endif // CONFIGURATION_HPP
+#endif // EMULATOR_HPP

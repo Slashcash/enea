@@ -5,7 +5,8 @@ enable_testing()
 add_executable(
   ${EXECUTABLE}Test
   source/rom_test.cpp
-  mock/rom_mock.hpp
+  mock/emulator_mock.hpp
+  source/emulator_test.cpp
   source/romsource_test.cpp
   mock/romsource_mock.hpp
   source/configuration_test.cpp

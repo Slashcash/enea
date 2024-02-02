@@ -213,11 +213,12 @@ void RomSource::fillFromFolder(const std::filesystem::path& cachePath)
         {
             try
             {
-                Rom rom{path};
+                RomDB::RomInfo info;
                 if (auto romInfo = findInDB(path.stem().string()); romInfo.has_value())
                 {
-                    rom.setRomInfo(romInfo.value());
+                    info = *romInfo;
                 }
+                Rom rom{path, info};
                 mRoms.push_back(rom);
                 romAdded(rom);
             }

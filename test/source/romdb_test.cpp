@@ -69,8 +69,8 @@ TEST_F(RomDBFixture, info)
     EXPECT_FALSE(romdb.load().has_value());
     auto rom = romdb.find("sf2");
     ASSERT_TRUE(rom.has_value());
-    ASSERT_TRUE(rom->name.has_value());
-    EXPECT_EQ(rom->name.value(), "Street Fighter II - The World Warrior (World 910522)");
+    ASSERT_TRUE(rom->title.has_value());
+    EXPECT_EQ(rom->title.value(), "Street Fighter II - The World Warrior (World 910522)");
     ASSERT_TRUE(rom->year.has_value());
     EXPECT_EQ(rom->year.value(), "1991");
     ASSERT_TRUE(rom->manufacturer.has_value());

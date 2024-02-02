@@ -29,7 +29,15 @@ RomMenu::RomMenu(const RomSource& romSource)
         mRomList.push_back(rom);
     }
 
-    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) { return a.name() < b.name(); });
+    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) {
+        std::string aTitle;
+        std::string bTitle;
+
+        a.title().has_value() ? aTitle = *(a.title()) : aTitle = a.path().stem();
+        b.title().has_value() ? bTitle = *(b.title()) : bTitle = b.path().stem();
+
+        return aTitle < bTitle;
+    });
 
     mAddedConnection = romSource.romAdded.connect([this](const Rom& rom) { romAdded(rom); });
     mDeletedConnection = romSource.romDeleted.connect([this](const Rom& rom) { romDeleted(rom); });
@@ -74,7 +82,8 @@ void RomMenu::draw(sf::RenderTarget& target, sf::RenderStates states) const
         for (unsigned int i = start; i < stop; i++)
         {
             // Set text, font and size
-            auto romName = mRomList[i].name();
+            std::string romName;
+            mRomList[i].title().has_value() ? romName = *(mRomList[i].title()) : romName = mRomList[i].path().stem();
             auto romNameShortened = romName.substr(0, romName.find_first_of('(')).substr(0, 25);
             sf::Text text(romNameShortened, font, 36);
 
@@ -108,7 +117,16 @@ void RomMenu::romAdded(const Rom& rom)
 {
     std::scoped_lock lock(mMutex);
     mRomList.push_back(rom);
-    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) { return a.name() < b.name(); });
+    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) {
+        std::string aTitle;
+        std::string bTitle;
+
+        a.title().has_value() ? aTitle = *(a.title()) : aTitle = a.path().stem();
+        b.title().has_value() ? bTitle = *(b.title()) : bTitle = b.path().stem();
+
+        return aTitle < bTitle;
+    });
+
     if (mRomList.size() == 1)
     {
         selectionChanged(rom);
@@ -121,7 +139,15 @@ void RomMenu::romDeleted(const Rom& rom)
         std::remove_if(mRomList.begin(), mRomList.end(), [&rom](const Rom& r) { return rom.path() == r.path(); }),
         mRomList.end());
 
-    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) { return a.name() < b.name(); });
+    std::ranges::sort(mRomList, [](const Rom& a, const Rom& b) {
+        std::string aTitle;
+        std::string bTitle;
+
+        a.title().has_value() ? aTitle = *(a.title()) : aTitle = a.path().stem();
+        b.title().has_value() ? bTitle = *(b.title()) : bTitle = b.path().stem();
+
+        return aTitle < bTitle;
+    });
 
     if (mSelected >= mRomList.size() - 1)
     {

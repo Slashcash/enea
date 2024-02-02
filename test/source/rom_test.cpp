@@ -1,128 +1,98 @@
-#include "rom_mock.hpp"
+#include "rom.hpp"
 
 #include <gtest/gtest.h>
-
 #include <nlohmann/json.hpp>
+
+static const std::filesystem::path ROM_FOLDER = "home";
+static const std::string ROM_NAME = "sf2";
+static const std::string ROM_EXTENSION = ".zip";
+static const std::filesystem::path ROM_FILENAME = std::filesystem::path(ROM_NAME + ROM_EXTENSION);
+static const std::filesystem::path ROM_PATH = std::filesystem::absolute(ROM_FOLDER) / ROM_FILENAME;
+
+static const std::filesystem::path WRONG_ROM_PATH = std::filesystem::absolute("tmp") / ROM_FILENAME;
+
+static const std::string ROM_TITLE = "Street Fighter II: The World Warrior";
+static const std::string ROM_YEAR = "1991";
+static const std::string ROM_MANUFACTURER = "Capcom";
+
+static const RomDB::RomInfo ROM_INFO{ROM_TITLE, ROM_YEAR, ROM_MANUFACTURER};
+
+using namespace nlohmann::literals;
+using namespace nlohmann::literals;
+static const nlohmann::json COMPLETE_JSON{
+    {"path", ROM_PATH}, {"title", ROM_TITLE}, {"year", ROM_YEAR}, {"manufacturer", ROM_MANUFACTURER}};
+static const nlohmann::json INCOMPLETE_JSON{{"path", ROM_PATH}};
+static const nlohmann::json WRONG_JSON{{"error", ROM_PATH}};
 
 class RomFixture : public ::testing::Test
 {
  protected:
-    RomMock rom{ROM_PATH};
-    RomMock romCompleteJson{COMPLETE_JSON};
-    RomMock romIncompleteJson{INCOMPLETE_JSON};
-    RomMock romFromInfo{ROM_PATH};
+    Rom rom{ROM_PATH};
+    Rom sameRom{ROM_PATH};
+    Rom notSameRom{WRONG_ROM_PATH};
 
-    inline RomFixture()
-    {
-        RomDB::RomInfo info;
-        info.name = ROM_NAME_COMPLETE;
-        info.year = ROM_YEAR;
-        info.manufacturer = ROM_MANUFACTURER;
-        romFromInfo.setRomInfo(info);
-    }
+    Rom romFromInfo{ROM_PATH, ROM_INFO};
+    Rom sameRomFromInfo{ROM_PATH, ROM_INFO};
+    Rom notSameRomFromInfo{WRONG_ROM_PATH, ROM_INFO};
 
-    static const std::filesystem::path ROM_FOLDER;
-    static const std::string ROM_NAME;
-    static const std::string ROM_YEAR;
-    static const std::string ROM_MANUFACTURER;
-    static const std::string ROM_NAME_COMPLETE;
-    static const std::string ROM_EXTENSION;
-    static const std::filesystem::path ROM_PATH;
-    static const nlohmann::json COMPLETE_JSON;
-    static const nlohmann::json INCOMPLETE_JSON;
+    Rom romCompleteJson{COMPLETE_JSON};
+    Rom romIncompleteJson{INCOMPLETE_JSON};
 };
-
-const std::filesystem::path RomFixture::ROM_FOLDER = "/home";
-const std::string RomFixture::ROM_NAME = "sf2";
-const std::string RomFixture::ROM_YEAR = "1991";
-const std::string RomFixture::ROM_MANUFACTURER = "Capcom";
-const std::string RomFixture::ROM_NAME_COMPLETE = "Street Fighter II";
-const std::string RomFixture::ROM_EXTENSION = ".zip";
-const std::filesystem::path RomFixture::ROM_PATH =
-    RomFixture::ROM_FOLDER / (RomFixture::ROM_NAME + RomFixture::ROM_EXTENSION);
-
-using namespace nlohmann::literals;
-const nlohmann::json RomFixture::COMPLETE_JSON = R"(
-    {
-        "path": "/sf2.zip",
-        "name": "Street Fighter II",
-        "year": "1991",
-        "manufacturer": "Capcom"
-    }
-    )"_json;
-
-const nlohmann::json RomFixture::INCOMPLETE_JSON = R"(
-    {
-        "path": "/sf2.zip"
-    }
-    )"_json;
 
 TEST_F(RomFixture, path)
 {
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_EQ(romCompleteJson.path(), "/sf2.zip");
-    EXPECT_EQ(romIncompleteJson.path(), "/sf2.zip");
     EXPECT_EQ(romFromInfo.path(), ROM_PATH);
+    EXPECT_EQ(romCompleteJson.path(), ROM_PATH);
+    EXPECT_EQ(romIncompleteJson.path(), ROM_PATH);
 }
 
-TEST_F(RomFixture, fileName)
+TEST_F(RomFixture, title)
 {
-    EXPECT_EQ(rom.fileName(), ROM_NAME + ROM_EXTENSION);
-    EXPECT_EQ(romCompleteJson.fileName(), "sf2.zip");
-    EXPECT_EQ(romIncompleteJson.fileName(), "sf2.zip");
-    EXPECT_EQ(romFromInfo.fileName(), "sf2.zip");
-}
-
-TEST_F(RomFixture, name)
-{
-    EXPECT_EQ(rom.name(), ROM_NAME);
-    EXPECT_EQ(romCompleteJson.name(), "Street Fighter II");
-    EXPECT_EQ(romIncompleteJson.name(), "sf2");
-    EXPECT_EQ(romFromInfo.name(), ROM_NAME_COMPLETE);
+    EXPECT_FALSE(rom.title().has_value());
+    ASSERT_TRUE(romCompleteJson.title().has_value());
+    EXPECT_EQ(*(romCompleteJson.title()), ROM_TITLE);
+    EXPECT_FALSE(romIncompleteJson.title().has_value());
+    ASSERT_TRUE(romFromInfo.title().has_value());
+    EXPECT_EQ(*(romFromInfo.title()), ROM_TITLE);
 }
 
 TEST_F(RomFixture, year)
 {
     EXPECT_FALSE(rom.year().has_value());
     ASSERT_TRUE(romCompleteJson.year().has_value());
-    EXPECT_EQ(romCompleteJson.year().value(), "1991");
+    EXPECT_EQ(*(romCompleteJson.year()), ROM_YEAR);
     EXPECT_FALSE(romIncompleteJson.year().has_value());
     ASSERT_TRUE(romFromInfo.year().has_value());
-    EXPECT_EQ(romFromInfo.year().value(), ROM_YEAR);
+    EXPECT_EQ(*(romFromInfo.year()), ROM_YEAR);
 }
 
 TEST_F(RomFixture, manufacturer)
 {
     EXPECT_FALSE(rom.manufacturer().has_value());
     ASSERT_TRUE(romCompleteJson.manufacturer().has_value());
-    EXPECT_EQ(romCompleteJson.manufacturer().value(), "Capcom");
+    EXPECT_EQ(*(romCompleteJson.manufacturer()), ROM_MANUFACTURER);
     EXPECT_FALSE(romIncompleteJson.manufacturer().has_value());
     ASSERT_TRUE(romFromInfo.manufacturer().has_value());
-    EXPECT_EQ(romFromInfo.manufacturer().value(), ROM_MANUFACTURER);
+    EXPECT_EQ(*(romFromInfo.manufacturer()), ROM_MANUFACTURER);
 }
 
-TEST_F(RomFixture, launch)
+TEST_F(RomFixture, comparison)
 {
-    EXPECT_CALL(rom, runEmulator()).WillOnce(testing::Return(0));
+    EXPECT_EQ(rom, sameRom);
+    EXPECT_NE(rom, notSameRom);
 
-    auto error = rom.launch();
-    EXPECT_FALSE(error.has_value());
+    EXPECT_EQ(romFromInfo, sameRomFromInfo);
+    EXPECT_NE(romFromInfo, notSameRomFromInfo);
 }
 
-TEST_F(RomFixture, launchEmulatorError)
+TEST_F(RomFixture, to_json)
 {
-    EXPECT_CALL(rom, runEmulator()).WillOnce(testing::Return(1));
-
-    auto error = rom.launch();
-    ASSERT_TRUE(error.has_value());
-    EXPECT_EQ(error.value(), RomMock::Error::EMULATOR_ERROR);
+    EXPECT_EQ(COMPLETE_JSON, nlohmann::json(romCompleteJson));
+    EXPECT_EQ(INCOMPLETE_JSON, nlohmann::json(romIncompleteJson));
 }
 
-TEST_F(RomFixture, launchNonExistantFile)
+TEST_F(RomFixture, from_invalidJson)
 {
-    EXPECT_CALL(rom, fileExists(ROM_PATH)).WillOnce(testing::Return(std::error_code()));
-
-    auto error = rom.launch();
-    ASSERT_TRUE(error.has_value());
-    EXPECT_EQ(error.value(), RomMock::Error::INVALID_ROM_FILE);
+    EXPECT_THROW(Rom{WRONG_JSON}, Rom::Exception);
 }

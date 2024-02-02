@@ -24,8 +24,9 @@ int main()
 
     // Searching for advmame
     spdlog::info("Searching for advanceMAME on the system");
-    std::optional<std::string> emulatorVersion;
-    if (emulatorVersion = Emulator::get().version(); !emulatorVersion.has_value())
+    Emulator emulator;
+    auto emulatorInfo = emulator.info();
+    if (!emulatorInfo.has_value())
     {
         spdlog::error("advanceMAME not found on the system");
         return 1;
@@ -42,7 +43,7 @@ int main()
     }
 
     RomSource romSource(romPath);
-    romSource.romAdded.connect([](const Rom& rom) { spdlog::debug("Found rom: {}", rom.name()); });
+    romSource.romAdded.connect([](const Rom& rom) { spdlog::debug("Found rom: {}", rom.path().string()); });
 
     // Searching for a suitable video mode
     auto availableVideoModes = sf::VideoMode::getFullscreenModes();
@@ -95,7 +96,8 @@ int main()
     versionText.setPosition(versionSpacing, view.getSize().y / 1.05f);
 
     // Constructing emulator name and version
-    sf::Text emulatorText(emulatorVersion.value(), FontManager::get().getResource("fonts/inter.ttf"), 16);
+    sf::Text emulatorText(fmt::format("{} {}", emulatorInfo->name, emulatorInfo->version),
+                          FontManager::get().getResource("fonts/inter.ttf"), 16);
     constexpr unsigned int emulatorSpacing = 5;
     emulatorText.setFillColor(sf::Color::Red);
     emulatorText.setPosition(versionText.getPosition().x,
@@ -111,15 +113,14 @@ int main()
     InputManager::get().closeWindow.connect([&window]() { window.close(); });
     InputManager::get().goUp.connect([&romMenu]() { [[maybe_unused]] auto result = romMenu.selectedUp(); });
     InputManager::get().goDown.connect([&romMenu]() { [[maybe_unused]] auto result = romMenu.selectedDown(); });
-    InputManager::get().select.connect([&romMenu, &launchSound]() {
+    InputManager::get().select.connect([&romMenu, &launchSound, &emulator]() {
         if (auto rom = romMenu.selectedRom(); rom.has_value())
         {
             launchSound.play();
 
-            if (auto error = rom.value().launch(); error.has_value())
+            if (auto error = emulator.run(*rom); error.has_value())
             {
-                spdlog::error("Failed to launch {}. Error: {}", rom.value().name(),
-                              magic_enum::enum_name(error.value()));
+                spdlog::error("Failed to launch {}. Error: {}", rom->path().string(), magic_enum::enum_name(*error));
             }
         }
     });

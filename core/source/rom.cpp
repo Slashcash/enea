@@ -1,132 +1,34 @@
 #include "rom.hpp"
 
-#include <exception>
-#include <map>
-#include <nlohmann/detail/iterators/iter_impl.hpp>
-#include <nlohmann/detail/json_pointer.hpp>
-#include <nlohmann/json.hpp>
-
-#include "emulator.hpp"
-
-Rom::Rom(const std::filesystem::path& path, const RomDB::RomInfo& romInfo) : mPath(path), mRomInfo(romInfo)
+Rom::Rom(const std::filesystem::path& path) : mPath(path)
 {
-    checkPathValidity();
 }
 
-Rom::Rom(const nlohmann::json& j)
+Rom::Rom(const std::filesystem::path& path, const RomDB::RomInfo& info) : mPath(path), mInfo(info)
 {
-    from_json(j, *this);
-    checkPathValidity();
 }
 
-void Rom::checkPathValidity() const
+std::filesystem::path Rom::path() const
 {
-    if (mPath.is_relative())
-    {
-        throw Exception("Rom build with relative path");
-    }
-
-    if (!mPath.has_stem())
-    {
-        throw Exception("Rom path does not have stem");
-    }
+    return mPath;
 }
 
-int Rom::runEmulator() const
+std::optional<std::string> Rom::title() const
 {
-    return Emulator::get().run(*this);
+    return mInfo.title;
 }
 
-std::optional<std::error_code> Rom::fileExists(const std::filesystem::path& path) const
+std::optional<std::string> Rom::year() const
 {
-    if (std::error_code ec; !std::filesystem::is_regular_file(path, ec))
-    {
-        return ec;
-    }
-
-    return std::nullopt;
+    return mInfo.year;
 }
 
-std::optional<Rom::Error> Rom::launch() const
+[[nodiscard]] std::optional<std::string> Rom::manufacturer() const
 {
-    if (fileExists(mPath).has_value())
-    {
-        return Error::INVALID_ROM_FILE;
-    }
-
-    if (int ec = runEmulator(); ec != 0)
-    {
-        return Error::EMULATOR_ERROR;
-    }
-
-    return std::nullopt;
+    return mInfo.manufacturer;
 }
 
-void to_json(nlohmann::json& j, const Rom& rom)
+bool Rom::operator==(const Rom& rom) const
 {
-    j.clear();
-    j["path"] = rom.mPath;
-    if (rom.mRomInfo.name.has_value())
-    {
-        j["name"] = rom.mRomInfo.name.value();
-    }
-    if (rom.mRomInfo.year.has_value())
-    {
-        j["year"] = rom.mRomInfo.year.value();
-    }
-    if (rom.mRomInfo.manufacturer.has_value())
-    {
-        j["manufacturer"] = rom.mRomInfo.manufacturer.value();
-    }
-}
-
-void from_json(const nlohmann::json& j, Rom& rom)
-{
-    try
-    {
-        j.at("path").get_to(rom.mPath);
-    }
-    catch (const std::exception& e)
-    {
-        throw Rom::Exception("Rom constructed from invalid json");
-    }
-
-    // Finding rom name
-    if (auto it = j.find("name"); it != j.end())
-    {
-        try
-        {
-            rom.mRomInfo.name = *it;
-        }
-        catch (const std::exception& e)
-        {
-            rom.mRomInfo.name.reset();
-        }
-    }
-
-    // Finding rom year
-    if (auto it = j.find("year"); it != j.end())
-    {
-        try
-        {
-            rom.mRomInfo.year = *it;
-        }
-        catch (const std::exception& e)
-        {
-            rom.mRomInfo.year.reset();
-        }
-    }
-
-    // Finding rom manufacturer
-    if (auto it = j.find("manufacturer"); it != j.end())
-    {
-        try
-        {
-            rom.mRomInfo.manufacturer = *it;
-        }
-        catch (const std::exception& e)
-        {
-            rom.mRomInfo.manufacturer.reset();
-        }
-    }
+    return this->mPath == rom.mPath;
 }
