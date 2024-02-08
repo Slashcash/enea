@@ -28,7 +28,14 @@ RUN apt update && apt install -y \
     python3-pip \
     git \
     pkg-config \
+    wget \
+    file \
     sudo
+
+# These dependencies are only needed in order to pack advmame within the AppImage
+RUN apt install -y \
+    libsdl2-dev \
+    libasound2-dev
 
 # Install conan
 RUN pip install conan
@@ -38,3 +45,6 @@ RUN conan remote add --index 0 enea https://conan.geniorio.it
 
 # Modify PKG_CONFIG_PATH, modifying it within conan recipes doesn't work (conan bug)
 ENV PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
+
+# Install linuxdeploy (needed to create AppImage)
+RUN wget -O /usr/bin/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-static-x86_64.AppImage && chmod +x /usr/bin/linuxdeploy
