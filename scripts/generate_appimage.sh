@@ -3,6 +3,7 @@
 # Initialize variables with default values
 executable_path=""
 output_directory=""
+env_file=""
 
 # Set up required folders
 base_temp_dir="/tmp/enea_appimage"
@@ -14,6 +15,7 @@ function display_help {
   echo "Usage: $0 -e <executable_path>"
   echo "  -e  Specify the path of the enea executable"
   echo "  -o  Specify the output path"
+  echo "  -t  Specify an optional environment file"
   echo "  -h  Display this help message"
   exit 1
 }
@@ -51,13 +53,16 @@ function download_file {
 trap cleanup EXIT
 
 # Parse command line options
-while getopts "e:o:h" opt; do
+while getopts "e:o:t:h" opt; do
   case "$opt" in
     e)
       executable_path="$OPTARG"
       ;;
     o)
       output_directory="$OPTARG"
+      ;;
+    t)
+      env_file="$OPTARG"
       ;;
     h)
       display_help
@@ -68,6 +73,11 @@ while getopts "e:o:h" opt; do
       ;;
   esac
 done
+
+# Parsing environment file
+set -o allexport
+source ${env_file} set
++o allexport
 
 # Check if linuxdeploy command exists
 if ! command -v linuxdeploy &> /dev/null; then
@@ -93,12 +103,9 @@ if [ -z "$executable_path" ] || [ -z "$output_directory" ]; then
   exit 1
 fi
 
-# Check the architecture of the executable
-executable_arch=$(file "$executable_path" | awk '{print substr($7, 1, length($7)-1)}')
-if [ "$executable_arch" == "x86-64" ]; then
-  executable_arch="x86_64"
-else
-  echo "Error: We can't still generate appimage for other architectures: $executable_arch. Expected x86_64."
+# Check if we have the ADVMAME_VERSION available
+if [ -z ${ADVMAME_VERSION+x} ]; then 
+  echo "Please set the ADVMAME_VERSION variable to a supported value"
   exit 1
 fi
 
@@ -107,6 +114,15 @@ if [ -x "$executable_path" ]; then
   echo "Executable found: $executable_path"
 else
   echo "Error: Executable not found at $executable_path"
+  exit 1
+fi
+
+# Check the architecture of the executable
+executable_arch=$(file "$executable_path" | awk '{print substr($7, 1, length($7)-1)}')
+if [ "$executable_arch" == "x86-64" ]; then
+  executable_arch="x86_64"
+else
+  echo "Error: We can't still generate appimage for other architectures: $executable_arch. Expected x86_64."
   exit 1
 fi
 
@@ -145,8 +161,7 @@ icon_path="$downloads_dir/icon.png"
 download_file "$icon_url" "$icon_path"
 
 # Download the advmame emulator
-advmame_version="3.9-84-g14b4dfaa"
-advmame_url="https://enea.geniorio.it/advmame/$advmame_version/$executable_arch/advmame"
+advmame_url="https://enea.geniorio.it/advmame/$ADVMAME_VERSION/$executable_arch/advmame"
 advmame_path="$downloads_dir/advmame"
 download_file "$advmame_url" "$advmame_path"
 

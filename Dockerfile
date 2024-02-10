@@ -38,7 +38,10 @@ RUN apt install -y \
     libasound2-dev
 
 # Install conan
-RUN pip install conan
+RUN pip install conan 
+
+# Install python-dotenv (used in our conanfile.py)
+RUN pip install python-dotenv
 
 # Add our own remote
 RUN conan remote add --index 0 enea https://conan.geniorio.it

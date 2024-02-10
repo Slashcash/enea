@@ -2,20 +2,21 @@ from conan import ConanFile
 from conan.tools.cmake import cmake_layout, CMakeToolchain, CMake
 from conan.errors import ConanInvalidConfiguration
 from conan.tools.files import load
+from conan.tools.env import VirtualBuildEnv
+from dotenv import load_dotenv
 import re, os
 
 
 class EneaRecipe(ConanFile):
     name = "enea"
     settings = "os", "compiler", "build_type", "arch"
-    generators = "CMakeDeps"
+    generators = "CMakeDeps", "VirtualBuildEnv"
     options = {"build_tests": [True, False]}
     default_options = {"build_tests": True}
+    load_dotenv()
 
     def set_version(self):
-        content = load(self, os.path.join(self.recipe_folder, "cmake", "manageOptions.cmake"))
-        version = re.search(r"set\(SOFTWARE_VERSION (.*)\)", content).group(1)
-        self.version = version.strip()
+        version = os.getenv('SOFTWARE_NAME')
 
     def generate(self):
         tc = CMakeToolchain(self)
