@@ -3,7 +3,7 @@
 Enea is a WIP AdvMAME frontend written in C++ for Linux.
 
 It currently looks like this:
-![enea](https://i.ibb.co/wWL9bWf/enea-v0-2-0.png)
+![enea](https://i.ibb.co/LPNPzYD/enea-v0-2-1.png)
 
 I know it is not much. But it will improve!
 
@@ -42,8 +42,8 @@ The project ships with a Docker container which can be used to containerize the 
 
 - We are ready to build the project by doing:
 
-    `$ conan build -pr:h conan_profiles/enea-release-linux-${ENEA_ARCH}-11.3.0 -pr:b conan_profiles/enea-host-linux-x86_64-11.3.0 -o enea*:build_tests=False --build "*" -of build-${ENEA_ARCH} .`
+    `$ conan build -pr:h conan_profiles/enea-release-linux-${ENEA_ARCH}-11.3.0 -pr:b cornan_profiles/enea-host-linux-x86_64-11.3.0 -o enea*:build_tests=False --build "*" -of build-${ENEA_ARCH} .`
 
 - Even if Enea can be theoretically launched stand-alone the preferred distribution format is [AppImage](https://appimage.org/). You can generate an AppImage for Enea by doing:
 
-    `$ cd build-${ENEA_ARCH} && ../scripts/generate_appimage.sh -e Release/enea -o . -t ../.env`
+    `$ cd build-${ENEA_ARCH} && ../scripts/generate_appimage.sh -e build/Release/enea -o . -t ../.env`

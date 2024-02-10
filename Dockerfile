@@ -50,4 +50,7 @@ RUN conan remote add --index 0 enea https://conan.geniorio.it
 ENV PKG_CONFIG_PATH=/usr/lib/aarch64-linux-gnu/pkgconfig
 
 # Install linuxdeploy (needed to create AppImage)
-RUN wget -O /usr/bin/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-static-x86_64.AppImage && chmod +x /usr/bin/linuxdeploy
+RUN wget -O /usr/bin/linuxdeploy https://github.com/linuxdeploy/linuxdeploy/releases/download/1-alpha-20240109-1/linuxdeploy-static-x86_64.AppImage
+
+# Setting linuxdeploy as executable and fixing magic byte in order to run it in a docker (https://github.com/linuxdeploy/linuxdeploy/issues/86)
+RUN chmod +x /usr/bin/linuxdeploy && sed -i 's|AI\x02|\x00\x00\x00|' /usr/bin/linuxdeploy
