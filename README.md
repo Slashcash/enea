@@ -46,4 +46,4 @@ The project ships with a Docker container which can be used to containerize the 
 
 - Even if Enea can be theoretically launched stand-alone the preferred distribution format is [AppImage](https://appimage.org/). You can generate an AppImage for Enea by doing:
 
-    `$ ./scripts/generate_appimage.sh -e build-${ENEA_ARCH}/build/Release/enea -o build-${ENEA_ARCH} -t .env`
+    `$ cd build-${ENEA_ARCH} && ../scripts/generate_appimage.sh -e Release/enea -o . -t ../.env`

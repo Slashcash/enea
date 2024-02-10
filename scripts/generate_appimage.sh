@@ -190,7 +190,10 @@ export PATH="$APPDIR/usr/bin"
 exec $APPDIR/usr/bin/enea' > "$launcher_path"
 
 # Using linuxdeploy to generate app image
-LDAI_OUTPUT="$output_directory/Enea-$executable_arch.AppImage" linuxdeploy --appimage-extract-and-run --appdir="$app_dir" --custom-apprun="$launcher_path" --executable="$executable_path" --executable="$advmame_path" --icon-file="$icon_path" --desktop-file="$base_temp_dir/enea.desktop" --output appimage --verbosity 2
+appimage_name="Enea-$executable_arch.AppImage"
+export LDAI_OUTPUT="$output_directory/$appimage_name" 
+export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Slashcash|enea|latest|$appimage_name.zsync"
+linuxdeploy --appimage-extract-and-run --appdir="$app_dir" --custom-apprun="$launcher_path" --executable="$executable_path" --executable="$advmame_path" --icon-file="$icon_path" --desktop-file="$base_temp_dir/enea.desktop" --output appimage --verbosity 2
 
 
 # Check if linuxdeploy was successful
