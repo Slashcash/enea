@@ -1,0 +1,6 @@
+Checks: 'bugprone-*,cppcoreguidelines-*,modernize-*,performance-*,portability-*,
+            readability-*,-modernize-use-trailing-return-type,-clang-diagnostic-unused-command-line-argument,-clang-diagnostic-error'
+WarningsAsErrors: '*'
+CheckOptions:
+- key: readability-function-cognitive-complexity.Threshold
+  value: '40'

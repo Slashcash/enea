@@ -1,0 +1,10 @@
+#ifndef SOFTWAREINFO_HPP
+#define SOFTWAREINFO_HPP
+
+#include <string_view>
+
+static constexpr std::string_view projectName = "@SOFTWARE_NAME@";
+static constexpr std::string_view executableName = "@EXECUTABLE@";
+static constexpr std::string_view projectVersion = "@SOFTWARE_VERSION@";
+
+#endif // SOFTWAREINFO_HPP

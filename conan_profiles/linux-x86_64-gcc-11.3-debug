@@ -1,0 +1,25 @@
+{% set os, arch, compiler, compiler_version, type = profile_name.split('-') %}
+{% set toolchain = "toolchain-{}-{}-{}-{}/1.0".format(os, arch, compiler, compiler_version) %}
+
+{% if type == "debug" %}
+    {% set loglevel = "trace" %}
+    {% set btype = "Debug" %}
+{% else %}
+    {% set loglevel = "info" %}
+    {% set btype = "Release" %}
+{% endif %}
+
+[settings]
+os={{ os.capitalize() }}
+arch={{ arch }}
+compiler={{ compiler }}
+compiler.version={{ compiler_version }}
+compiler.libcxx=libstdc++11
+build_type={{ btype }}
+
+[tool_requires]
+{{ toolchain }}
+cmake/3.27.0
+
+[runenv]
+SPDLOG_LEVEL={{ loglevel }}

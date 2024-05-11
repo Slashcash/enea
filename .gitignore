@@ -1,0 +1,6 @@
+build*
+TODO.md
+.vscode
+CMakeUserPresets.json
+*.AppImage
+*.AppImage.zsync

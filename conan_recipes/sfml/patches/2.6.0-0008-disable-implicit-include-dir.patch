@@ -1,0 +1,27 @@
+From b63a5e0dc302768ce37c409ffd64eae522ffce3b Mon Sep 17 00:00:00 2001
+From: Gennaro Iorio <gennaro.iorio@schindler.com>
+Date: Sun, 20 Aug 2023 21:59:14 +0200
+Subject: [PATCH] unset CMAKE_LANG_IMPLICIT_INCLUDE_DIRECTORIES in order to
+ find host X11 headers when cross-compiling with conan
+
+---
+ CMakeLists.txt | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 9e3f89df..ce919be2 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -37,6 +37,9 @@ endif()
+ # project name
+ project(SFML)
+ 
++unset(CMAKE_C_IMPLICIT_INCLUDE_DIRECTORIES)
++unset(CMAKE_CXX_IMPLICIT_INCLUDE_DIRECTORIES)
++
+ # include the configuration file
+ include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Config.cmake)
+ 
+-- 
+2.34.1
+
