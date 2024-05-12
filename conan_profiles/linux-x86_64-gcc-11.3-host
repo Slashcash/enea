@@ -19,3 +19,6 @@ build_type={{ btype }}
 [conf]
 tools.system.package_manager:mode=install
 tools.system.package_manager:sudo=True
+
+[tool_requires]
+cmake/3.27.0
