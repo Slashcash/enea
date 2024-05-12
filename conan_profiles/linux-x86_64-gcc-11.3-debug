@@ -23,3 +23,7 @@ cmake/3.27.0
 
 [runenv]
 SPDLOG_LEVEL={{ loglevel }}
+
+[conf]
+tools.system.package_manager:mode=install
+tools.system.package_manager:sudo=True
