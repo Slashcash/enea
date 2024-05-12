@@ -1,5 +1,15 @@
 #!/bin/bash
 
+# Default paths (script's parent path)
+DEFAULT_SOURCE_DIR="$( cd "$(dirname "$0/..")" >/dev/null 2>&1 ; pwd -P )"
+DEFAULT_OUTPUT_DIR="$DEFAULT_SOURCE_DIR"
+
+# temporary folders
+base_temp_dir="/tmp/enea_appimage"
+app_dir="$base_temp_dir/app"
+downloads_dir="$base_temp_dir/downloads"
+logs_dir="$base_temp_dir/logs"
+
 # Function to display usage help
 function display_help {
   echo "Usage: $(basename "$0") [-s <source_folder>] [-o <output_directory>] [-a <executable>] [-e <executable>]"
@@ -10,9 +20,15 @@ function display_help {
   echo "  -h  Display this help message"
 }
 
-# Default paths (script's parent path)
-DEFAULT_SOURCE_DIR="$( cd "$(dirname "$0/..")" >/dev/null 2>&1 ; pwd -P )"
-DEFAULT_OUTPUT_DIR="$DEFAULT_SOURCE_DIR"
+# Function to clean up temporary folders (keeping the logs folder just in case we need to analyze it)
+function cleanup {
+  rm $base_temp_dir/* 2> /dev/null || true
+  rm -rf "$app_dir"
+  rm -rf "$downloads_dir"
+}
+
+# Trap function to ensure cleanup is called on exit
+trap cleanup EXIT
 
 # Sourcing common scripts
 source $(dirname $0)/common.sh
@@ -62,11 +78,6 @@ if ! is_path_writable "$OUTPUT_DIR"; then
 fi
 
 # Creating temporary folders
-base_temp_dir="/tmp/enea_appimage"
-app_dir="$base_temp_dir/app"
-downloads_dir="$base_temp_dir/downloads"
-logs_dir="$base_temp_dir/logs"
-
 mkdir -p "$app_dir"
 if ! is_path_writable "$app_dir"; then
   exit 1
