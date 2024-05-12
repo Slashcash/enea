@@ -1,3 +1,4 @@
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 # Enea
 *Enea* is an AdvanceMAME frontend for Linux. It wants to be a *launch-and-play* way to use the AdvanceMAME emulator. No setup needed: just download, click and play.
 
@@ -25,29 +26,40 @@ Screenshots are supposed to be named using the very same rom pattern, eg:
 if you want to provide a screenshot for *Street Fighter Alpa III* (rom name: *sfa3.zip*) it will need to be named *sfa3.png* (or any other suitable image extension).
 
 ## Building
-To build this software you will need a machine running a Linux distribution ([Ubuntu](https://ubuntu.com/download) is proven to work). This instructions also assume a working [Python](https://www.python.org/) environment. Every command is supposed to be launched from the project root folder.
+The project ships with a Docker container which can be used to containerize the building process. Commands are meant to be launched from the project's root directory and assume a valid [Docker](https://www.docker.com/get-started/) installation is available within the system.
 
-The software is built using the [Conan](https://conan.io/) package manager. You can install it by doing:
+- Build Docker container:
 
-`$ pip install conan`
+    `$ docker build --tag enea_build docker`
 
-## Generate AppImage
-The preferred way to distribute *Enea* is through the [AppImage](https://appimage.org/) format. A convenient script that builds *Enea* and automatically packages into an .AppImage is provided:
+- Launch Docker container:
 
-`$ ./scripts/generate_appimage.sh`
+    `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
-This script will build from source and generate a file named `Enea-x86_64.AppImage` in the source folder
+- Build from source and pack:
 
-## Building native executable
+    `$ ./scripts/generate_appimage.sh`
 
-While not recommended you may want to build *Enea* as a native executable. In order for this executable to work you will need to launch it on a machine that provides a working AdvanceMAME installation.
+    This script will build from source and pack *Enea* using the [AppImage](https://appimage.org/) format. You will find a file called *Enea-x86_64.AppImage* as a result in the project's source folder.
 
-Since we use some custom Conan dependencies (unavailable on official remote) you will need to install them by doing:
+### Building without packing
 
-`$ find conan_recipes -name "conanfile.py" -execdir conan export . \;`
+While not recommended you may want to build *Enea* without packing it. In order for this executable to work you will need to launch it on a machine that provides a working AdvanceMAME installation. These commands can be launched in the very same Docker container used for building the .AppImage.
 
-You can now start building the software by doing:
+- Build Docker container:
 
-`$ conan build -pr:h conan_profiles/linux-x86_64-gcc-11.3-release -pr:b conan_profiles/linux-x86_64-host -o build_tests=False --build "missing" .`
+    `$ docker build --tag enea_build docker`
+
+- Launch Docker container:
+
+    `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
+
+- Install additional dependency not provided by official Conan remote:
+
+    `$ find conan_recipes -name "conanfile.py" -execdir conan export . \;`
+
+- You can now start building the software by doing:
+
+    `$ conan build -pr:h conan_profiles/linux-x86_64-gcc-11.3-release -pr:b conan_profiles/linux-x86_64-host -o build_tests=False --build "missing" .`
 
 The compiled binary will now be available under `build/Release/enea`.
