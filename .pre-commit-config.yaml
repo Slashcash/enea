@@ -27,3 +27,8 @@ repos:
   - id: mixed-line-ending
   - id: trailing-whitespace
     exclude: '.*\.patch$'
+
+ci:
+  autofix_prs: false
+  autoupdate_commit_msg: 'ci: pre-commit autoupdate'
+  autoupdate_schedule: monthly
