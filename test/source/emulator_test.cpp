@@ -11,8 +11,13 @@ static const std::string EMULATOR_VERSION_OUTPUT =
 static const std::string EMULATOR_VERSION_UNEXPECTED_OUTPUT = "UNEXPECTED OUTPUT";
 static const std::filesystem::path ROM_PATH = std::filesystem::absolute("sf2.zip");
 static const std::filesystem::path ROM_PATH_INVALID = "";
-static const std::string LAUNCH_COMMAND = fmt::format("-misc_quiet -nomisc_safequit -dir_rom {} {}",
-                                                      ROM_PATH.parent_path().string(), ROM_PATH.stem().string());
+static const std::string LAUNCH_COMMAND =
+    fmt::format("-misc_quiet -nomisc_safequit -input_map[p1_up] keyboard[0,up] -input_map[p1_down] keyboard[0,down] "
+                "-input_map[p1_left] keyboard[0,left] -input_map[p1_right] keyboard[0,right] -input_map[p1_button1] "
+                "keyboard[0,q] -input_map[p1_button2] keyboard[0,w] -input_map[p1_button3] keyboard[0,e] "
+                "-input_map[p1_button4] keyboard[0,a] -input_map[p1_button5] keyboard[0,s] -input_map[p1_button6] "
+                "keyboard[0,d] -input_map[coin1] keyboard[0,3] -input_map[start1] keyboard[0,1] -dir_rom {} {}",
+                ROM_PATH.parent_path().string(), ROM_PATH.stem().string());
 
 class EmulatorFixture : public ::testing::Test
 {

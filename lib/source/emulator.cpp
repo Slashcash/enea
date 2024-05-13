@@ -1,9 +1,17 @@
 #include "emulator.hpp"
 
 #include <filesystem>
+
 #include <fmt/format.h>
+#include <magic_enum.hpp>
+#include <magic_enum_utility.hpp>
 
 #include "systemcommand.hpp"
+
+const std::unordered_map<Emulator::Input, std::string> Emulator::mKeyboardInput{
+    {Input::p1_up, "up"},     {Input::p1_down, "down"}, {Input::p1_left, "left"}, {Input::p1_right, "right"},
+    {Input::p1_button1, "q"}, {Input::p1_button2, "w"}, {Input::p1_button3, "e"}, {Input::p1_button4, "a"},
+    {Input::p1_button5, "s"}, {Input::p1_button6, "d"}, {Input::coin1, "3"},      {Input::start1, "1"}};
 
 bool Emulator::romExists(const Rom& rom) const
 {
@@ -17,6 +25,26 @@ bool Emulator::romIsReadable(const Rom& rom) const
     auto perms = fs::status(rom.path()).permissions();
     return ((perms & fs::perms::owner_read) != fs::perms::none && (perms & fs::perms::group_read) != fs::perms::none &&
             (perms & fs::perms::others_read) != fs::perms::none);
+}
+
+std::string Emulator::inputString(const Input& input)
+{
+    if (auto elem = mKeyboardInput.find(input); elem != mKeyboardInput.end())
+    {
+        return fmt::format("keyboard[0,{}]", elem->second);
+    }
+
+    throw Excep(fmt::format("Possible input value not found for {}", magic_enum::enum_name(input)));
+}
+
+std::string Emulator::controlString() const
+{
+    std::string result;
+    magic_enum::enum_for_each<Input>([this, &result](const Input val) {
+        result += fmt::format("-input_map[{}] {} ", magic_enum::enum_name(val), inputString(val));
+    });
+    // Erasing last character as it probably contains a space anyway
+    return result.substr(0, result.size() - 1);
 }
 
 std::optional<Emulator::Error> Emulator::run(const Rom& rom) const
@@ -41,9 +69,10 @@ std::optional<Emulator::Error> Emulator::run(const Rom& rom) const
     }
 
     // Launching emulator
-    if (launch(fmt::format("-misc_quiet -nomisc_safequit -dir_rom {} {}", romPath.parent_path().string(),
-                           romPath.stem().string()))
-            .exitcode != 0)
+    auto cmdString = fmt::format("-misc_quiet -nomisc_safequit {} -dir_rom {} {}", controlString(),
+                                 romPath.parent_path().string(), romPath.stem().string());
+
+    if (launch(cmdString).exitcode != 0)
     {
         return Emulator::Error::EMULATOR_ERROR;
     }
