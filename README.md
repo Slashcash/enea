@@ -60,6 +60,6 @@ While not recommended you may want to build *Enea* without packing it. In order 
 
 - You can now start building the software by doing:
 
-    `$ conan build -pr:h conan_profiles/linux-x86_64-gcc-11.3-release -pr:b conan_profiles/linux-x86_64-host -o build_tests=False --build "missing" .`
+    `$ conan build -pr:h conan_profiles/linux-x86_64-gcc-11.3-release -pr:b conan_profiles/linux-x86_64-gcc-11.3-host -o build_tests=False --build "missing" .`
 
 The compiled binary will now be available under `build/Release/enea`.
