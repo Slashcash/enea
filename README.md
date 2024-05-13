@@ -12,13 +12,25 @@ You can then just launch the software by clicking on it or through a terminal, e
 `$ ./Enea-x86_64.AppImage`
 
 ## Using
-You can navigate the rom list using *Arrows* and then launch the rom by pressing *Enter*. You can exit Enea using the *Esc* button.
-
 Roms and screenshots are searched in:
 
 `~/.enea/roms`
 
-You are supposed to fill this folder with roms and screenshot yourself. If no rom is found Enea will simply exit at startup. Be sure to provide at least a rom.
+You are supposed to fill this folder with roms and screenshot yourself. **If no rom is found Enea will simply exit at startup.** Be sure to provide at least a rom.
+
+Control mapping as follows:
+
+*Frontend*
+---
+| UP       | DOWN       | Launch rom | Exit |
+|----------|------------|------------|------|
+| Arrow Up | Arrow Down | Enter      | Esc  |
+
+*In game*
+---
+| P1 UP    | P1 DOWN    | P1 LEFT    | P1 RIGHT    | Action buttons   | P1 START | P1 Insert Coin | Exit Game |
+|----------|------------|------------|-------------|------------------|----------|----------------|-----------|
+| Arrow Up | Arrow Down | Arrow Left | Arrow Right | q, w, e, a, s, d | 1        | 3              | Esc       |
 
 Please note that you will need an AdvanceMAME compatible romset for games to work.
 
