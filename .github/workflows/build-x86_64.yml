@@ -1,0 +1,22 @@
+name: Build enea for x86_64 architecture
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Conan
+      id: conan
+      uses: turtlebrowser/get-conan@main
+
+    - name: Install custom Conan recipes
+      run: find ${{github.workspace}}/conan_recipes -name conanfile.py -execdir conan export . \;
+
+    - name: Build
+      run: conan build -pr:h ${{github.workspace}}/conan_profiles/linux-x86_64-gcc-11.3-release -pr:b ${{github.workspace}}/conan_profiles/linux-x86_64-gcc-11.3-host -o build_tests=False --build missing ${{github.workspace}}
