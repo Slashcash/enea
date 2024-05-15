@@ -9,9 +9,15 @@
 #include "systemcommand.hpp"
 
 const std::unordered_map<Emulator::Input, std::string> Emulator::mKeyboardInput{
-    {Input::p1_up, "up"},     {Input::p1_down, "down"}, {Input::p1_left, "left"}, {Input::p1_right, "right"},
-    {Input::p1_button1, "q"}, {Input::p1_button2, "w"}, {Input::p1_button3, "e"}, {Input::p1_button4, "a"},
-    {Input::p1_button5, "s"}, {Input::p1_button6, "d"}, {Input::coin1, "3"},      {Input::start1, "1"}};
+    {Input::p1_up, "up"},         {Input::p1_down, "down"},     {Input::p1_left, "left"},
+    {Input::p1_right, "right"},   {Input::p1_button1, "7_pad"}, {Input::p1_button2, "8_pad"},
+    {Input::p1_button3, "9_pad"}, {Input::p1_button4, "4_pad"}, {Input::p1_button5, "5_pad"},
+    {Input::p1_button6, "6_pad"}, {Input::coin1, "3"},          {Input::start1, "1"},
+    {Input::p2_up, "w"},          {Input::p2_down, "s"},        {Input::p2_left, "a"},
+    {Input::p2_right, "d"},       {Input::p2_button1, "i"},     {Input::p2_button2, "o"},
+    {Input::p2_button3, "p"},     {Input::p2_button4, "j"},     {Input::p2_button5, "k"},
+    {Input::p2_button6, "l"},     {Input::coin2, "4"},          {Input::start2, "2"},
+    {Input::ui_pause, "9"}};
 
 bool Emulator::romExists(const Rom& rom) const
 {

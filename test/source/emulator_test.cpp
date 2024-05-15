@@ -11,13 +11,18 @@ static const std::string EMULATOR_VERSION_OUTPUT =
 static const std::string EMULATOR_VERSION_UNEXPECTED_OUTPUT = "UNEXPECTED OUTPUT";
 static const std::filesystem::path ROM_PATH = std::filesystem::absolute("sf2.zip");
 static const std::filesystem::path ROM_PATH_INVALID = "";
-static const std::string LAUNCH_COMMAND =
-    fmt::format("-misc_quiet -nomisc_safequit -input_map[p1_up] keyboard[0,up] -input_map[p1_down] keyboard[0,down] "
-                "-input_map[p1_left] keyboard[0,left] -input_map[p1_right] keyboard[0,right] -input_map[p1_button1] "
-                "keyboard[0,q] -input_map[p1_button2] keyboard[0,w] -input_map[p1_button3] keyboard[0,e] "
-                "-input_map[p1_button4] keyboard[0,a] -input_map[p1_button5] keyboard[0,s] -input_map[p1_button6] "
-                "keyboard[0,d] -input_map[coin1] keyboard[0,3] -input_map[start1] keyboard[0,1] -dir_rom {} {}",
-                ROM_PATH.parent_path().string(), ROM_PATH.stem().string());
+static const std::string LAUNCH_COMMAND = fmt::format(
+    "-misc_quiet -nomisc_safequit -input_map[p1_up] keyboard[0,up] -input_map[p1_down] keyboard[0,down] "
+    "-input_map[p1_left] keyboard[0,left] -input_map[p1_right] keyboard[0,right] -input_map[p1_button1] "
+    "keyboard[0,7_pad] -input_map[p1_button2] keyboard[0,8_pad] -input_map[p1_button3] keyboard[0,9_pad] "
+    "-input_map[p1_button4] keyboard[0,4_pad] -input_map[p1_button5] keyboard[0,5_pad] -input_map[p1_button6] "
+    "keyboard[0,6_pad] -input_map[coin1] keyboard[0,3] -input_map[start1] keyboard[0,1] -input_map[p2_up] "
+    "keyboard[0,w] -input_map[p2_down] keyboard[0,s] -input_map[p2_left] keyboard[0,a] -input_map[p2_right] "
+    "keyboard[0,d] -input_map[p2_button1] keyboard[0,i] -input_map[p2_button2] keyboard[0,o] -input_map[p2_button3] "
+    "keyboard[0,p] -input_map[p2_button4] keyboard[0,j] -input_map[p2_button5] keyboard[0,k] -input_map[p2_button6] "
+    "keyboard[0,l] -input_map[coin2] keyboard[0,4] -input_map[start2] keyboard[0,2] -input_map[ui_pause] keyboard[0,9] "
+    "-dir_rom {} {}",
+    ROM_PATH.parent_path().string(), ROM_PATH.stem().string());
 
 class EmulatorFixture : public ::testing::Test
 {
