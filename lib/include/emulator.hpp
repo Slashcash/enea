@@ -37,7 +37,20 @@ class Emulator
         p1_button5,
         p1_button6,
         coin1,
-        start1
+        start1,
+        p2_up,
+        p2_down,
+        p2_left,
+        p2_right,
+        p2_button1,
+        p2_button2,
+        p2_button3,
+        p2_button4,
+        p2_button5,
+        p2_button6,
+        coin2,
+        start2,
+        ui_pause
     };
 
     static const std::unordered_map<Input, std::string> mKeyboardInput;
