@@ -7,12 +7,12 @@ repos:
   - id: clang-format
 
 - repo: https://github.com/cheshirekow/cmake-format-precommit
-  rev: v0.6.10
+  rev: v0.6.13
   hooks:
   - id: cmake-format
 
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v3.25.0
+  rev: v3.27.0
   hooks:
   - id: commitizen
 
