@@ -31,6 +31,7 @@ void Gui::run()
 
     sf::RenderWindow window(availableVideoModes[0], std::string(projectName), sf::Style::Fullscreen);
     window.setMouseCursorVisible(false);
+    window.setFramerateLimit(MAX_FRAME_RATE);
     sf::View view(sf::FloatRect(0, 0, SCENE_WIDTH, SCENE_HEIGHT));
     window.setView(view);
 

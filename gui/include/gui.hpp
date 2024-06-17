@@ -10,6 +10,7 @@ class Gui
  private:
     static constexpr unsigned int SCENE_WIDTH = 1920;
     static constexpr unsigned int SCENE_HEIGHT = 1080;
+    static constexpr unsigned int MAX_FRAME_RATE = 30;
 
     std::list<Rom> mRomList;
 
