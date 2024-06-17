@@ -7,3 +7,4 @@ commitizen:
   version_files:
   - .env:SOFTWARE_VERSION
   version_scheme: semver
+  update_changelog_on_bump: true
