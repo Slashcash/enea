@@ -30,7 +30,8 @@ add_subdirectory(gui)
 add_subdirectory(app)
 
 # Creating tests
-if(BUILD_TESTS)
+include(CTest)
+if(BUILD_TESTING)
   add_subdirectory(test)
 endif()
 
