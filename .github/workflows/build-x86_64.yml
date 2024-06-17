@@ -18,5 +18,5 @@ jobs:
     - name: Install custom Conan recipes
       run: find ${{github.workspace}}/conan_recipes -name conanfile.py -execdir conan export . \;
 
-    - name: Build
-      run: conan build -pr:h ${{github.workspace}}/conan_profiles/linux-x86_64-gcc-11.3-release -pr:b ${{github.workspace}}/conan_profiles/linux-x86_64-gcc-11.3-host -o build_tests=False --build missing ${{github.workspace}}
+    - name: Build and run tests
+      run: conan build -pr:h ${{github.workspace}}/conan_profiles/linux-x86_64-gcc-11.3-release -pr:b ${{github.workspace}}/conan_profiles/linux-x86_64-gcc-11.3-host --build missing ${{github.workspace}}

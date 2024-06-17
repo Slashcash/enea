@@ -210,7 +210,7 @@ if [ -z "$USER_ENEA_EXEC" ]; then
     enea_log="$logs_dir/enea.log"
 
     find "$SOURCE_DIR/conan_recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
-    conan create -pr:h $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-release -pr:b $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-host -o enea*:build_tests=False --build "missing" --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
+    conan create -pr:h $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-release -pr:b $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
 
     # Check if building enea was successful
     if [ $? -ne 0 ]; then

@@ -4,13 +4,10 @@ from conan.tools.cmake import cmake_layout, CMakeToolchain, CMake
 class Recipe(ConanFile):
     generators = "CMakeDeps", "VirtualBuildEnv", "VirtualRunEnv"
     settings = "build_type"
-    options = {"build_tests": [True, False]}
-    default_options = {"build_tests": True}
     exports_sources = "*"
 
     def generate(self):
         tc = CMakeToolchain(self)
-        tc.cache_variables["BUILD_TESTS"] = self.options.build_tests
         tc.generate()
 
     def configure(self):
@@ -20,6 +17,8 @@ class Recipe(ConanFile):
         cmake = CMake(self)
         cmake.configure()
         cmake.build()
+        if not self.conf.get("tools.build:skip_test", default=False):
+            cmake.test()
 
     def package(self):
         cmake = CMake(self)
@@ -34,7 +33,7 @@ class Recipe(ConanFile):
         self.requires("rocket/2.0")
 
     def build_requirements(self):
-        if self.options.build_tests:
+        if not self.conf.get("tools.build:skip_test", default=False):
             self.test_requires("gtest/1.14.0")
 
     def layout(self):
