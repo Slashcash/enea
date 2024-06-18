@@ -17,4 +17,4 @@ find_package(
   REQUIRED)
 
 # rocket
-find_package(rocket 2.0 REQUIRED)
+find_package(rocket REQUIRED)
