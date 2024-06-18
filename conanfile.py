@@ -30,7 +30,7 @@ class Recipe(ConanFile):
         self.requires("magic_enum/0.9.3")
         self.requires("nlohmann_json/3.11.2")
         self.requires("sfml/2.6.0")
-        self.requires("rocket/2.0")
+        self.requires("rocket/cci.20200603")
 
     def build_requirements(self):
         if not self.conf.get("tools.build:skip_test", default=False):
