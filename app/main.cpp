@@ -87,16 +87,17 @@ int main()
                 // Adding it to the database if: query is succesful && rom is not a bios
                 if (auto query = romdb.find(file); query && (!query->isBios || !(*(query->isBios))))
                 {
-                    auto& rom = romList.emplace_back(file, *query);
-
                     // Searching if we found any media associated to the rom in the rom folder
+                    RomMedia media;
                     for (const auto& screenshot : scanResult.screenshots)
                     {
-                        if (screenshot.filename().string().starts_with(rom.path().stem().string()))
+                        if (screenshot.filename().string().starts_with(file.stem().string()))
                         {
-                            rom.setMedia({.screenshot = screenshot});
+                            media = RomMedia{.screenshot = screenshot};
                         }
                     }
+
+                    romList.emplace_back(file, *query, media);
                 }
                 else
                 {

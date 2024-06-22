@@ -13,12 +13,12 @@ TEST(RomInfo, fromJson)
         Building RomInfo from a json which has a complete set of information.
         Expectation: RomInfo struct has every field correctly set.
     */
-    const nlohmann::json INFO_SET_COMPLETE{{RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
-                                           {RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
-                                           {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
-                                           {RomInfo::ISBIOS_JSON_FIELD, ROM_IS_BIOS}};
-
-    auto romInfo = INFO_SET_COMPLETE.template get<RomInfo>();
+    auto romInfo = nlohmann::json{
+        {RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
+        {RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
+        {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
+        {RomInfo::ISBIOS_JSON_FIELD,
+         ROM_IS_BIOS}}.template get<RomInfo>();
 
     EXPECT_TRUE(romInfo.title && *(romInfo.title) == ROM_TITLE);
     EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
@@ -29,11 +29,10 @@ TEST(RomInfo, fromJson)
         Building RomInfo from a json which has an incomplete set of information. It misses rom title.
         Expectation: RomInfo struct has every field correctly set apart for title which should be empty.
     */
-    const nlohmann::json INFO_SET_TITLE_MISSING{{RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
-                                                {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
-                                                {RomInfo::ISBIOS_JSON_FIELD, ROM_IS_BIOS}};
-
-    romInfo = INFO_SET_TITLE_MISSING.template get<RomInfo>();
+    romInfo = nlohmann::json{{RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
+                             {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
+                             {RomInfo::ISBIOS_JSON_FIELD, ROM_IS_BIOS}}
+                  .template get<RomInfo>();
 
     EXPECT_FALSE(romInfo.title);
     EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
@@ -44,11 +43,10 @@ TEST(RomInfo, fromJson)
         Building RomInfo from a json which has an incomplete set of information. It misses rom year.
         Expectation: RomInfo struct has every field correctly set apart for year which should be empty.
     */
-    const nlohmann::json INFO_SET_YEAR_MISSING{{RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
-                                               {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
-                                               {RomInfo::ISBIOS_JSON_FIELD, ROM_IS_BIOS}};
-
-    romInfo = INFO_SET_YEAR_MISSING.template get<RomInfo>();
+    romInfo = nlohmann::json{{RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
+                             {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
+                             {RomInfo::ISBIOS_JSON_FIELD, ROM_IS_BIOS}}
+                  .template get<RomInfo>();
 
     EXPECT_TRUE(romInfo.title && *(romInfo.title) == ROM_TITLE);
     EXPECT_FALSE(romInfo.year);
@@ -59,11 +57,10 @@ TEST(RomInfo, fromJson)
         Building RomInfo from a json which has an incomplete set of information. It misses rom manufacturer.
         Expectation: RomInfo struct has every field correctly set apart for manufacturer which should be empty
     */
-    const nlohmann::json INFO_SET_MANUFACTURER_MISSING{{RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
-                                                       {RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
-                                                       {RomInfo::ISBIOS_JSON_FIELD, ROM_IS_BIOS}};
-
-    romInfo = INFO_SET_MANUFACTURER_MISSING.template get<RomInfo>();
+    romInfo = nlohmann::json{{RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
+                             {RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
+                             {RomInfo::ISBIOS_JSON_FIELD, ROM_IS_BIOS}}
+                  .template get<RomInfo>();
 
     EXPECT_TRUE(romInfo.title && *(romInfo.title) == ROM_TITLE);
     EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
@@ -74,12 +71,10 @@ TEST(RomInfo, fromJson)
         Building RomInfo from a json which has an incomplete set of information. It misses bios.
         Expectation: RomInfo struct has every field correctly set apart fo bios which should be empty.
     */
-
-    const nlohmann::json INFO_SET_BIOS_MISSING{{RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
-                                               {RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
-                                               {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER}};
-
-    romInfo = INFO_SET_BIOS_MISSING.template get<RomInfo>();
+    romInfo = nlohmann::json{{RomInfo::TITLE_JSON_FIELD, ROM_TITLE},
+                             {RomInfo::YEAR_JSON_FIELD, ROM_YEAR},
+                             {RomInfo::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER}}
+                  .template get<RomInfo>();
 
     EXPECT_TRUE(romInfo.title && *(romInfo.title) == ROM_TITLE);
     EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
@@ -90,9 +85,7 @@ TEST(RomInfo, fromJson)
         Building RomInfo from an invalid json (it contains random data).
         Expectation: RomInfo struct has no field set.
     */
-    const nlohmann::json INFO_SET_INVALID{{"error", "ignored"}};
-
-    romInfo = INFO_SET_INVALID.template get<RomInfo>();
+    romInfo = nlohmann::json{{"error", "ignored"}}.template get<RomInfo>();
 
     EXPECT_FALSE(romInfo.title);
     EXPECT_FALSE(romInfo.year);
@@ -103,9 +96,7 @@ TEST(RomInfo, fromJson)
         Building RomInfo from an empty json.
         Expectation: RomInfo struct has no field set.
     */
-    const nlohmann::json INFO_SET_EMPTY;
-
-    romInfo = INFO_SET_EMPTY.template get<RomInfo>();
+    romInfo = nlohmann::json{}.template get<RomInfo>();
 
     EXPECT_FALSE(romInfo.title);
     EXPECT_FALSE(romInfo.year);

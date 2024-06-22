@@ -4,13 +4,19 @@ Rom::Rom(std::filesystem::path path) : mPath(std::move(path))
 {
 }
 
-Rom::Rom(std::filesystem::path path, RomInfo info) : mPath(std::move(path)), mInfo(std::move(info))
+Rom::Rom(std::filesystem::path path, RomInfo info, RomMedia media)
+    : mPath(std::move(path)), mInfo(std::move(info)), mMedia(std::move(media))
 {
 }
 
 std::filesystem::path Rom::path() const
 {
     return mPath;
+}
+
+RomInfo Rom::info() const
+{
+    return mInfo;
 }
 
 std::optional<std::string> Rom::title() const
@@ -31,16 +37,6 @@ std::optional<std::string> Rom::year() const
 std::optional<bool> Rom::isBios() const
 {
     return mInfo.isBios;
-}
-
-void Rom::setMedia(const RomMedia& media)
-{
-    mMedia = media;
-}
-
-RomInfo Rom::info() const
-{
-    return mInfo;
 }
 
 RomMedia Rom::media() const
