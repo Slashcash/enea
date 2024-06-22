@@ -28,17 +28,12 @@ std::optional<std::string> Rom::year() const
     return mInfo.manufacturer;
 }
 
-std::optional<std::filesystem::path> Rom::media() const
-{
-    return mMedia;
-}
-
 std::optional<bool> Rom::isBios() const
 {
     return mInfo.isBios;
 }
 
-void Rom::setMedia(const std::filesystem::path& media)
+void Rom::setMedia(const RomMedia& media)
 {
     mMedia = media;
 }
@@ -46,6 +41,16 @@ void Rom::setMedia(const std::filesystem::path& media)
 RomInfo Rom::info() const
 {
     return mInfo;
+}
+
+RomMedia Rom::media() const
+{
+    return mMedia;
+}
+
+std::optional<std::filesystem::path> Rom::screenshot() const
+{
+    return mMedia.screenshot;
 }
 
 bool Rom::operator==(const Rom& rom) const

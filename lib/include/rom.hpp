@@ -12,13 +12,14 @@
 
 #include "exception.hpp"
 #include "rominfo.hpp"
+#include "rommedia.hpp"
 
 class Rom
 {
  private:
     std::filesystem::path mPath;
     RomInfo mInfo;
-    std::optional<std::filesystem::path> mMedia;
+    RomMedia mMedia;
 
  public:
     class Excep : public Exception
@@ -35,10 +36,11 @@ class Rom
     [[nodiscard]] std::optional<std::string> title() const;
     [[nodiscard]] std::optional<std::string> year() const;
     [[nodiscard]] std::optional<std::string> manufacturer() const;
-    [[nodiscard]] std::optional<std::filesystem::path> media() const;
     [[nodiscard]] std::optional<bool> isBios() const;
 
-    void setMedia(const std::filesystem::path& media);
+    [[nodiscard]] RomMedia media() const;
+    [[nodiscard]] std::optional<std::filesystem::path> screenshot() const;
+    void setMedia(const RomMedia& media);
 
     [[nodiscard]] bool operator==(const Rom& rom) const;
 };
@@ -73,11 +75,10 @@ template <> struct adl_serializer<Rom>
 
         Rom rom{romPath, romInfo};
 
-        // Finding if rom has a media associated to it
-        std::optional<std::filesystem::path> media;
+        // Finding rom media
         try
         {
-            rom.setMedia(jsonv.at("media").get<std::filesystem::path>());
+            rom.setMedia(jsonv.at("media").get<RomMedia>());
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
@@ -97,11 +98,8 @@ template <> struct adl_serializer<Rom>
         // Setting rom info
         jsonv["info"] = rom.info();
 
-        // Setting if there is any media associated to it
-        if (auto media = rom.media(); media)
-        {
-            jsonv["media"] = *media;
-        }
+        // Setting rom media
+        jsonv["media"] = rom.media();
     }
 };
 } // namespace nlohmann

@@ -90,11 +90,11 @@ int main()
                     auto& rom = romList.emplace_back(file, *query);
 
                     // Searching if we found any media associated to the rom in the rom folder
-                    for (const auto& media : scanResult.media)
+                    for (const auto& screenshot : scanResult.screenshots)
                     {
-                        if (media.filename().string().starts_with(rom.path().stem().string()))
+                        if (screenshot.filename().string().starts_with(rom.path().stem().string()))
                         {
-                            rom.setMedia(media);
+                            rom.setMedia({.screenshot = screenshot});
                         }
                     }
                 }

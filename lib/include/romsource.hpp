@@ -14,7 +14,7 @@ class RomSource
     {
         std::string lastModified;
         std::list<std::filesystem::path> roms;
-        std::list<std::filesystem::path> media;
+        std::list<std::filesystem::path> screenshots;
     };
 
  private:

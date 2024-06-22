@@ -21,7 +21,8 @@ static const RomInfo ROM_INCOMPLETE_INFO{.title{ROM_TITLE}};
 static const RomInfo BIOS_INFO{BIOS_TITLE, BIOS_YEAR, BIOS_MANUFACTURER, true};
 
 using namespace nlohmann::literals;
-static const nlohmann::json COMPLETE_JSON{{"path", ROM_PATH}, {"info", ROM_INFO}, {"media", MEDIA_PATH}};
+static const nlohmann::json COMPLETE_JSON{
+    {"path", ROM_PATH}, {"info", ROM_INFO}, {"media", RomMedia{.screenshot = MEDIA_PATH}}};
 static const nlohmann::json BIOS_JSON{{"path", BIOS_PATH}, {"info", BIOS_INFO}};
 static const nlohmann::json DIFFERENT_JSON{{"path", DIFFERENT_ROM_PATH}};
 static const nlohmann::json INCOMPLETE_JSON{{"path", ROM_PATH}, {"info", ROM_INCOMPLETE_INFO}};
@@ -54,13 +55,13 @@ TEST_F(RomFixture, romFromPath)
     EXPECT_FALSE(rom.manufacturer());
     EXPECT_FALSE(rom.year());
     EXPECT_FALSE(rom.isBios());
-    EXPECT_FALSE(rom.media());
+    EXPECT_FALSE(rom.media().screenshot);
     EXPECT_EQ(rom, sameRom);
     EXPECT_NE(rom, notSameRom);
 
-    rom.setMedia(MEDIA_PATH);
-    ASSERT_TRUE(rom.media());
-    EXPECT_EQ(*(rom.media()), MEDIA_PATH);
+    rom.setMedia({.screenshot = MEDIA_PATH});
+    ASSERT_TRUE(rom.media().screenshot);
+    EXPECT_EQ(rom.screenshot(), MEDIA_PATH);
 }
 
 TEST_F(RomFixture, romFromInfo)
@@ -74,7 +75,7 @@ TEST_F(RomFixture, romFromInfo)
     EXPECT_EQ(*(romFromInfo.year()), ROM_YEAR);
     ASSERT_TRUE(romFromInfo.isBios().has_value());
     EXPECT_FALSE(*(romFromInfo.isBios()));
-    EXPECT_FALSE(rom.media());
+    EXPECT_FALSE(rom.media().screenshot);
 
     EXPECT_EQ(romFromIncompleteInfo.path(), ROM_PATH);
     ASSERT_TRUE(romFromIncompleteInfo.title().has_value());
@@ -82,7 +83,7 @@ TEST_F(RomFixture, romFromInfo)
     EXPECT_FALSE(romFromIncompleteInfo.manufacturer().has_value());
     EXPECT_FALSE(romFromIncompleteInfo.year().has_value());
     EXPECT_FALSE(romFromIncompleteInfo.isBios().has_value());
-    EXPECT_FALSE(rom.media());
+    EXPECT_FALSE(rom.media().screenshot);
 
     EXPECT_EQ(biosFromInfo.path(), BIOS_PATH);
     ASSERT_TRUE(biosFromInfo.title().has_value());
@@ -93,7 +94,7 @@ TEST_F(RomFixture, romFromInfo)
     EXPECT_EQ(*(biosFromInfo.year()), BIOS_YEAR);
     ASSERT_TRUE(biosFromInfo.isBios().has_value());
     EXPECT_TRUE(*(biosFromInfo.isBios()));
-    EXPECT_FALSE(rom.media());
+    EXPECT_FALSE(rom.media().screenshot);
 
     EXPECT_EQ(romFromInfo, sameRomFromInfo);
     EXPECT_NE(romFromInfo, notSameRomFromInfo);
@@ -110,8 +111,8 @@ TEST_F(RomFixture, romFromJson)
     EXPECT_EQ(*(romFromJson.year()), ROM_YEAR);
     ASSERT_TRUE(romFromJson.isBios().has_value());
     EXPECT_FALSE(*(romFromJson.isBios()));
-    ASSERT_TRUE(romFromJson.media());
-    ASSERT_EQ(*(romFromJson.media()), MEDIA_PATH);
+    ASSERT_TRUE(romFromJson.screenshot());
+    ASSERT_EQ(*(romFromJson.screenshot()), MEDIA_PATH);
 
     EXPECT_EQ(biosFromJson.path(), BIOS_PATH);
     ASSERT_TRUE(biosFromJson.title().has_value());
@@ -122,7 +123,7 @@ TEST_F(RomFixture, romFromJson)
     EXPECT_EQ(*(biosFromJson.year()), BIOS_YEAR);
     ASSERT_TRUE(biosFromJson.isBios().has_value());
     EXPECT_TRUE(*(biosFromJson.isBios()));
-    EXPECT_FALSE(biosFromJson.media());
+    EXPECT_FALSE(biosFromJson.screenshot());
 
     EXPECT_EQ(romFromIncompleteJson.path(), ROM_PATH);
     ASSERT_TRUE(romFromIncompleteJson.title().has_value());
@@ -130,7 +131,7 @@ TEST_F(RomFixture, romFromJson)
     EXPECT_FALSE(romFromIncompleteJson.manufacturer().has_value());
     EXPECT_FALSE(romFromIncompleteJson.year().has_value());
     EXPECT_FALSE(romFromIncompleteJson.isBios().has_value());
-    EXPECT_FALSE(romFromIncompleteJson.media());
+    EXPECT_FALSE(romFromIncompleteJson.screenshot());
 
     EXPECT_THROW(Rom{WRONG_JSON}, Rom::Excep);
 

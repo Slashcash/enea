@@ -22,7 +22,8 @@ add_executable(
   # TODO: Re-enable once we figure out how to run in a docker without X11
   mock/resourcemanager_mock.hpp
   source/resourcemanager_test.cpp
-  source/rominfo_test.cpp)
+  source/rominfo_test.cpp
+  source/rommedia_test.cpp)
 
 target_link_libraries(
   ${EXECUTABLE}Test PRIVATE GTest::gtest_main GTest::gmock ${EXECUTABLE}Lib
