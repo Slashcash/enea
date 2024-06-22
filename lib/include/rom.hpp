@@ -11,13 +11,13 @@
 #include <string>
 
 #include "exception.hpp"
-#include "romdb.hpp"
+#include "rominfo.hpp"
 
 class Rom
 {
  private:
     std::filesystem::path mPath;
-    RomDB::RomInfo mInfo;
+    RomInfo mInfo;
     std::optional<std::filesystem::path> mMedia;
 
  public:
@@ -28,9 +28,10 @@ class Rom
 
     Rom() = delete;
     explicit Rom(std::filesystem::path path);
-    explicit Rom(std::filesystem::path path, RomDB::RomInfo info);
+    explicit Rom(std::filesystem::path path, RomInfo info);
 
     [[nodiscard]] std::filesystem::path path() const;
+    [[nodiscard]] RomInfo info() const;
     [[nodiscard]] std::optional<std::string> title() const;
     [[nodiscard]] std::optional<std::string> year() const;
     [[nodiscard]] std::optional<std::string> manufacturer() const;
@@ -55,49 +56,19 @@ template <> struct adl_serializer<Rom>
         }
         catch (const json::exception& e)
         {
-            throw Rom::Excep("Rom constructed from invalid json");
+            throw Rom::Excep("Rom constructed from invalid json, mandatory path field is missing");
         }
 
-        RomDB::RomInfo romInfo;
+        RomInfo romInfo;
 
-        // Finding rom title
+        // Finding rom info
         try
         {
-            romInfo.title = jsonv.at("title").get<std::string>();
+            romInfo = jsonv.at("info").get<RomInfo>();
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
-            romInfo.title.reset();
-        }
-
-        // Finding rom year
-        try
-        {
-            romInfo.year = jsonv.at("year").get<std::string>();
-        }
-        catch ([[maybe_unused]] const json::exception& e)
-        {
-            romInfo.year.reset();
-        }
-
-        // Finding rom manufacturer
-        try
-        {
-            romInfo.manufacturer = jsonv.at("manufacturer").get<std::string>();
-        }
-        catch ([[maybe_unused]] const json::exception& e)
-        {
-            romInfo.manufacturer.reset();
-        }
-
-        // Finding if rom is a bios
-        try
-        {
-            romInfo.isBios = jsonv.at("isBios").get<bool>();
-        }
-        catch ([[maybe_unused]] const json::exception& e)
-        {
-            romInfo.isBios.reset();
+            // Nothing happening if it is not present as this field is optional
         }
 
         Rom rom{romPath, romInfo};
@@ -123,29 +94,8 @@ template <> struct adl_serializer<Rom>
         // Setting rom path
         jsonv["path"] = rom.path();
 
-        // Setting rom title
-        if (auto title = rom.title(); title)
-        {
-            jsonv["title"] = *title;
-        }
-
-        // Setting rom year
-        if (auto year = rom.year(); year)
-        {
-            jsonv["year"] = *year;
-        }
-
-        // Setting rom manufacturer
-        if (auto manufacturer = rom.manufacturer(); manufacturer)
-        {
-            jsonv["manufacturer"] = *manufacturer;
-        }
-
-        // Setting if it is bios
-        if (auto isBios = rom.isBios(); isBios)
-        {
-            jsonv["isBios"] = *isBios;
-        }
+        // Setting rom info
+        jsonv["info"] = rom.info();
 
         // Setting if there is any media associated to it
         if (auto media = rom.media(); media)

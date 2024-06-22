@@ -82,7 +82,7 @@ int main()
             for (const auto& file : scanResult.roms)
             {
                 // Searching rom information into the database
-                RomDB::RomInfo romInfo;
+                RomInfo romInfo;
                 spdlog::trace("Querying rom database for: {}", file.string());
                 // Adding it to the database if: query is succesful && rom is not a bios
                 if (auto query = romdb.find(file); query && (!query->isBios || !(*(query->isBios))))

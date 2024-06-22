@@ -16,22 +16,15 @@ static const std::string BIOS_TITLE = "Hyper NeoGeo 64 Bios";
 static const std::string BIOS_YEAR = "1997";
 static const std::string BIOS_MANUFACTURER = "SNK";
 
-static const RomDB::RomInfo ROM_INFO{ROM_TITLE, ROM_YEAR, ROM_MANUFACTURER, false};
-static const RomDB::RomInfo ROM_INCOMPLETE_INFO{.title{ROM_TITLE}};
-static const RomDB::RomInfo BIOS_INFO{BIOS_TITLE, BIOS_YEAR, BIOS_MANUFACTURER, true};
+static const RomInfo ROM_INFO{ROM_TITLE, ROM_YEAR, ROM_MANUFACTURER, false};
+static const RomInfo ROM_INCOMPLETE_INFO{.title{ROM_TITLE}};
+static const RomInfo BIOS_INFO{BIOS_TITLE, BIOS_YEAR, BIOS_MANUFACTURER, true};
 
 using namespace nlohmann::literals;
-static const nlohmann::json COMPLETE_JSON{{"path", ROM_PATH},    {"title", ROM_TITLE},
-                                          {"year", ROM_YEAR},    {"manufacturer", ROM_MANUFACTURER},
-                                          {"media", MEDIA_PATH}, {"isBios", false}};
-static const nlohmann::json BIOS_JSON{{"path", BIOS_PATH},
-                                      {"title", BIOS_TITLE},
-                                      {"year", BIOS_YEAR},
-                                      {"manufacturer", BIOS_MANUFACTURER},
-                                      {"isBios", true}};
-static const nlohmann::json DIFFERENT_JSON{
-    {"path", DIFFERENT_ROM_PATH}, {"title", ROM_TITLE}, {"year", ROM_YEAR}, {"manufacturer", ROM_MANUFACTURER}};
-static const nlohmann::json INCOMPLETE_JSON{{"path", ROM_PATH}, {"title", ROM_TITLE}};
+static const nlohmann::json COMPLETE_JSON{{"path", ROM_PATH}, {"info", ROM_INFO}, {"media", MEDIA_PATH}};
+static const nlohmann::json BIOS_JSON{{"path", BIOS_PATH}, {"info", BIOS_INFO}};
+static const nlohmann::json DIFFERENT_JSON{{"path", DIFFERENT_ROM_PATH}};
+static const nlohmann::json INCOMPLETE_JSON{{"path", ROM_PATH}, {"info", ROM_INCOMPLETE_INFO}};
 static const nlohmann::json WRONG_JSON{{"error", ROM_PATH}};
 
 class RomFixture : public ::testing::Test
