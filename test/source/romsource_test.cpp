@@ -29,8 +29,8 @@ TEST_F(RomSourceFixture, scan)
     auto result = romSource.scan();
     ASSERT_EQ(result.roms.size(), 1);
     EXPECT_EQ(*(result.roms.begin()), ROM_PATH);
-    ASSERT_EQ(result.media.size(), 1);
-    EXPECT_EQ(*(result.media.begin()), SCREENSHOT_PATH);
+    ASSERT_EQ(result.screenshots.size(), 1);
+    EXPECT_EQ(*(result.screenshots.begin()), SCREENSHOT_PATH);
     EXPECT_EQ(result.lastModified, LAST_EDIT);
 
     EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));

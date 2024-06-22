@@ -118,10 +118,10 @@ void RomMenu::reorganize()
     auto screenshotSprite = std::make_shared<SpriteNode>();
     try
     {
-        if (auto media = rom.media(); media)
+        if (auto screenshot = rom.screenshot(); screenshot)
         {
             auto screenshotSprite = std::make_shared<SpriteNode>();
-            screenshotSprite->element().setTexture(ScreenShotManager::get().getResource(*media));
+            screenshotSprite->element().setTexture(ScreenShotManager::get().getResource(*screenshot));
             auto screenshotWidth = screenshotSprite->element().getGlobalBounds().width;
             auto screenshotHeight = screenshotSprite->element().getGlobalBounds().height;
             // NOLINTNEXTLINE

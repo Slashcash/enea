@@ -43,7 +43,7 @@ RomSource::ScanResult RomSource::scan() const
         }
         else if (fileIsImage(file))
         {
-            result.media.push_back(file);
+            result.screenshots.push_back(file);
         }
     }
 
