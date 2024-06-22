@@ -22,6 +22,10 @@ class Rom
     RomMedia mMedia;
 
  public:
+    static constexpr std::string_view PATH_JSON_FIELD = "path";
+    static constexpr std::string_view INFO_JSON_FIELD = "info";
+    static constexpr std::string_view MEDIA_JSON_FIELD = "media";
+
     class Excep : public Exception
     {
         using Exception::Exception;
@@ -29,9 +33,10 @@ class Rom
 
     Rom() = delete;
     explicit Rom(std::filesystem::path path);
-    explicit Rom(std::filesystem::path path, RomInfo info);
+    explicit Rom(std::filesystem::path path, RomInfo info, RomMedia media);
 
     [[nodiscard]] std::filesystem::path path() const;
+
     [[nodiscard]] RomInfo info() const;
     [[nodiscard]] std::optional<std::string> title() const;
     [[nodiscard]] std::optional<std::string> year() const;
@@ -40,7 +45,6 @@ class Rom
 
     [[nodiscard]] RomMedia media() const;
     [[nodiscard]] std::optional<std::filesystem::path> screenshot() const;
-    void setMedia(const RomMedia& media);
 
     [[nodiscard]] bool operator==(const Rom& rom) const;
 };
@@ -48,58 +52,58 @@ class Rom
 namespace nlohmann {
 template <> struct adl_serializer<Rom>
 {
-    static Rom from_json(const json& jsonv)
+    static Rom from_json(const json& json)
     {
         // Finding rom path
         std::filesystem::path romPath;
         try
         {
-            jsonv.at("path").get_to(romPath);
+            json.at(Rom::PATH_JSON_FIELD).get_to(romPath);
         }
         catch (const json::exception& e)
         {
             throw Rom::Excep("Rom constructed from invalid json, mandatory path field is missing");
         }
 
-        RomInfo romInfo;
-
         // Finding rom info
+        RomInfo romInfo;
         try
         {
-            romInfo = jsonv.at("info").get<RomInfo>();
+            romInfo = json.at(Rom::INFO_JSON_FIELD).get<RomInfo>();
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
             // Nothing happening if it is not present as this field is optional
         }
 
-        Rom rom{romPath, romInfo};
-
         // Finding rom media
+        RomMedia romMedia;
         try
         {
-            rom.setMedia(jsonv.at("media").get<RomMedia>());
+            romMedia = json.at(Rom::MEDIA_JSON_FIELD).get<RomMedia>();
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
             // Do not do anything, no media is allowed
         }
 
+        Rom rom{romPath, romInfo, romMedia};
+
         return rom;
     }
 
-    static void to_json(json& jsonv, Rom const& rom)
+    static void to_json(json& json, Rom const& rom)
     {
-        jsonv.clear();
+        json.clear();
 
         // Setting rom path
-        jsonv["path"] = rom.path();
+        json[Rom::PATH_JSON_FIELD] = rom.path();
 
         // Setting rom info
-        jsonv["info"] = rom.info();
+        json[Rom::INFO_JSON_FIELD] = rom.info();
 
         // Setting rom media
-        jsonv["media"] = rom.media();
+        json[Rom::MEDIA_JSON_FIELD] = rom.media();
     }
 };
 } // namespace nlohmann
