@@ -73,12 +73,7 @@ int main()
             // Retrieving rom information
             RomDB romdb;
             spdlog::debug("Loading rom database");
-            if (auto loadDbError = romdb.load(); loadDbError)
-            {
-                spdlog::warn("Error while reading rom database, rom information may not be available: {}",
-                             magic_enum::enum_name(*loadDbError));
-            }
-
+            romdb.load();
             for (const auto& file : scanResult.roms)
             {
                 // Searching rom information into the database
