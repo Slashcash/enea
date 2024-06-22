@@ -75,7 +75,7 @@ tinyxml2::XMLElement* RomDB::findRom(const std::string& rom) const
     return roms;
 }
 
-std::optional<RomDB::RomInfo> RomDB::find(const std::filesystem::path& rom) const
+std::optional<RomInfo> RomDB::find(const std::filesystem::path& rom) const
 {
     // Return an empty result if the db was not loaded
     if (!mLoaded)

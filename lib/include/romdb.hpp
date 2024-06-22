@@ -7,6 +7,8 @@
 
 #include <tinyxml2.h>
 
+#include "rominfo.hpp"
+
 /**
  * @brief This class manages the database that contains information about roms.
  * The rom database is an xml file built using the 'advmame --listxml' command.
@@ -16,14 +18,6 @@
 class RomDB
 {
  public:
-    struct RomInfo
-    {
-        std::optional<std::string> title;
-        std::optional<std::string> year;
-        std::optional<std::string> manufacturer;
-        std::optional<bool> isBios;
-    };
-
     enum class Error
     {
         UNABLE_TO_PARSE_DB_FILE,

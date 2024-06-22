@@ -4,7 +4,7 @@ Rom::Rom(std::filesystem::path path) : mPath(std::move(path))
 {
 }
 
-Rom::Rom(std::filesystem::path path, RomDB::RomInfo info) : mPath(std::move(path)), mInfo(std::move(info))
+Rom::Rom(std::filesystem::path path, RomInfo info) : mPath(std::move(path)), mInfo(std::move(info))
 {
 }
 
@@ -41,6 +41,11 @@ std::optional<bool> Rom::isBios() const
 void Rom::setMedia(const std::filesystem::path& media)
 {
     mMedia = media;
+}
+
+RomInfo Rom::info() const
+{
+    return mInfo;
 }
 
 bool Rom::operator==(const Rom& rom) const

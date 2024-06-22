@@ -14,7 +14,9 @@ add_library(
   include/emulator.hpp
   source/emulator.cpp
   include/cache.hpp
-  source/cache.cpp)
+  source/cache.cpp
+  include/rominfo.hpp
+  source/rominfo.cpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
 target_link_libraries(
