@@ -1,4 +1,5 @@
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 # Enea
 *Enea* is an AdvanceMAME frontend for Linux. It wants to be a *launch-and-play* way to use the AdvanceMAME emulator. No setup needed: just download, click and play.
 
