@@ -9,7 +9,7 @@ class RomDBMock : public RomDB
 {
  public:
     using RomDB::RomDB;
-    MOCK_METHOD(std::string, loadFromFile, (), (const override));
+    MOCK_METHOD(nlohmann::json, loadFromFile, (), (const override));
 };
 
 #endif // ROMDBMOCK_HPP

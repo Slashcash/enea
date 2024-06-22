@@ -4,32 +4,26 @@
 #include <filesystem>
 #include <optional>
 #include <string>
+#include <unordered_map>
 
-#include <tinyxml2.h>
+#include <nlohmann/json.hpp>
 
+#include "exception.hpp"
 #include "rominfo.hpp"
 
-/**
- * @brief This class manages the database that contains information about roms.
- * The rom database is an xml file built using the 'advmame --listxml' command.
- * This xml file is then embedded into our executable binary.
- *
- */
 class RomDB
 {
  public:
-    enum class Error
+    class Excep : public Exception
     {
-        UNABLE_TO_PARSE_DB_FILE,
+        using Exception::Exception;
     };
 
  private:
-    tinyxml2::XMLDocument mXML;
-    tinyxml2::XMLElement* mRootElement = nullptr;
+    std::unordered_map<std::string, RomInfo> mRecords;
     bool mLoaded{false};
 
-    [[nodiscard]] virtual std::string loadFromFile() const;
-    [[nodiscard]] tinyxml2::XMLElement* findRom(const std::string& rom) const;
+    [[nodiscard]] virtual nlohmann::json loadFromFile() const;
 
  public:
     RomDB() = default;
@@ -37,7 +31,7 @@ class RomDB
     RomDB(RomDB&& romdb) = delete;
 
     [[nodiscard]] bool loaded() const;
-    [[nodiscard]] std::optional<Error> load();
+    void load();
     [[nodiscard]] std::optional<RomInfo> find(const std::filesystem::path& rom) const;
 
     RomDB& operator=(const RomDB& romdb) = delete;

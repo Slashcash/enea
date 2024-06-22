@@ -16,21 +16,32 @@ struct dummy;
 
 CMRC_DECLARE(resources);
 
-std::string RomDB::loadFromFile() const
+nlohmann::json RomDB::loadFromFile() const
 {
     // We are not really loading rom database from filesystem, it's really embedded into our executable's filesystem
     auto embeddedFS = cmrc::resources::get_filesystem();
     cmrc::file dbFile;
     try
     {
-        dbFile = embeddedFS.open("romdb/romdb.xml");
+        dbFile = embeddedFS.open("romdb/romdb.json");
     }
-    catch ([[maybe_unused]] const std::system_error& exception)
+    catch (...)
     {
-        return {};
+        throw RomDB::Excep("Unable to load rom database");
     }
 
-    return {dbFile.begin(), static_cast<std::size_t>(std::distance(dbFile.begin(), dbFile.end()))};
+    nlohmann::json json;
+    try
+    {
+        json = nlohmann::json::parse(
+            std::string{dbFile.begin(), static_cast<std::size_t>(std::distance(dbFile.begin(), dbFile.end()))});
+    }
+    catch (...)
+    {
+        throw RomDB::Excep("Unable to parse rom database from json");
+    }
+
+    return json;
 }
 
 bool RomDB::loaded() const
@@ -38,41 +49,36 @@ bool RomDB::loaded() const
     return mLoaded;
 }
 
-std::optional<RomDB::Error> RomDB::load()
+void RomDB::load()
 {
     // No need to reload if already loaded
     if (mLoaded)
     {
-        return std::nullopt;
+        return;
     }
 
-    // Parsing string into an xml
-    if (mXML.Parse(loadFromFile().c_str()) != tinyxml2::XML_SUCCESS)
+    auto json = loadFromFile();
+
+    // If the db does not contain the "roms" or is not an array element we deem it invalid
+    if (!json.contains("roms") || !json["roms"].is_array())
     {
-        return Error::UNABLE_TO_PARSE_DB_FILE;
+        throw RomDB::Excep("Invalid rom database");
     }
 
-    mRootElement = mXML.RootElement()->FirstChild()->NextSiblingElement("game");
+    auto roms = json["roms"];
 
-    if (mRootElement == nullptr)
+    for (const auto& rom : roms)
     {
-        return Error::UNABLE_TO_PARSE_DB_FILE;
+        // If not enough information we do not add the rom to our database
+        if (!rom.contains("name") || !rom.contains("info"))
+        {
+            continue;
+        }
+
+        mRecords.try_emplace(rom["name"], rom["info"]);
     }
 
     mLoaded = true;
-    return std::nullopt;
-}
-
-tinyxml2::XMLElement* RomDB::findRom(const std::string& rom) const
-{
-    auto* roms = mRootElement;
-    while (roms != nullptr && roms->Attribute("name") != nullptr &&
-           std::strcmp(roms->Attribute("name"), rom.c_str()) != 0)
-    {
-        roms = roms->NextSiblingElement("game");
-    }
-
-    return roms;
 }
 
 std::optional<RomInfo> RomDB::find(const std::filesystem::path& rom) const
@@ -89,42 +95,13 @@ std::optional<RomInfo> RomDB::find(const std::filesystem::path& rom) const
         return std::nullopt;
     }
 
-    auto* info = findRom(rom.stem());
+    auto result = mRecords.find(rom.stem().string());
 
     // Return an empty result if we didn't find the rom
-    if (info == nullptr)
+    if (result == mRecords.end())
     {
         return std::nullopt;
     }
 
-    // Finding the rom name
-    RomInfo result;
-    if (auto* title = info->FirstChildElement("description"); title != nullptr)
-    {
-        result.title = title->GetText();
-    }
-
-    // Finding the rom year
-    if (auto* year = info->FirstChildElement("year"); year != nullptr)
-    {
-        result.year = year->GetText();
-    }
-
-    // Finding the rom manufacturer
-    if (auto* manufacturer = info->FirstChildElement("manufacturer"); manufacturer != nullptr)
-    {
-        result.manufacturer = manufacturer->GetText();
-    }
-
-    // Finding if it is a bios
-    if (const auto* bios = info->Attribute("isbios"); bios != nullptr && std::strcmp(bios, "yes") == 0)
-    {
-        result.isBios = true;
-    }
-    else
-    {
-        result.isBios = false;
-    }
-
-    return result;
+    return result->second;
 }
