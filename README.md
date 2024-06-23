@@ -73,12 +73,16 @@ While not recommended you may want to build *Enea* without packing it. In order 
 
     `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
+- Install custom conan configuration
+
+    `$ conan config install conan`
+
 - Install additional dependency not provided by official Conan remote:
 
-    `$ find conan_recipes -name "conanfile.py" -execdir conan export . \;`
+    `$ find recipes -name "conanfile.py" -execdir conan export . \;`
 
 - You can now start building the software by doing:
 
-    `$ conan build -pr:h conan_profiles/linux-x86_64-gcc-11.3-release -pr:b conan_profiles/linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true .`
+    `$ conan build -pr:h linux-x86_64-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true .`
 
 The compiled binary will now be available under `build/Release/enea`.
