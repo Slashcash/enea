@@ -1,13 +1,13 @@
-name: Build enea for aarch64 architecture
+name: Build enea for armv7hf architecture
 
 on:
   pull_request:
     branches: [ "main" ]
 
 env:
-  ENEA_ARCH: aarch64
-  ENEA_LINUX_ARCH: arm64
-  ENEA_PKGCONFIG_ARCH: aarch64
+  ENEA_ARCH: armv7hf
+  ENEA_LINUX_ARCH: armhf
+  ENEA_PKGCONFIG_ARCH: arm-linux-gnueabihf
 
 jobs:
   build:
@@ -17,7 +17,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
-    - name: Add aarch64 Ubuntu sources
+    - name: Add arm Ubuntu sources
       uses: ryankurte/action-apt@master
       with:
         arch: $ENEA_LINUX_ARCH
@@ -29,4 +29,4 @@ jobs:
       run: conan config install conan && find ${{github.workspace}}/recipes -name conanfile.py -execdir conan export . \;
 
     - name: Build and run tests
-      run: PKG_CONFIG_PATH="/usr/lib/$ENEA_PKGCONFIG_ARCH-linux-gnu/pkgconfig" conan build -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build missing -c tools.build:skip_test=true ${{github.workspace}}
+      run: PKG_CONFIG_PATH="/usr/lib/$ENEA_PKGCONFIG_ARCH/pkgconfig" conan build -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build missing -c tools.build:skip_test=true ${{github.workspace}}

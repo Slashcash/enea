@@ -3,11 +3,10 @@ from conan.tools.files import get, replace_in_file
 import shutil
 import os
 
-recipe_arch = "x86_64"
-toolchain_arch = "x86_64"
-download_toolchain_arch = "x86-64"
-toolchain_distro = "linux-gnu"
-
+recipe_arch = "armv7hf"
+toolchain_arch = "arm"
+download_toolchain_arch = "armv7-eabihf"
+toolchain_distro = "linux-gnueabihf"
 
 class Toolchain(ConanFile):
     name = "toolchain-linux-" + recipe_arch + "-gcc-11.3"
