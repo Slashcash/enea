@@ -73,13 +73,9 @@ While not recommended you may want to build *Enea* without packing it. In order 
 
     `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
-- Install custom conan configuration
+- Install custom conan configuration and recipes
 
-    `$ conan config install conan`
-
-- Install additional dependency not provided by official Conan remote:
-
-    `$ find recipes -name "conanfile.py" -execdir conan export . \;`
+    `$ conan config install conan && find recipes -name "conanfile.py" -execdir conan export . \;`
 
 - Choose the hardware architecture you want to build for:
 
@@ -88,6 +84,7 @@ While not recommended you may want to build *Enea* without packing it. In order 
     Allowed values are:
     - x86_64
     - aarch64
+    - armv7hf
 
 - You can now start building the software by doing:
 

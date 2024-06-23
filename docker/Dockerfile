@@ -4,18 +4,18 @@ FROM ubuntu:22.04
 # Disable prompts during installation with apt-get
 ARG DEBIAN_FRONTEND=noninteractive
 
-# Add support to build for arm64 architecture
+# Add support to build for arm64 and armhf architecture
 RUN dpkg --add-architecture arm64
+RUN dpkg --add-architecture armhf
+ENV PKG_CONFIG_PATH="/usr/lib/aarch64-linux-gnu/pkgconfig:/usr/lib/arm-linux-gnueabihf/pkgconfig"
 
-RUN echo "deb [arch=arm64] http://ports.ubuntu.com/ jammy main restricted\n\
-deb [arch=arm64] http://ports.ubuntu.com/ jammy-updates main restricted\n\
-deb [arch=arm64] http://ports.ubuntu.com/ jammy universe\n\
-deb [arch=arm64] http://ports.ubuntu.com/ jammy-updates universe\n\
-deb [arch=arm64] http://ports.ubuntu.com/ jammy multiverse\n\
-deb [arch=arm64] http://ports.ubuntu.com/ jammy-updates multiverse\n\
-deb [arch=arm64] http://ports.ubuntu.com/ jammy-backports main restricted universe multiverse" | tee /etc/apt/sources.list.d/arm64.list
-
-ENV PKG_CONFIG_PATH="/usr/lib/aarch64-linux-gnu/pkgconfig"
+RUN echo "deb [arch=arm64,armhf] http://ports.ubuntu.com/ jammy main restricted\n\
+deb [arch=arm64,armhf] http://ports.ubuntu.com/ jammy-updates main restricted\n\
+deb [arch=arm64,armhf] http://ports.ubuntu.com/ jammy universe\n\
+deb [arch=arm64,armhf] http://ports.ubuntu.com/ jammy-updates universe\n\
+deb [arch=arm64,armhf] http://ports.ubuntu.com/ jammy multiverse\n\
+deb [arch=arm64,armhf] http://ports.ubuntu.com/ jammy-updates multiverse\n\
+deb [arch=arm64,armhf] http://ports.ubuntu.com/ jammy-backports main restricted universe multiverse" | tee /etc/apt/sources.list.d/crosscompile.list
 
 RUN sed -i 's/^deb /deb [arch=amd64,i386] /' "/etc/apt/sources.list"
 
