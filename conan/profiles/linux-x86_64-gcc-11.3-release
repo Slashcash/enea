@@ -7,6 +7,10 @@
     {% set loglevel = "info" %}
 {% endif %}
 
+{% if arch == "aarch64" %}
+    {% set arch = "armv8" %}
+{% endif %}
+
 [settings]
 os={{ os.capitalize() }}
 arch={{ arch }}

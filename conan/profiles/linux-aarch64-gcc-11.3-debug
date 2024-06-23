@@ -3,10 +3,10 @@
 
 {% if type == "debug" %}
     {% set loglevel = "trace" %}
-    {% set btype = "Debug" %}
+    {% set type = "Debug" %}
 {% else %}
     {% set loglevel = "info" %}
-    {% set btype = "Release" %}
+    {% set type = "Release" %}
 {% endif %}
 
 {% if arch == "aarch64" %}
@@ -19,7 +19,7 @@ arch={{ arch }}
 compiler={{ compiler }}
 compiler.version={{ compiler_version }}
 compiler.libcxx=libstdc++11
-build_type={{ btype }}
+build_type={{ type }}
 
 [tool_requires]
 {{ toolchain }}

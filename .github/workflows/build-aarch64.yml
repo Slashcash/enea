@@ -1,12 +1,12 @@
-name: Build enea for x86_64 architecture
+name: Build enea for aarch64 architecture
 
 on:
   pull_request:
     branches: [ "main" ]
 
 env:
-  ENEA_ARCH: x86_64
-  ENEA_LINUX_ARCH: x86_64
+  ENEA_ARCH: aarch64
+  ENEA_LINUX_ARCH: arm64
 
 jobs:
   build:
@@ -16,6 +16,11 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
 
+    - name: Add aarch64 Ubuntu sources
+      uses: ryankurte/action-apt@master
+      with:
+        arch: $ENEA_LINUX_ARCH
+
     - name: Install Conan
       uses: turtlebrowser/get-conan@main
 
@@ -23,4 +28,4 @@ jobs:
       run: conan config install conan && find ${{github.workspace}}/recipes -name conanfile.py -execdir conan export . \;
 
     - name: Build and run tests
-      run: conan build -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build missing ${{github.workspace}}
+      run: PKG_CONFIG_PATH="/usr/lib/$ENEA_ARCH-linux-gnu/pkgconfig" conan build -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build missing -c tools.build:skip_test=true ${{github.workspace}}
