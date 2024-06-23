@@ -1,4 +1,5 @@
 build*
+!build*.yml
 TODO.md
 .vscode
 CMakeUserPresets.json

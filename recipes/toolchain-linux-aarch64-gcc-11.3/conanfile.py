@@ -3,13 +3,12 @@ from conan.tools.files import get, replace_in_file
 import shutil
 import os
 
-toolchain_arch = "x86_64"
-download_toolchain_arch = "x86-64"
+toolchain_arch = "aarch64"
+download_toolchain_arch = "aarch64"
 toolchain_distro = "linux-gnu"
 
-
 class Toolchain(ConanFile):
-    name = "toolchain-linux-x86_64-gcc-11.3"
+    name = "toolchain-linux-" + toolchain_arch + "-gcc-11.3"
     version = "1.0"
 
     def source(self):

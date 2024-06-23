@@ -55,7 +55,7 @@ The project ships with a Docker container which can be used to containerize the 
 
     `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
-- Build from source and pack:
+- Build from source and pack (currently only for x86_64):
 
     `$ ./scripts/generate_appimage.sh`
 
@@ -81,8 +81,16 @@ While not recommended you may want to build *Enea* without packing it. In order 
 
     `$ find recipes -name "conanfile.py" -execdir conan export . \;`
 
+- Choose the hardware architecture you want to build for:
+
+    `$ export ENEA_ARCH="x86_64"`
+
+    Allowed values are:
+    - x86_64
+    - aarch64
+
 - You can now start building the software by doing:
 
-    `$ conan build -pr:h linux-x86_64-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true .`
+    `$ conan build -pr:h linux-${ENEA_ARCH}-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true .`
 
-The compiled binary will now be available under `build/Release/enea`.
+The compiled binary will now be available under `build/Release/app/enea`.
