@@ -186,8 +186,9 @@ if [ -z "$USER_ADVMAME_EXEC" ]; then
     echo "Compiling advmame from source. This may take a very long time."
     advmame_log="$logs_dir/advmame.log"
 
-    find "$SOURCE_DIR/conan_recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
-    conan create -pr:h $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-release -pr:b $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-host --build "missing" $(conan cache path advmame/$ADVMAME_VERSION) &> "$advmame_log"
+    conan config install "$SOURCE_DIR/conan" > /dev/null 2>&1
+    find "$SOURCE_DIR/recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
+    conan create -pr:h linux-x86_64-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" $(conan cache path advmame/$ADVMAME_VERSION) &> "$advmame_log"
 
     # Check if building enea was successful
     if [ $? -ne 0 ]; then
@@ -209,8 +210,9 @@ if [ -z "$USER_ENEA_EXEC" ]; then
     echo "Compiling enea from source. This may take a very long time."
     enea_log="$logs_dir/enea.log"
 
-    find "$SOURCE_DIR/conan_recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
-    conan create -pr:h $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-release -pr:b $SOURCE_DIR/conan_profiles/linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
+    conan config install "$SOURCE_DIR/conan" > /dev/null 2>&1
+    find "$SOURCE_DIR/recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
+    conan create -pr:h linux-x86_64-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
 
     # Check if building enea was successful
     if [ $? -ne 0 ]; then
