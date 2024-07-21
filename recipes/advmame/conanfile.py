@@ -30,7 +30,7 @@ class AdvMameConan(ConanFile):
 
     def build(self):
         autotools = Autotools(self)
-        autotools.autoreconf()
+        self.run("./autogen.sh")
         autotools.configure(args=["--disable-fb"])
         autotools.make()
 

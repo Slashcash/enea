@@ -7,6 +7,7 @@ recipe_arch = "aarch64"
 toolchain_arch = "aarch64"
 download_toolchain_arch = "aarch64"
 toolchain_distro = "linux-gnu"
+toolchain_base_folder = toolchain_arch + "-buildroot-" + toolchain_distro
 
 class Toolchain(ConanFile):
     name = "toolchain-linux-" + recipe_arch + "-gcc-11.3"
@@ -17,8 +18,6 @@ class Toolchain(ConanFile):
                   strip_root=True)
 
     def package(self):
-        toolchain_base_folder = toolchain_arch + "-buildroot-" + toolchain_distro
-
         shutil.copytree(os.path.join(self.build_folder, "bin"), os.path.join(self.package_folder, "bin"), dirs_exist_ok=True, symlinks=True)
         shutil.copytree(os.path.join(self.build_folder, "etc"), os.path.join(self.package_folder, "etc"), dirs_exist_ok=True, symlinks=True)
         shutil.copytree(os.path.join(self.build_folder, "include"), os.path.join(self.package_folder, "include"), dirs_exist_ok=True, symlinks=True)
@@ -80,7 +79,7 @@ class Toolchain(ConanFile):
             "libfontenc.so", "libfontenc.a", "libX11-xcb.so", "libX11-xcb.a",
             "libxcb.so", "libxcb.a", "libX11.so", "libX11.a",
             "libudev.so", "libGLdispatch.so.0", "libGLX.so.0", "libbsd.so.0",
-            "libz.so.1", "libmd.so.0"
+            "libz.so.1", "libmd.so.0", "libXau.so.6", "libXdmcp.so.6"
         ]
 
         for file_name in file_names:
@@ -92,6 +91,9 @@ class Toolchain(ConanFile):
         external_include_folder = os.path.join(self.package_folder, toolchain_base_folder, "include")
 
         os.symlink(os.path.join("/usr", "include", "pulse"), os.path.join(include_folder, "pulse"))
+        os.symlink(os.path.join("/usr", "include", "libudev.h"), os.path.join(include_folder, "libudev.h"))
+        os.symlink(os.path.join("/usr", "include", "xcb"), os.path.join(include_folder, "xcb"))
+        os.symlink(os.path.join("/usr", "include", "X11"), os.path.join(include_folder, "X11"))
         os.symlink(os.path.join("/usr", "include", "dbus-1.0", "dbus"), os.path.join(include_folder, "dbus"))
         os.symlink(os.path.join("/usr", "lib", f"{toolchain_arch}-{toolchain_distro}", "dbus-1.0", "include", "dbus"), os.path.join(external_include_folder, "dbus"))
 
@@ -119,3 +121,6 @@ class Toolchain(ConanFile):
         compiler_path = os.path.join(self.package_folder, "bin")
         self.conf_info.append("tools.cmake.cmaketoolchain:user_toolchain", os.path.join(self.package_folder, "share", "buildroot", "toolchainfile.cmake"))
         self.conf_info.define("tools.build:compiler_executables", {"c": os.path.join(compiler_path, compiler_c), "cpp": os.path.join(compiler_path, compiler_cxx)})
+
+        external_folder = os.path.join(self.package_folder, toolchain_base_folder, "sysroot", "usr", "lib", "external")
+        self.conf_info.append("tools.build:sharedlinkflags", "-L" + external_folder + " -Wl,-rpath-link," + external_folder + " -Wl,-rpath," + external_folder)
