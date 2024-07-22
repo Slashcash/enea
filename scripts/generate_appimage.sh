@@ -3,6 +3,7 @@
 # Default paths (script's parent path)
 DEFAULT_SOURCE_DIR="$( cd "$(dirname "$0/..")" >/dev/null 2>&1 ; pwd -P )"
 DEFAULT_OUTPUT_DIR="$DEFAULT_SOURCE_DIR"
+DEFAULT_ENEA_ARCH="x86_64"
 
 # temporary folders
 base_temp_dir="/tmp/enea_appimage"
@@ -12,10 +13,11 @@ logs_dir="$base_temp_dir/logs"
 
 # Function to display usage help
 function display_help {
-  echo "Usage: $(basename "$0") [-s <source_folder>] [-o <output_directory>] [-a <executable>] [-e <executable>]"
+  echo "Usage: $(basename "$0") [-s <source_folder>] [-o <output_directory>] [-m <executable>] [-e <executable>] [-a <architecture>]"
   echo "  -s  Specify the source folder for enea"
   echo "  -o  Specify the output path"
-  echo "  -a  Specify the advancemame executable"
+  echo "  -m  Specify the advancemame executable"
+  echo "  -a  Specify build architecture (either x86_64, aarch64 or armv7hf)"
   echo "  -e  Specify the enea executable"
   echo "  -h  Display this help message"
 }
@@ -34,7 +36,7 @@ trap cleanup EXIT
 source $(dirname $0)/common.sh
 
 # Parse command line options
-while getopts "s:o:a:e:h" opt; do
+while getopts "s:o:a:m:e:h" opt; do
   case "$opt" in
     s)
       SOURCE_DIR=$(realpath "$OPTARG")
@@ -42,11 +44,14 @@ while getopts "s:o:a:e:h" opt; do
     o)
       OUTPUT_DIR=$(realpath "$OPTARG")
       ;;
-    a)
+    m)
       USER_ADVMAME_EXEC=$(realpath "$OPTARG")
       ;;
     e)
       USER_ENEA_EXEC=$(realpath "$OPTARG")
+      ;;
+    a)
+      ENEA_ARCH="$OPTARG"
       ;;
     h)
       display_help
@@ -66,6 +71,7 @@ done
 
 SOURCE_DIR=${SOURCE_DIR:-$DEFAULT_SOURCE_DIR}
 OUTPUT_DIR=${OUTPUT_DIR:-$DEFAULT_OUTPUT_DIR}
+ENEA_ARCH=${ENEA_ARCH:-$DEFAULT_ENEA_ARCH}
 
 # Checking if the folder really contains enea source folder
 if ! check_path_validity "$SOURCE_DIR/.env"; then
@@ -74,6 +80,18 @@ fi
 
 # Checking if the output folder is writable
 if ! is_path_writable "$OUTPUT_DIR"; then
+  exit 1
+fi
+
+# Checking if build architecture is a suitable value
+if [ "$ENEA_ARCH" == "x86_64" ]; then
+  CONAN_ARCH="x86_64"
+elif [ "$ENEA_ARCH" == "armv7hf" ]; then
+  CONAN_ARCH="armv7hf"
+elif [ "$ENEA_ARCH" == "aarch64" ]; then
+  CONAN_ARCH="armv8"
+else
+  echo "Error: build architecture must be either 'x86_64', 'aarch64' or 'armv7hf'."
   exit 1
 fi
 
@@ -188,7 +206,7 @@ if [ -z "$USER_ADVMAME_EXEC" ]; then
 
     conan config install "$SOURCE_DIR/conan" > /dev/null 2>&1
     find "$SOURCE_DIR/recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
-    conan create -pr:h linux-x86_64-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" $(conan cache path advmame/$ADVMAME_VERSION) &> "$advmame_log"
+    conan create -pr:h linux-${ENEA_ARCH}-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "*" $(conan cache path advmame/$ADVMAME_VERSION) &> "$advmame_log"
 
     # Check if building enea was successful
     if [ $? -ne 0 ]; then
@@ -196,7 +214,7 @@ if [ -z "$USER_ADVMAME_EXEC" ]; then
         exit 1
     fi
 
-    advmame_package_folder="$(conan cache path advmame/$ADVMAME_VERSION:$(conan list "advmame/$ADVMAME_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
+    advmame_package_folder="$(conan cache path advmame/$ADVMAME_VERSION:$(conan list -p "arch=$CONAN_ARCH" "advmame/$ADVMAME_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
 
     ADVMAME_EXEC="$advmame_package_folder/bin/advmame"
 else
@@ -212,7 +230,7 @@ if [ -z "$USER_ENEA_EXEC" ]; then
 
     conan config install "$SOURCE_DIR/conan" > /dev/null 2>&1
     find "$SOURCE_DIR/recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
-    conan create -pr:h linux-x86_64-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
+    conan create -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "*" -c tools.build:skip_test=true --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
 
     # Check if building enea was successful
     if [ $? -ne 0 ]; then
@@ -220,7 +238,7 @@ if [ -z "$USER_ENEA_EXEC" ]; then
         exit 1
     fi
 
-    enea_package_folder="$(conan cache path enea/$SOFTWARE_VERSION:$(conan list "enea/$SOFTWARE_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
+    enea_package_folder="$(conan cache path enea/$SOFTWARE_VERSION:$(conan list -p "arch=$CONAN_ARCH" "enea/$SOFTWARE_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
 
     ENEA_EXEC="$enea_package_folder/bin/enea"
 else
@@ -230,12 +248,13 @@ fi
 echo "Using enea executable at $ENEA_EXEC"
 
 # Using linuxdeploy to generate app dir
-appimage_name="Enea-x86_64.AppImage"
+appimage_name="Enea-$ENEA_ARCH.AppImage"
 appimage_output="$OUTPUT_DIR/$appimage_name"
 appimage_log="$logs_dir/appimage.log"
 echo "Genearting "$appimage_output""
 export LDAI_OUTPUT="$appimage_output"
 export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Slashcash|enea|latest|$appimage_name.zsync"
+export NO_STRIP=1
 cd $OUTPUT_DIR
 $deploy_path --appimage-extract-and-run --appdir="$app_dir" --custom-apprun="$launcher_path" --executable="$ENEA_EXEC" --executable="$ADVMAME_EXEC" --icon-file="$icon_path" --desktop-file="$desktop_path" --output appimage &> "$appimage_log"
 

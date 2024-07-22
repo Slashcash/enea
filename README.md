@@ -55,11 +55,20 @@ The project ships with a Docker container which can be used to containerize the 
 
     `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
-- Build from source and pack (currently only for x86_64):
+- Choose the hardware architecture you want to build for:
 
-    `$ ./scripts/generate_appimage.sh`
+    `$ export ENEA_ARCH="x86_64"`
 
-    This script will build from source and pack *Enea* using the [AppImage](https://appimage.org/) format. You will find a file called *Enea-x86_64.AppImage* as a result in the project's source folder.
+    Allowed values are:
+    - x86_64
+    - aarch64
+    - armv7hf
+
+- Build from source and pack:
+
+    `$ ./scripts/generate_appimage.sh -a ${ENEA_ARCH}`
+
+    This script will build from source and pack *Enea* using the [AppImage](https://appimage.org/) format. You will find a file called *Enea-${ENEA_ARCH}.AppImage* as a result in the project's source folder.
 
 ### Building without packing
 

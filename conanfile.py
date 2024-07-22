@@ -3,7 +3,7 @@ from conan.tools.cmake import cmake_layout, CMakeToolchain, CMake
 
 class Recipe(ConanFile):
     generators = "CMakeDeps", "VirtualBuildEnv", "VirtualRunEnv"
-    settings = "build_type"
+    settings = "build_type", "arch"
     exports_sources = "*"
 
     def generate(self):
