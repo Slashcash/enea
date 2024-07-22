@@ -1,0 +1,14 @@
+name: Build enea
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+    build:
+      strategy:
+        matrix:
+          arch: [x86_64, aarch64, armv7hf]
+      uses: ./.github/workflows/build-workflow.yml
+      with:
+        architecture: ${{ matrix.arch }}

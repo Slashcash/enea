@@ -97,6 +97,6 @@ While not recommended you may want to build *Enea* without packing it. In order 
 
 - You can now start building the software by doing:
 
-    `$ conan build -pr:h linux-${ENEA_ARCH}-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=true .`
+    `$ conan build -pr:h linux-${ENEA_ARCH}-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "missing" -c tools.build:skip_test=True .`
 
 The compiled binary will now be available under `build/Release/app/enea`.
