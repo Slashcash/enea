@@ -1,0 +1,9 @@
+{
+    "remotes": [
+        {
+            "name": "enea",
+            "url": "https://conan.geniorio.it",
+            "verify_ssl": true
+        }
+    ]
+}

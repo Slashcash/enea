@@ -205,7 +205,7 @@ if [ -z "$USER_ADVMAME_EXEC" ]; then
     advmame_log="$logs_dir/advmame.log"
 
     conan config install "$SOURCE_DIR/conan" > /dev/null 2>&1
-    find "$SOURCE_DIR/recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
+    conan download -r enea --only-recipe advmame/$ADVMAME_VERSION > /dev/null 2>&1
     conan create -pr:h linux-${ENEA_ARCH}-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "*" $(conan cache path advmame/$ADVMAME_VERSION) &> "$advmame_log"
 
     # Check if building enea was successful
@@ -229,8 +229,7 @@ if [ -z "$USER_ENEA_EXEC" ]; then
     enea_log="$logs_dir/enea.log"
 
     conan config install "$SOURCE_DIR/conan" > /dev/null 2>&1
-    find "$SOURCE_DIR/recipes" -name "conanfile.py" -execdir conan export . \; > /dev/null 2>&1
-    conan create -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "*" -c tools.build:skip_test=true --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
+    conan create -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "*" -c tools.build:skip_test=True --name enea --version $SOFTWARE_VERSION "$SOURCE_DIR" &> "$enea_log"
 
     # Check if building enea was successful
     if [ $? -ne 0 ]; then
@@ -251,7 +250,7 @@ echo "Using enea executable at $ENEA_EXEC"
 appimage_name="Enea-$ENEA_ARCH.AppImage"
 appimage_output="$OUTPUT_DIR/$appimage_name"
 appimage_log="$logs_dir/appimage.log"
-echo "Genearting "$appimage_output""
+echo "Generating "$appimage_output""
 export LDAI_OUTPUT="$appimage_output"
 export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Slashcash|enea|latest|$appimage_name.zsync"
 export NO_STRIP=1

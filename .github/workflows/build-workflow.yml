@@ -48,8 +48,8 @@ jobs:
     - name: Install Conan
       uses: turtlebrowser/get-conan@main
 
-    - name: Install custom Conan recipes and config
-      run: conan config install conan && find ${{github.workspace}}/recipes -name conanfile.py -execdir conan export . \;
+    - name: Install custom Conan config
+      run: conan config install conan
 
     - name: Build and run tests
       run: PKG_CONFIG_PATH="/usr/lib/${{ env.ENEA_PKGCONFIG_ARCH }}/pkgconfig" conan build -pr:h linux-${{ env.ENEA_ARCH }}-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build missing -c tools.build:skip_test=${{ env.ENEA_SKIP_TESTS }} ${{github.workspace}}

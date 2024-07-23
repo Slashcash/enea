@@ -82,9 +82,9 @@ While not recommended you may want to build *Enea* without packing it. In order 
 
     `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
 
-- Install custom conan configuration and recipes
+- Install custom conan configuration
 
-    `$ conan config install conan && find recipes -name "conanfile.py" -execdir conan export . \;`
+    `$ conan config install conan`
 
 - Choose the hardware architecture you want to build for:
 
