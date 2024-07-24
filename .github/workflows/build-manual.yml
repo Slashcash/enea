@@ -1,0 +1,17 @@
+on:
+  workflow_dispatch:
+    inputs:
+      build_dependencies:
+        description: 'Whether or not to build dependencies (they will be downloaded instead)'
+        required: true
+        type: boolean
+
+jobs:
+    build:
+      strategy:
+        matrix:
+          arch: [x86_64, aarch64, armv7hf]
+      uses: ./.github/workflows/build-workflow.yml
+      with:
+        architecture: ${{ matrix.arch }}
+        build_dependencies: ${{ inputs.build_dependencies }}
