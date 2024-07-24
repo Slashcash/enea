@@ -6,6 +6,11 @@ on:
         required: true
         type: string
 
+      build_dependencies:
+        description: 'Whether or not to build dependencies (they will be downloaded instead)'
+        required: true
+        type: boolean
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -42,6 +47,12 @@ jobs:
           exit 1
         fi
 
+        if [[ "${{ inputs.build_dependencies }}" == "True" ]]; then
+          echo "BUILD_DEPS=*" >> $GITHUB_ENV
+        else
+          echo "BUILD_DEPS=missing" >> $GITHUB_ENV
+        fi
+
     - name: Add arm Ubuntu sources
       if: ${{ inputs.architecture != 'x86_64' }}
       uses: ryankurte/action-apt@master
@@ -61,7 +72,7 @@ jobs:
           conan create \
           -pr:h linux-${{ env.ENEA_ARCH }}-gcc-11.3-release \
           -pr:b linux-x86_64-gcc-11.3-host \
-          --build "missing" -c tools.build:skip_test=${{ env.ENEA_SKIP_TESTS }} --name enea --version $SOFTWARE_VERSION ${{ github.workspace }}
+          --build "${{ env.BUILD_DEPS }}" -c tools.build:skip_test=${{ env.ENEA_SKIP_TESTS }} --name enea --version $SOFTWARE_VERSION ${{ github.workspace }}
 
     - name: Build advmame
       run: |
@@ -71,7 +82,7 @@ jobs:
           conan create \
           -pr:h linux-${{ env.ENEA_ARCH }}-gcc-11.3-release \
           -pr:b linux-x86_64-gcc-11.3-host \
-          --build "missing" $(conan cache path advmame/$ADVMAME_VERSION)
+          --build "${{ env.BUILD_DEPS }}" $(conan cache path advmame/$ADVMAME_VERSION)
 
     - name: Generate .AppImage
       run: |
