@@ -18,18 +18,21 @@ jobs:
       run: |
         if [[ "${{ inputs.architecture }}" == "x86_64" ]]; then
           echo "ENEA_ARCH=x86_64" >> $GITHUB_ENV
+          echo "ENEA_CONAN_ARCH=x86_64" >> $GITHUB_ENV
           echo "ENEA_LINUX_ARCH=x86_64" >> $GITHUB_ENV
           echo "ENEA_PKGCONFIG_ARCH=x86_64-linux-gnu" >> $GITHUB_ENV
           echo "ENEA_SKIP_TESTS=False" >> $GITHUB_ENV
           echo "Valid architecture: ${{ inputs.architecture }}"
         elif [[ "${{ inputs.architecture }}" == "aarch64" ]]; then
           echo "ENEA_ARCH=aarch64" >> $GITHUB_ENV
+          echo "ENEA_CONAN_ARCH=armv8" >> $GITHUB_ENV
           echo "ENEA_LINUX_ARCH=arm64" >> $GITHUB_ENV
           echo "ENEA_PKGCONFIG_ARCH=aarch64-linux-gnu" >> $GITHUB_ENV
           echo "ENEA_SKIP_TESTS=True" >> $GITHUB_ENV
           echo "Valid architecture: ${{ inputs.architecture }}"
         elif [[ "${{ inputs.architecture }}" == "armv7hf" ]]; then
           echo "ENEA_ARCH=armv7hf" >> $GITHUB_ENV
+          echo "ENEA_CONAN_ARCH=armv7hf" >> $GITHUB_ENV
           echo "ENEA_LINUX_ARCH=armhf" >> $GITHUB_ENV
           echo "ENEA_PKGCONFIG_ARCH=arm-linux-gnueabihf" >> $GITHUB_ENV
           echo "ENEA_SKIP_TESTS=True" >> $GITHUB_ENV
@@ -51,5 +54,29 @@ jobs:
     - name: Install custom Conan config
       run: conan config install conan
 
-    - name: Build and run tests
-      run: PKG_CONFIG_PATH="/usr/lib/${{ env.ENEA_PKGCONFIG_ARCH }}/pkgconfig" conan build -pr:h linux-${{ env.ENEA_ARCH }}-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build missing -c tools.build:skip_test=${{ env.ENEA_SKIP_TESTS }} ${{github.workspace}}
+    - name: Build enea and run tests
+      run: |
+        source ${{github.workspace}}/.env && \
+          PKG_CONFIG_PATH="/usr/lib/${{ env.ENEA_PKGCONFIG_ARCH }}/pkgconfig" \
+          conan create \
+          -pr:h linux-${{ env.ENEA_ARCH }}-gcc-11.3-release \
+          -pr:b linux-x86_64-gcc-11.3-host \
+          --build "missing" -c tools.build:skip_test=${{ env.ENEA_SKIP_TESTS }} --name enea --version $SOFTWARE_VERSION ${{github.workspace}}
+
+    - name: Build advmame
+      run: |
+        source ${{github.workspace}}/.env && \
+          conan download -r enea --only-recipe advmame/$ADVMAME_VERSION && \
+          PKG_CONFIG_PATH="/usr/lib/${{ env.ENEA_PKGCONFIG_ARCH }}/pkgconfig" \
+          conan create \
+          -pr:h linux-${{ env.ENEA_ARCH }}-gcc-11.3-release \
+          -pr:b linux-x86_64-gcc-11.3-host \
+          --build "missing" $(conan cache path advmame/$ADVMAME_VERSION)
+
+    - name: Generate .AppImage
+      run: |
+        source ${{github.workspace}}/.env && \
+          ${{github.workspace}}/scripts/generate_appimage.sh \
+          -a ${{ env.ENEA_ARCH }} \
+          -e $(conan cache path enea/$SOFTWARE_VERSION:$(conan list -p "arch=${{ env.ENEA_CONAN_ARCH }}" "enea/$SOFTWARE_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))/bin/enea \
+          -m $(conan cache path advmame/$ADVMAME_VERSION:$(conan list -p "arch=${{ env.ENEA_CONAN_ARCH }}" "advmame/$ADVMAME_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))/bin/advmame
