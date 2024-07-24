@@ -1,8 +1,10 @@
+name: Manual build of Enea
+
 on:
   workflow_dispatch:
     inputs:
       build_dependencies:
-        description: 'Whether or not to build dependencies (they will be downloaded instead)'
+        description: 'Build dependencies from scratch'
         required: true
         type: boolean
 

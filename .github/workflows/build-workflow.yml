@@ -47,7 +47,7 @@ jobs:
           exit 1
         fi
 
-        if [[ "${{ inputs.build_dependencies }}" == "True" ]]; then
+        if [[ "${{ inputs.build_dependencies }}" == "true" ]]; then
           echo "BUILD_DEPS=*" >> $GITHUB_ENV
         else
           echo "BUILD_DEPS=missing" >> $GITHUB_ENV
