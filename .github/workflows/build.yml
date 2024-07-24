@@ -12,3 +12,4 @@ jobs:
       uses: ./.github/workflows/build-workflow.yml
       with:
         architecture: ${{ matrix.arch }}
+        build_dependencies: False
