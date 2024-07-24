@@ -4,6 +4,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+  schedule:
+    - cron: "15 01 * * *"
+
 jobs:
     build:
       strategy:
@@ -12,4 +15,4 @@ jobs:
       uses: ./.github/workflows/build-workflow.yml
       with:
         architecture: ${{ matrix.arch }}
-        build_dependencies: False
+        build_dependencies: ${{ github.event.schedule == 'true' }}
