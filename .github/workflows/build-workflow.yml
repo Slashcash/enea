@@ -56,16 +56,16 @@ jobs:
 
     - name: Build enea and run tests
       run: |
-        source ${{github.workspace}}/.env && \
+        source ${{ github.workspace }}/.env && \
           PKG_CONFIG_PATH="/usr/lib/${{ env.ENEA_PKGCONFIG_ARCH }}/pkgconfig" \
           conan create \
           -pr:h linux-${{ env.ENEA_ARCH }}-gcc-11.3-release \
           -pr:b linux-x86_64-gcc-11.3-host \
-          --build "missing" -c tools.build:skip_test=${{ env.ENEA_SKIP_TESTS }} --name enea --version $SOFTWARE_VERSION ${{github.workspace}}
+          --build "missing" -c tools.build:skip_test=${{ env.ENEA_SKIP_TESTS }} --name enea --version $SOFTWARE_VERSION ${{ github.workspace }}
 
     - name: Build advmame
       run: |
-        source ${{github.workspace}}/.env && \
+        source ${{ github.workspace }}/.env && \
           conan download -r enea --only-recipe advmame/$ADVMAME_VERSION && \
           PKG_CONFIG_PATH="/usr/lib/${{ env.ENEA_PKGCONFIG_ARCH }}/pkgconfig" \
           conan create \
@@ -75,8 +75,15 @@ jobs:
 
     - name: Generate .AppImage
       run: |
-        source ${{github.workspace}}/.env && \
-          ${{github.workspace}}/scripts/generate_appimage.sh \
+        source ${{ github.workspace }}/.env && \
+          ${{ github.workspace }}/scripts/generate_appimage.sh \
           -a ${{ env.ENEA_ARCH }} \
           -e $(conan cache path enea/$SOFTWARE_VERSION:$(conan list -p "arch=${{ env.ENEA_CONAN_ARCH }}" "enea/$SOFTWARE_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))/bin/enea \
           -m $(conan cache path advmame/$ADVMAME_VERSION:$(conan list -p "arch=${{ env.ENEA_CONAN_ARCH }}" "advmame/$ADVMAME_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))/bin/advmame
+
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: Enea-${{ env.ENEA_ARCH }}.AppImage
+        path: ${{ github.workspace }}/Enea-${{ env.ENEA_ARCH }}.AppImage
+        if-no-files-found: error
