@@ -25,11 +25,13 @@ class Recipe(ConanFile):
         cmake.install()
 
     def requirements(self):
+        self.requires("flac/1.4.3", override=True)
         self.requires("spdlog/1.12.0")
         self.requires("magic_enum/0.9.3")
         self.requires("nlohmann_json/3.11.2")
         self.requires("sfml/2.6.0")
         self.requires("rocket/cci.20200603")
+        self.requires("advmame/3.10")
 
     def build_requirements(self):
         if not self.conf.get("tools.build:skip_test", default=False):
