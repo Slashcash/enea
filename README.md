@@ -14,6 +14,9 @@ You can then just launch the software by clicking on it or through a terminal, e
 
 `$ ./Enea-x86_64.AppImage`
 
+### Nightly builds
+We also host some [nightly built binaries](https://github.com/Slashcash/enea/actions/workflows/build.yml?query=event%3Aschedule). They can be useful if you need a recently built binary of *Enea*.
+
 ## Using
 Roms and screenshots are searched in:
 
