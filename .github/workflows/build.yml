@@ -1,11 +1,11 @@
-name: Build enea
+name: Build
 
 on:
   pull_request:
     branches: [ "main" ]
 
   schedule:
-    - cron: "15 01 * * *"
+    - cron: "30 01 * * *"
 
 jobs:
     build:
