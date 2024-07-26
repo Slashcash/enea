@@ -1,5 +1,8 @@
 name: Build
-run-name: ${{ github.event.event_name == 'schedule' && 'Nightly build' }}
+run-name: >-
+  ${{ github.event.event_name == 'schedule' && 'Nightly build' ||
+  (github.event.event_name == 'pull_request && format('PR #{0} test build', ${{ github.event.number }}) ||
+  ' ') }}
 
 on:
   pull_request:
