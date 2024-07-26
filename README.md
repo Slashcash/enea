@@ -1,3 +1,5 @@
+![example workflow](https://github.com/Slashcash/enea/actions/workflows/build.yml/badge.svg?event=schedule;branch=main)
+
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 # Enea
