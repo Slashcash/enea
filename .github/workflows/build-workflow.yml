@@ -66,5 +66,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: Enea-${{ env.ENEA_ARCH }}.AppImage
-        path: ${{ github.workspace }}/Enea-${{ env.ENEA_ARCH }}.AppImage
+        path: ${{ github.workspace }}/Enea-${{ env.ENEA_ARCH }}.AppImage*
         if-no-files-found: error
