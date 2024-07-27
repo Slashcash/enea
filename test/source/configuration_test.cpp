@@ -16,6 +16,10 @@ class ConfigurationFixture : public ::testing::Test
 
 TEST_F(ConfigurationFixture, romDirectory)
 {
+    /*
+        Asking for the folder where to store the roms.
+        Expectation: We get an hidden folder constructed with the home directory + enea.
+    */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
 
     EXPECT_EQ(config.romDirectory(), roms);
@@ -23,6 +27,10 @@ TEST_F(ConfigurationFixture, romDirectory)
 
 TEST_F(ConfigurationFixture, cacheFile)
 {
+    /*
+        Asking for the file where to store the rom cache.
+        Expectation: We get a file name constructed with the home directory + .enea + cache.json.
+    */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
 
     EXPECT_EQ(config.cacheFile(), base / "cache.json");
@@ -30,12 +38,20 @@ TEST_F(ConfigurationFixture, cacheFile)
 
 TEST_F(ConfigurationFixture, romDirectory_noHome)
 {
+    /*
+        Asking for the place where to store the roms but we are unable to get the home directory.
+        Expectation: We throw an exception.
+    */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(config.romDirectory(), Configuration::Excep);
+    EXPECT_THROW(config.romDirectory(), Conf::Excep);
 }
 
 TEST_F(ConfigurationFixture, cacheFile_noHome)
 {
+    /*
+        Asking for the file where to store the rom cache but we are unable to get the home directory.
+        Expectation: We throw an exception.
+    */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(config.cacheFile(), Configuration::Excep);
+    EXPECT_THROW(config.cacheFile(), Conf::Excep);
 }

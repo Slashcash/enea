@@ -4,7 +4,7 @@
 
 #include "softwareinfo.hpp"
 
-std::optional<std::filesystem::path> Configuration::homeDirectory() const
+std::optional<std::filesystem::path> Conf::homeDirectory() const
 {
     if (auto* envValue = std::getenv("HOME"); envValue != nullptr)
     {
@@ -14,23 +14,23 @@ std::optional<std::filesystem::path> Configuration::homeDirectory() const
     return std::nullopt;
 }
 
-std::filesystem::path Configuration::baseDirectory() const
+std::filesystem::path Conf::baseDirectory() const
 {
     auto home = homeDirectory();
     if (!home)
     {
-        throw Configuration::Excep("HOME folder path cannot be retrieved");
+        throw Conf::Excep("HOME folder path cannot be retrieved");
     }
 
     return *home / ("." + std::string(executableName));
 }
 
-std::filesystem::path Configuration::romDirectory() const
+std::filesystem::path Conf::romDirectory() const
 {
     return baseDirectory() / "roms";
 }
 
-std::filesystem::path Configuration::cacheFile() const
+std::filesystem::path Conf::cacheFile() const
 {
     return baseDirectory() / "cache.json";
 }

@@ -32,8 +32,7 @@ int main()
         }
 
         // Creating useful folders
-        Configuration config;
-        auto romPath = config.romDirectory();
+        auto romPath = Configuration::get().romDirectory();
 
         std::error_code createFolderEc;
         std::filesystem::create_directories(romPath, createFolderEc);
@@ -42,7 +41,7 @@ int main()
             spdlog::warn("Rom folder creation failed at {}", romPath.string());
         }
 
-        auto cacheFile = config.cacheFile();
+        auto cacheFile = Configuration::get().cacheFile();
         auto cachePath = cacheFile.parent_path();
         std::filesystem::create_directories(cachePath, createFolderEc);
         if (createFolderEc)
@@ -56,7 +55,7 @@ int main()
         RomSource romSource(romPath);
         auto lastEditTime = romSource.lastEditTime();
         spdlog::debug("Trying to load cache file from: {}", cachePath.string());
-        Cache cache(config.cacheFile());
+        Cache cache(Configuration::get().cacheFile());
 
         if (auto error = cache.load(); error || lastEditTime != *(cache.lastEditTime()))
         {

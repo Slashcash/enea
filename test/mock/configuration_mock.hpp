@@ -5,10 +5,10 @@
 
 #include <gmock/gmock.h>
 
-class ConfigurationMock : public Configuration
+class ConfigurationMock : public Conf
 {
  public:
-    using Configuration::Configuration;
+    using Conf::Conf;
 
     MOCK_METHOD(std::optional<std::filesystem::path>, homeDirectory, (), (const override));
 };
