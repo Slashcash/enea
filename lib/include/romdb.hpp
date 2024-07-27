@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include <nlohmann/json.hpp>
+#include <spdlog/spdlog.h>
 
 #include "exception.hpp"
 #include "rominfo.hpp"
@@ -15,6 +16,7 @@
  * @brief This class represents a rom database. We retrieve information about roms from this.
  * This database is stored as a json file into our codebase, see: db/romdb.json,
  * This json is then embedded directly into our executable and read from there to fill the database.
+ * This class is then wrapped into a singleton
  */
 class RomDB
 {
@@ -44,6 +46,25 @@ class RomDB
     bool operator==(const RomDB& romdb) = delete;
 
     virtual ~RomDB() = default;
+};
+
+class RomDatabase
+{
+ public:
+    RomDatabase() = delete;
+
+    [[nodiscard]] inline static RomDB& get()
+    {
+        static RomDB romdb;
+
+        if (!romdb.loaded())
+        {
+            spdlog::debug("Loading rom information database");
+            romdb.load();
+        }
+
+        return romdb;
+    }
 };
 
 #endif // ROMDB_HPP
