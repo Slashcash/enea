@@ -70,16 +70,13 @@ int main()
             }
 
             // Retrieving rom information
-            RomDB romdb;
-            spdlog::debug("Loading rom database");
-            romdb.load();
             for (const auto& file : scanResult.roms)
             {
                 // Searching rom information into the database
                 RomInfo romInfo;
                 spdlog::trace("Querying rom database for: {}", file.string());
                 // Adding it to the database if: query is succesful && rom is not a bios
-                if (auto query = romdb.find(file); query && (!query->isBios || !(*(query->isBios))))
+                if (auto query = RomDatabase::get().find(file); query && (!query->isBios || !(*(query->isBios))))
                 {
                     // Searching if we found any media associated to the rom in the rom folder
                     RomMedia media;
