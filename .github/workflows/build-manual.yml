@@ -17,3 +17,13 @@ jobs:
       with:
         architecture: ${{ matrix.arch }}
         build_dependencies: ${{ inputs.build_dependencies }}
+
+    deploy:
+      if:
+      strategy:
+        matrix:
+          arch: [x86_64, aarch64, armv7hf]
+      uses: ./.github/workflows/build-workflow.yml
+      with:
+        architecture: ${{ matrix.arch }}
+        build_dependencies: ${{ inputs.build_dependencies }}

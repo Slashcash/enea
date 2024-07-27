@@ -2,7 +2,11 @@
 #define ROMINFO_HPP
 
 #include <nlohmann/json.hpp>
-
+/**
+ * @brief This struct represents a set of information about a rom. This information
+ * is generally retrieved from a rom database (currently the database is stored as a json format)
+ * within the source code, please see: db/romdb.json for reference.
+ */
 struct RomInfo
 {
     static constexpr std::string_view TITLE_JSON_FIELD = "title";
