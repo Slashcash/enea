@@ -14,6 +14,11 @@
 #include "rominfo.hpp"
 #include "rommedia.hpp"
 
+/**
+ * @brief This struct represents a game rom within the context of this software. Roms are meant to be
+ * launched by AdvMAME and are generally identified by their path on the filesystem.
+ * This class also stores information related to roms and the medias associated to it.
+ */
 class Rom
 {
  private:

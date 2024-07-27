@@ -3,6 +3,10 @@
 
 #include <nlohmann/json.hpp>
 
+/**
+ * @brief This struct represents a set of media associated to a rom. Roms are generally accompanied
+ * by screenshots, videos, sfx that are used in frontend to get a fancier presentation.
+ */
 struct RomMedia
 {
     static constexpr std::string_view SCREENSHOT_JSON_FIELD = "screenshot";

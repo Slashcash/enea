@@ -11,6 +11,11 @@
 #include "exception.hpp"
 #include "rominfo.hpp"
 
+/**
+ * @brief This class represents a rom database. We retrieve information about roms from this.
+ * This database is stored as a json file into our codebase, see: db/romdb.json,
+ * This json is then embedded directly into our executable and read from there to fill the database.
+ */
 class RomDB
 {
  public:
