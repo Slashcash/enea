@@ -1,9 +1,136 @@
 #include "romsource.hpp"
 
-#include <algorithm>
+#include <fstream>
 
-RomSource::RomSource(std::filesystem::path romFolder) : mRomFolder(std::move(romFolder))
+#include <spdlog/spdlog.h>
+
+#include "romdb.hpp"
+#include "rommedia.hpp"
+#include "softwareinfo.hpp"
+
+RomSource::RomSource(std::filesystem::path romFolder, std::filesystem::path cacheFolder)
+    : mRomFolder(std::move(romFolder)), mCacheFolder(std::move(cacheFolder))
 {
+}
+
+std::filesystem::path RomSource::romFolder() const
+{
+    return mRomFolder;
+}
+
+std::filesystem::path RomSource::cacheFolder() const
+{
+    return mCacheFolder;
+}
+
+std::vector<Rom> RomSource::scan() const
+{
+    std::vector<Rom> result;
+
+    if (!isFolder(mRomFolder))
+    {
+        throw Excep("Scan path is not a folder");
+    }
+
+    spdlog::debug("Getting last modification time for: {}", mRomFolder.string());
+    auto lastModification = lastFolderModification(mRomFolder);
+
+    // If unable to get the folder last modification date we throw
+    if (!lastModification)
+    {
+        throw Excep(fmt::format("Unable to get last folder modification for: {}", mRomFolder.string()));
+    }
+
+    // If unable to load data from cache we phisycally scan the folder
+    auto cache = cacheScan(*lastModification);
+    cache ? result = *cache : result = physicalScan();
+
+    // Storing cache
+    mCache.roms = result;
+    mCache.lastModified = *lastModification;
+
+    return result;
+}
+
+std::vector<Rom> RomSource::physicalScan() const
+{
+    std::vector<Rom> result;
+    spdlog::debug("Searching for roms and media in: {}", mRomFolder.string());
+    // Physically scanning the folder
+    for (auto files = scanResult(mRomFolder); const auto& rom : files.roms)
+    {
+        if (auto query = romInfo(rom); query)
+        {
+            spdlog::trace("Found rom: {}", rom.string());
+            RomMedia media;
+
+            // Searching if there is an image file with the stem equal to the rom's one, in this case it's a screenshot
+            if (auto picture = std::ranges::find_if(files.screenshots,
+                                                    [&rom](const std::filesystem::path& screenshot) {
+                                                        return fileIsImage(screenshot) &&
+                                                               screenshot.stem() == rom.stem();
+                                                    });
+                picture != files.screenshots.end())
+
+            {
+                spdlog::trace("Found screenshot: {}", picture->string());
+                media.screenshot = *picture;
+            }
+
+            result.emplace_back(rom, *query, media);
+        }
+
+        else
+        {
+            spdlog::warn("File: {} does not look like a launchable rom, discarding it", rom.string());
+        }
+    }
+
+    return result;
+}
+
+bool RomSource::isFolder(const std::filesystem::path& path) const
+{
+    return std::filesystem::is_directory(mRomFolder);
+}
+
+std::vector<std::filesystem::path> RomSource::scanFolder(const std::filesystem::path& folder) const
+{
+    std::vector<std::filesystem::path> result;
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(folder))
+    {
+        if (entry.is_regular_file())
+        {
+            result.push_back(std::filesystem::absolute(entry.path()));
+        }
+    }
+
+    return result;
+}
+
+RomSource::ScanResult RomSource::scanResult(const std::filesystem::path& path) const
+{
+    ScanResult result;
+
+    for (auto files = scanFolder(path); const auto& file : files)
+    {
+        if (fileIsRom(file))
+        {
+            result.roms.emplace_back(file);
+        }
+
+        else if (fileIsImage(file))
+        {
+            result.screenshots.emplace_back(file);
+        }
+
+        else
+        {
+            spdlog::warn("File: {} does not look like a rom or an image, discarding it", file.string());
+        }
+    }
+
+    return result;
 }
 
 bool RomSource::fileIsImage(const std::filesystem::path& path)
@@ -16,61 +143,10 @@ bool RomSource::fileIsRom(const std::filesystem::path& path)
     return path.extension() == ".zip";
 }
 
-bool RomSource::isRomFolderValid() const
+std::optional<RomInfo> RomSource::romInfo(const std::filesystem::path& path) const
 {
-    return std::filesystem::is_directory(mRomFolder);
-}
-
-std::filesystem::path RomSource::romFolder() const
-{
-    return mRomFolder;
-}
-
-RomSource::ScanResult RomSource::scan() const
-{
-    ScanResult result;
-
-    if (!isRomFolderValid())
-    {
-        throw Excep("Rom source folder is not a directory");
-    }
-
-    for (auto files = scanFolder(mRomFolder); const auto& file : files)
-    {
-        if (fileIsRom(file))
-        {
-            result.roms.push_back(file);
-        }
-        else if (fileIsImage(file))
-        {
-            result.screenshots.push_back(file);
-        }
-    }
-
-    if (auto lastModified = lastFolderModification(mRomFolder); lastModified)
-    {
-        result.lastModified = *lastModified;
-    }
-    else
-    {
-        throw Excep("Can't read rom source last edit time");
-    }
-
-    return result;
-}
-
-std::list<std::filesystem::path> RomSource::scanFolder(const std::filesystem::path& path) const
-{
-    std::list<std::filesystem::path> result;
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
-    {
-        if (entry.is_regular_file())
-        {
-            result.push_back(std::filesystem::absolute(entry.path()));
-        }
-    }
-
-    return result;
+    spdlog::trace("Querying rom database for: {}", path.stem().string());
+    return RomDatabase::get().find(path);
 }
 
 std::optional<std::string> RomSource::lastFolderModification(const std::filesystem::path& path) const
@@ -79,7 +155,7 @@ std::optional<std::string> RomSource::lastFolderModification(const std::filesyst
 
     // With this algorithm we scan all the subfolders of a folder and we find the most recently modified one, this way
     // we know which is the very last modification moment of a folder structure
-    std::list<std::filesystem::file_time_type> editTimes;
+    std::vector<std::filesystem::file_time_type> editTimes;
 
     // First checking the modification time of the actual folder
     std::filesystem::file_time_type lastModified = std::filesystem::last_write_time(path, errorCode);
@@ -104,7 +180,7 @@ std::optional<std::string> RomSource::lastFolderModification(const std::filesyst
     }
 
     // Then we find the most recent modification
-    lastModified = *(std::max_element(editTimes.begin(), editTimes.end()));
+    lastModified = *(std::ranges::max_element(editTimes));
 
     // I can't believe it's 2024 and I still need to do this cumbersome stuff.
     // Unluckily I can't use std::format since my GCC doesn't support it yet.
@@ -118,12 +194,128 @@ std::optional<std::string> RomSource::lastFolderModification(const std::filesyst
     return timess.str();
 }
 
-std::string RomSource::lastEditTime() const
+bool RomSource::saveOnCache() const
 {
-    if (auto editTime = lastFolderModification(mRomFolder); editTime)
+    auto file = cacheFile();
+    spdlog::debug("Writing rom source cache file at: {}", file.string());
+
+    nlohmann::json json;
+
+    json[LASTMODIFIED_JSON_FIELD] = mCache.lastModified;
+    json[VERSION_JSON_FIELD] = version();
+
+    nlohmann::json roms;
+    for (const auto& rom : mCache.roms)
     {
-        return *editTime;
+        roms.push_back(rom);
     }
 
-    throw Excep("Can't read rom source last edit time");
+    json[ROMS_JSON_FIELD] = roms;
+
+    return writeCacheFile(json, cacheFile());
+}
+
+std::filesystem::path RomSource::cacheFile() const
+{
+    return mCacheFolder / fmt::format("{}{}", std::to_string(std::filesystem::hash_value(mRomFolder)), ".json");
+}
+
+bool RomSource::writeCacheFile(const nlohmann::json& json, const std::filesystem::path& path) const
+{
+    // Nicely formatting our json
+    std::stringstream stringStream;
+    stringStream << std::setw(4) << json << std::endl;
+
+    std::ofstream file(path.string().c_str());
+    file << stringStream.str();
+
+    return file.good();
+}
+
+std::optional<nlohmann::json> RomSource::readCacheFile(const std::filesystem::path& path) const
+{
+    std::ifstream cacheFile(path.string());
+    std::stringstream buffer;
+    buffer << cacheFile.rdbuf();
+
+    nlohmann::json json;
+    try
+    {
+        json = nlohmann::json::parse(buffer.str());
+    }
+    catch (...)
+    {
+        return std::nullopt;
+    }
+
+    return json;
+}
+
+std::optional<std::vector<Rom>> RomSource::cacheScan(const std::string_view lastModified) const
+{
+    std::vector<Rom> result;
+
+    spdlog::debug("Trying to read cache file at: {}", cacheFile().string());
+    auto cache = readCacheFile(cacheFile());
+
+    // If unable to read cache from file we return empty result
+    if (!cache)
+    {
+        spdlog::warn("Unable to read cache file at: {}", cacheFile().string());
+        return std::nullopt;
+    }
+
+    // If unable to make sure that the cache json was produced by the very same software version that is running
+    // right now we return empty result
+    try
+    {
+        if (!cache->contains(VERSION_JSON_FIELD) || cache->at(VERSION_JSON_FIELD).get<std::string>() != version())
+        {
+            spdlog::warn("Cache file at {} does not seem to be produced by the same software version",
+                         cacheFile().string());
+            return std::nullopt;
+        }
+    }
+    catch ([[maybe_unused]] const nlohmann::json::exception& e)
+    {
+        spdlog::warn("Cache file at {} does not seem to be produced by the same software version",
+                     cacheFile().string());
+        return std::nullopt;
+    }
+
+    // If unable to make sure that the rom folder was not modified since last write we return empty result
+    try
+    {
+        if (!cache->contains(LASTMODIFIED_JSON_FIELD) ||
+            cache->at(LASTMODIFIED_JSON_FIELD).get<std::string>() != lastModified)
+        {
+            spdlog::warn("The rom folder was probably modified since last scan");
+            return std::nullopt;
+        }
+    }
+    catch ([[maybe_unused]] const nlohmann::json::exception& e)
+    {
+        spdlog::warn("The rom folder was probably modified since last scan");
+        return std::nullopt;
+    }
+
+    if (!cache->contains(ROMS_JSON_FIELD))
+    {
+        spdlog::warn("Cache seems to be malformed or corrupted");
+        return std::nullopt;
+    }
+
+    auto roms = (*cache)[ROMS_JSON_FIELD];
+    for (const auto& rom : roms)
+    {
+        const auto& inserted = result.emplace_back(rom);
+        spdlog::trace("Found rom: {}", inserted.path().stem().string());
+    }
+
+    return result;
+}
+
+std::string_view RomSource::version() const
+{
+    return projectVersion;
 }

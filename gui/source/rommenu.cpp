@@ -4,7 +4,7 @@
 
 #include <spdlog/spdlog.h>
 
-RomMenu::RomMenu(const std::list<Rom>& roms)
+RomMenu::RomMenu(const std::vector<Rom>& roms)
 {
     for (const auto& rom : roms)
     {
@@ -61,6 +61,7 @@ void RomMenu::reorganize()
 {
     deleteChildren();
     const unsigned long start = (mSelected / ROWS) * ROWS;
+    // This cast shouldn't be needed but we get compilation errors in armv7hf (?)
     const unsigned long stop = std::min(static_cast<std::size_t>((mSelected / ROWS) * ROWS + ROWS), mRoms.size());
 
     std::shared_ptr<TextNode> prev;

@@ -30,7 +30,7 @@ std::filesystem::path Conf::romDirectory() const
     return baseDirectory() / "roms";
 }
 
-std::filesystem::path Conf::cacheFile() const
+std::filesystem::path Conf::cacheDirectory() const
 {
-    return baseDirectory() / "cache.json";
+    return baseDirectory() / "cache";
 }

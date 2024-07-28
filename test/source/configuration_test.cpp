@@ -7,6 +7,7 @@
 static const std::filesystem::path home = "/home";
 static const std::filesystem::path base = home / ("." + std::string(executableName));
 static const std::filesystem::path roms = base / "roms";
+static const std::filesystem::path cache = base / "cache";
 
 class ConfigurationFixture : public ::testing::Test
 {
@@ -33,7 +34,7 @@ TEST_F(ConfigurationFixture, cacheFile)
     */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
 
-    EXPECT_EQ(config.cacheFile(), base / "cache.json");
+    EXPECT_EQ(config.cacheDirectory(), cache);
 }
 
 TEST_F(ConfigurationFixture, romDirectory_noHome)
@@ -53,5 +54,5 @@ TEST_F(ConfigurationFixture, cacheFile_noHome)
         Expectation: We throw an exception.
     */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(config.cacheFile(), Conf::Excep);
+    EXPECT_THROW(config.cacheDirectory(), Conf::Excep);
 }

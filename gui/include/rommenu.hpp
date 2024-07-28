@@ -34,7 +34,7 @@ class RomMenu : public Node
 
  public:
     RomMenu() = delete;
-    explicit RomMenu(const std::list<Rom>& roms);
+    explicit RomMenu(const std::vector<Rom>& roms);
 
     [[nodiscard]] bool selectionDown();
     [[nodiscard]] bool selectionUp();
