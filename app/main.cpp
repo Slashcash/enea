@@ -4,7 +4,6 @@
 #include <spdlog/cfg/env.h>
 #include <spdlog/spdlog.h>
 
-#include "cache.hpp"
 #include "configuration.hpp"
 #include "emulator.hpp"
 #include "gui.hpp"
@@ -41,8 +40,7 @@ int main()
             spdlog::warn("Rom folder creation failed at {}", romPath.string());
         }
 
-        auto cacheFile = Configuration::get().cacheFile();
-        auto cachePath = cacheFile.parent_path();
+        auto cachePath = Configuration::get().cacheDirectory();
         std::filesystem::create_directories(cachePath, createFolderEc);
         if (createFolderEc)
         {
@@ -50,72 +48,14 @@ int main()
         }
 
         // Searching for roms
-        spdlog::info("Searching for roms");
-        std::list<Rom> romList;
-        RomSource romSource(romPath);
-        auto lastEditTime = romSource.lastEditTime();
-        spdlog::debug("Trying to load cache file from: {}", cachePath.string());
-        Cache cache(Configuration::get().cacheFile());
+        spdlog::info("Searching for roms and media");
+        RomSource romSource(romPath, cachePath);
+        std::vector<Rom> romList = romSource.scan();
 
-        if (auto error = cache.load(); error || lastEditTime != *(cache.lastEditTime()))
+        spdlog::info("Saving cache information");
+        if (!romSource.saveOnCache())
         {
-            // Scanning folder
-            spdlog::debug("Scanning for roms in {}", romPath.string());
-            auto scanResult = romSource.scan();
-
-            // No rom found: we throw
-            if (scanResult.roms.empty())
-            {
-                throw Exception("No rom found");
-            }
-
-            // Retrieving rom information
-            for (const auto& file : scanResult.roms)
-            {
-                // Searching rom information into the database
-                RomInfo romInfo;
-                spdlog::trace("Querying rom database for: {}", file.string());
-                // Adding it to the database if: query is succesful && rom is not a bios
-                if (auto query = RomDatabase::get().find(file); query && (!query->isBios || !(*(query->isBios))))
-                {
-                    // Searching if we found any media associated to the rom in the rom folder
-                    RomMedia media;
-                    for (const auto& screenshot : scanResult.screenshots)
-                    {
-                        if (screenshot.filename().string().starts_with(file.stem().string()))
-                        {
-                            media = RomMedia{.screenshot = screenshot};
-                        }
-                    }
-
-                    romList.emplace_back(file, *query, media);
-                }
-                else
-                {
-                    spdlog::warn("No information in rom database for: {}, not adding it to the rom list",
-                                 file.stem().string());
-                }
-            }
-
-            cache.setRomCache(romSource.romFolder(), romList, scanResult.lastModified);
-        }
-
-        else
-        {
-            romList = *(cache.roms());
-        }
-
-        // Printing a convenient list of added roms
-        for (const auto& rom : romList)
-        {
-            spdlog::trace("Found rom: {}", rom.path().string());
-        }
-
-        spdlog::info("Saving information");
-        spdlog::debug("Writing cache file at: {}", cachePath.string());
-        if (auto error = cache.write(); error.has_value())
-        {
-            spdlog::warn("Failed to write cache file at: {}, cache will not be available", cachePath.string());
+            spdlog::warn("Failed to write cache file, cache will not be available");
         }
 
         // Starting gui
@@ -127,6 +67,6 @@ int main()
     }
     catch (const Exception& excep)
     {
-        spdlog::error("{}", excep.what());
+        spdlog::error(excep.what());
     }
 }

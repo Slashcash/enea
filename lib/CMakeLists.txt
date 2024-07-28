@@ -13,8 +13,6 @@ add_library(
   source/systemcommand.cpp
   include/emulator.hpp
   source/emulator.cpp
-  include/cache.hpp
-  source/cache.cpp
   include/rominfo.hpp
   source/rominfo.cpp
   include/rommedia.hpp

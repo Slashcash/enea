@@ -10,7 +10,7 @@
 #include "rommenu.hpp"
 #include "softwareinfo.hpp"
 
-Gui::Gui(const std::list<Rom>& romList) : mRomList(romList)
+Gui::Gui(const std::vector<Rom>& romList) : mRomList(romList)
 {
 }
 
