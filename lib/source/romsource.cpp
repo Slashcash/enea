@@ -1,6 +1,11 @@
 #include "romsource.hpp"
 
+#include <cstring>
+#include <dirent.h>
 #include <fstream>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include <spdlog/spdlog.h>
 
@@ -97,11 +102,12 @@ bool RomSource::isFolder(const std::filesystem::path& path) const
 std::vector<std::filesystem::path> RomSource::scanFolder(const std::filesystem::path& folder) const
 {
     std::vector<std::filesystem::path> result;
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(folder))
+    auto entries = fileInFolder(folder);
+    for (const auto& entry : entries)
     {
-        if (entry.is_regular_file())
+        if (std::filesystem::is_regular_file(entry))
         {
-            result.push_back(std::filesystem::absolute(entry.path()));
+            result.push_back(std::filesystem::absolute(entry));
         }
     }
 
@@ -165,10 +171,11 @@ std::optional<std::string> RomSource::lastFolderModification(const std::filesyst
     }
 
     // Then we scan all the subfolders for edit times
-    for (const auto& entry : std::filesystem::recursive_directory_iterator(path))
+    auto entries = fileInFolder(path);
+    for (const auto& entry : entries)
     {
-        if (lastModified = std::filesystem::last_write_time(entry.path(), errorCode);
-            entry.is_directory() && !errorCode)
+        if (lastModified = std::filesystem::last_write_time(entry, errorCode);
+            std::filesystem::is_directory(entry) && !errorCode)
         {
             editTimes.push_back(lastModified);
         }
@@ -318,4 +325,64 @@ std::optional<std::vector<Rom>> RomSource::cacheScan(const std::string_view last
 std::string_view RomSource::version() const
 {
     return projectVersion;
+}
+
+std::vector<std::filesystem::path> RomSource::fileInFolder(const std::filesystem::path& folder)
+{
+    /* We provide two different implementations to iterate over the content of a folder:
+        1. The first one uses POSIX API
+        2. The second one uses std::filesystem::recursive_directory_iterator
+
+        For some reasons our toolchain adds some strange symbols when using recursive_directory_iterator.
+        These symbols are generally unavailable on raspbian (?) and this makes the executable unusable.
+        For this reason we use the POSIX API when compiling arm so we don't break raspbian compatibility.
+        This issue should be investigated.
+    */
+    std::vector<std::filesystem::path> result;
+
+#ifdef USE_POSIX_FILE_LIST
+    DIR* dp;
+    struct dirent* entry;
+    struct stat info;
+
+    if ((dp = opendir(folder.c_str())) == NULL)
+    {
+        return result;
+    }
+
+    while ((entry = readdir(dp)) != NULL)
+    {
+        std::filesystem::path path = folder / entry->d_name;
+
+        if (stat(path.c_str(), &info) != 0)
+        {
+            continue;
+        }
+
+        if (S_ISDIR(info.st_mode))
+        {
+            // Skip "." and ".." directories
+            if (strcmp(entry->d_name, ".") != 0 && strcmp(entry->d_name, "..") != 0)
+            {
+                // Recurse into subdirectories
+                std::vector<std::filesystem::path> subDirFiles = fileInFolder(path);
+                result.insert(result.end(), subDirFiles.begin(), subDirFiles.end());
+            }
+        }
+        else
+        {
+            // It's a file, add to list
+            result.push_back(path);
+        }
+    }
+
+    closedir(dp);
+#else
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(folder))
+    {
+        result.push_back(std::filesystem::absolute(entry.path()));
+    }
+#endif
+
+    return result;
 }

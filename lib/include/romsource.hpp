@@ -35,6 +35,7 @@ class RomSource
 
     [[nodiscard]] virtual bool isFolder(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::vector<std::filesystem::path> scanFolder(const std::filesystem::path& folder) const;
+    [[nodiscard]] static std::vector<std::filesystem::path> fileInFolder(const std::filesystem::path& folder);
     [[nodiscard]] virtual std::optional<RomInfo> romInfo(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::optional<std::string> lastFolderModification(const std::filesystem::path& path) const;
     [[nodiscard]] virtual bool writeCacheFile(const nlohmann::json& json, const std::filesystem::path& path) const;

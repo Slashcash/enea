@@ -3,11 +3,17 @@ from conan.tools.cmake import cmake_layout, CMakeToolchain, CMake
 
 class Recipe(ConanFile):
     generators = "CMakeDeps", "VirtualBuildEnv", "VirtualRunEnv"
-    settings = "build_type", "arch"
+    settings = "build_type", "arch", "os"
     exports_sources = "*"
 
     def generate(self):
         tc = CMakeToolchain(self)
+
+        if self.settings.os == "Linux" and (self.settings.arch == "armv7hf" or self.settings.arch == "armv8"):
+            tc.variables["USE_POSIX_FILE_LIST"] = True
+        else:
+            tc.variables["USE_POSIX_FILE_LIST"] = False
+
         tc.generate()
 
     def configure(self):

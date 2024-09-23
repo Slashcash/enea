@@ -11,6 +11,138 @@ base_temp_dir="/tmp/enea_appimage"
 app_dir="$base_temp_dir/app"
 downloads_dir="$base_temp_dir/downloads"
 
+declare -a found_deps
+
+# Function to check if a string starts with any exclusion string
+is_excluded() {
+    # Exclusion list of libs that don't need to be included into the AppImage
+    local exclusion_list=("libGL.so" "libSM.so" "libuuid.so" "libxcb-dri2.so" "libxcb-dri3.so"
+                "libICE.so" "libX11-xcb.so" "libxcb.so" "libX11.so" "libstdc++.so"
+                "libm.so" "libgcc_s.so" "libz.so" "ld-linux" "libc.so"
+                "libGLX.so" "libGLdispatch.so")
+
+    local string="$1"
+    for exclude in "${exclusion_list[@]}"; do
+        if [[ "$string" == "$exclude"* ]]; then
+            return 0  # String starts with exclusion pattern
+        fi
+    done
+    return 1  # String does not match any exclusion pattern
+}
+
+find_dependencies() {
+    local file="$1"
+    local search_path="$2"
+    local -a deps
+    local -a deps_to_process
+
+    deps=( $( readelf -d "$file" | grep "NEEDED" | \
+        grep -o -E "\[[^]]*\]" | grep -o -E "[^][]*" ) )
+
+    local add_this_dep=true
+
+    # always assume we've found $file and add it to the $found_deps list
+    # if it's not there
+    for found_dep in "${found_deps[@]}"
+    do
+        if [ "$found_dep" = "$(basename $file)" ]
+        then
+            add_this_dep=false
+            break
+        fi
+    done
+
+    # if $add_this_dep is true, go ahead and add to the found_deps list
+    if $add_this_dep
+    then
+        found_deps+=("$(basename $file)")
+    fi
+
+    # for every dependency found by readelf (no path)
+    for dep in "${deps[@]}"
+    do
+        local process_dep=true
+
+        # if the basename of the file passed into the function is
+        # this dep, skip processing altogether
+        if [ "$dep" = "$(basename $file)" ]
+        then
+            break
+        else
+            # otherwise, if it's one of the 'found deps' don't process it
+            for found_dep in "${found_deps[@]}"
+            do
+                if [ "$dep" = "$found_dep" ]
+                then
+                    process_dep=false
+                    break
+                fi
+            done
+
+            # it wasn't one of the 'found deps' so add
+            # it to the found_deps list
+            if $process_dep
+            then
+                found_deps+=($dep)
+            fi
+        fi
+
+        # if we are supposed to process this dep
+        if $process_dep
+        then
+            local file_path=
+
+            # check each search path for a file named $dep underneath it
+            dep_basename="$(echo $dep | sed 's/\.so.*$/.so/')"
+            file_path=$( find "$search_path" -name "$dep_basename*" | head -n 1 )
+
+            # if the $file_path is not empty, then we found a copy
+            # of the file, place it the list of deps to be processed
+            if [ -n "$file_path" ]
+            then
+                deps_to_process+=("$(realpath $file_path)")
+            fi
+        fi
+    done
+
+    # now, go through all of our $deps_to_process (with path)
+    # and run "find_dependencies" on them
+    for dep_to_process in "${deps_to_process[@]}"
+    do
+        find_dependencies "$dep_to_process" "$2"
+    done
+}
+
+list_dependencies() {
+    local executable="$1"
+    local ld_search_path="$2"
+    local append_variable=""
+
+    find_dependencies "$executable" "$ld_search_path"
+
+    # transforming dependencies into their real path
+    for path_dep in "${found_deps[@]}"
+    do
+        if ! is_excluded "$path_dep"; then
+            path_dep_basename="$(echo $path_dep | sed 's/\.so.*$/.so/')"
+            real_path=$(realpath $(find "$2" -name "$path_dep_basename*" | head -n 1 ))
+
+            if [ -n "$real_path" ]
+            then
+
+                append_variable+="--library=$(echo $real_path | sed 's/\(\.so\.[0-9]*\).*/\1/') "
+                #cp "$(realpath $real_path)" "$copy_path/$(echo "$path_dep" | sed 's/\(\.so\.[0-9]*\).*/\1/')"
+            fi
+        fi
+    done
+
+    for variable in "${append_variable[@]}"
+    do
+      echo "$variable"
+    done
+}
+
+
 # Function to display usage help
 function display_help {
   echo "Usage: $(basename "$0") [-s <source_folder>] [-o <output_directory>] [-a <architecture>]"
@@ -84,15 +216,21 @@ fi
 if [ "$ENEA_ARCH" == "x86_64" ]; then
   CONAN_ARCH="x86_64"
   SKIP_TESTS="False"
+  SYSROOT_ARCH="undefined"
   PKGCONFIG_ARCH="x86_64-linux-gnu"
+  APPIMAGE_ARCH="x86_64"
 elif [ "$ENEA_ARCH" == "armv7hf" ]; then
   CONAN_ARCH="armv7hf"
   SKIP_TESTS="True"
+  SYSROOT_ARCH="arm-buildroot-linux-gnueabihf"
   PKGCONFIG_ARCH="arm-linux-gnueabihf"
+  APPIMAGE_ARCH="armhf"
 elif [ "$ENEA_ARCH" == "aarch64" ]; then
   CONAN_ARCH="armv8"
   SKIP_TESTS="True"
+  SYSROOT_ARCH="aarch64-buildroot-linux-gnu"
   PKGCONFIG_ARCH="aarch64-linux-gnu"
+  APPIMAGE_ARCH="aarch64"
 else
   echo "Error: build architecture must be either 'x86_64', 'aarch64' or 'armv7hf'."
   exit 1
@@ -212,6 +350,23 @@ advmame_package_folder="$(conan cache path advmame/$ADVMAME_VERSION:$(conan list
 ENEA_EXEC="$SOURCE_DIR/build/Release/app/enea"
 ADVMAME_EXEC="$advmame_package_folder/bin/advmame"
 
+# Downloading AppImage runtime for the correct architecture
+runtime_url="https://github.com/AppImage/type2-runtime/releases/download/old/runtime-fuse2-$APPIMAGE_ARCH"
+runtime_path="$downloads_dir/runtime-fuse2-$APPIMAGE_ARCH"
+if ! download_file "$runtime_url" "$runtime_path"; then
+    exit 1
+fi
+
+# If we are not packaging for x86_64 linuxdeploy cannot bundle dependencies. We do it manually instead
+if [[ "$ENEA_ARCH" != "x86_64" ]]; then
+  toolchain_package_folder="$(conan cache path toolchain-linux-$ENEA_ARCH-gcc-11.3/1.0:$(conan list "toolchain-linux-$ENEA_ARCH-gcc-11.3/1.0:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
+
+  enea_dep="$(list_dependencies "$ENEA_EXEC" "$toolchain_package_folder/$SYSROOT_ARCH/sysroot")"
+  advmame_dep="$(list_dependencies "$ADVMAME_EXEC" "$toolchain_package_folder/$SYSROOT_ARCH/sysroot")"
+  dynamic_deps="$enea_dep $advmame_dep"
+  export LDAI_RUNTIME_FILE="$runtime_path"
+fi
+
 # Using linuxdeploy to generate app dir
 appimage_name="Enea-$ENEA_ARCH.AppImage"
 appimage_output="$OUTPUT_DIR/$appimage_name"
@@ -219,8 +374,10 @@ echo "Generating "$appimage_output""
 export LDAI_OUTPUT="$appimage_output"
 export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Slashcash|enea|latest|$appimage_name.zsync"
 export NO_STRIP=1
+export ARCH="$APPIMAGE_ARCH"
+
 cd $OUTPUT_DIR
-$deploy_path --appimage-extract-and-run --appdir="$app_dir" --custom-apprun="$launcher_path" --executable="$ENEA_EXEC" --executable="$ADVMAME_EXEC" --icon-file="$icon_path" --desktop-file="$desktop_path" --output appimage
+$deploy_path --appimage-extract-and-run --appdir="$app_dir" --custom-apprun="$launcher_path" --executable="$ENEA_EXEC" --executable="$ADVMAME_EXEC" $dynamic_deps --icon-file="$icon_path" --desktop-file="$desktop_path" --output appimage
 
 # Check if linuxdeploy was successful
 if [ $? -ne 0 ]; then
