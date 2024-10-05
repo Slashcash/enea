@@ -12,6 +12,7 @@ static const std::filesystem::path ROM_PATH = ROM_FOLDER / "sf2.zip";
 static const std::filesystem::path SCREENSHOT_PATH = ROM_FOLDER / "sf2.png";
 static const std::filesystem::path USELESS_PATH = ROM_FOLDER / "sf2.mp3";
 static const std::filesystem::path NOT_ROM_PATH = ROM_FOLDER / "lollete.zip";
+static const std::filesystem::path BIOS_PATH = ROM_FOLDER / "neogeo.zip";
 static const std::string LAST_EDIT = "1970-01-01 00:00:00";
 
 static const std::string ROM_TITLE = "Street Fighter II: The World Warrior";
@@ -21,6 +22,8 @@ static const bool ROM_IS_BIOS = false;
 
 static const RomInfo INFO_SET_COMPLETE{
     .title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
+
+static const RomInfo INFO_SET_BIOS{.title = "NeoGeo", .year = "1991", .manufacturer = "SNK", .isBios = true};
 
 static const nlohmann::json CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST_EDIT},
                                        {RomSource::VERSION_JSON_FIELD, projectVersion},
@@ -36,7 +39,8 @@ static const nlohmann::json EMPTY_CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD
                                                  {},
                                              }};
 
-static const std::vector<std::filesystem::path> folderMock{ROM_PATH, SCREENSHOT_PATH};
+static const std::vector<std::filesystem::path> folderMock{ROM_PATH, SCREENSHOT_PATH, NOT_ROM_PATH, USELESS_PATH,
+                                                           BIOS_PATH};
 static const std::vector<std::filesystem::path> emptyFolderMock{};
 
 class RomSourceFixture : public ::testing::Test
@@ -63,10 +67,15 @@ TEST_F(RomSourceFixture, scanNoCache)
             - sf2.zip is an existing rom: it will be returned by the scan with all the information associated to it
             - sf2.mp3 it's a music file: it will not be returned
             - lollete.zip: looks like a rom but it's not in our database, will not be returned
+            - neogeo.zip: is a bios file, will not be returned
     */
     EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
     EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
+
     EXPECT_CALL(romSource, romInfo(ROM_PATH)).WillOnce(testing::Return(INFO_SET_COMPLETE));
+    EXPECT_CALL(romSource, romInfo(NOT_ROM_PATH)).WillOnce(testing::Return(std::nullopt));
+    EXPECT_CALL(romSource, romInfo(BIOS_PATH)).WillOnce(testing::Return(INFO_SET_BIOS));
+
     EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
     auto roms = romSource.scan();
     ASSERT_EQ(roms.size(), 1);
@@ -155,7 +164,11 @@ TEST_F(RomSourceFixture, saveOnCache)
     */
     EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
     EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
+
     EXPECT_CALL(romSource, romInfo(ROM_PATH)).WillOnce(testing::Return(INFO_SET_COMPLETE));
+    EXPECT_CALL(romSource, romInfo(NOT_ROM_PATH)).WillOnce(testing::Return(std::nullopt));
+    EXPECT_CALL(romSource, romInfo(BIOS_PATH)).WillOnce(testing::Return(INFO_SET_BIOS));
+
     EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
     EXPECT_CALL(romSource, version()).WillOnce(testing::Return(projectVersion));
     EXPECT_CALL(romSource, writeCacheFile(CACHE_JSON, CACHE_FILE)).WillOnce(testing::Return(true));
