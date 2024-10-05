@@ -64,7 +64,11 @@ std::vector<Rom> RomSource::physicalScan() const
     // Physically scanning the folder
     for (auto files = scanResult(mRomFolder); const auto& rom : files.roms)
     {
-        if (auto query = romInfo(rom); query)
+        if (auto query = romInfo(rom); !query || (query->isBios && *(query->isBios)))
+        {
+            spdlog::warn("File: {} does not look like a launchable rom, discarding it", rom.string());
+        }
+        else
         {
             spdlog::trace("Found rom: {}", rom.string());
             RomMedia media;
@@ -83,11 +87,6 @@ std::vector<Rom> RomSource::physicalScan() const
             }
 
             result.emplace_back(rom, *query, media);
-        }
-
-        else
-        {
-            spdlog::warn("File: {} does not look like a launchable rom, discarding it", rom.string());
         }
     }
 
