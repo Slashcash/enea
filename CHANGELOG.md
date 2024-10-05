@@ -1,3 +1,16 @@
+## v0.2.2 (2024-10-05)
+
+### Fix
+
+- do not list bios as launchable roms
+- solve crash at startup on arm architecture
+
+### Refactor
+
+- manage rom source cache management within RomSource class
+- reimplement romdb class as a singleton
+- reimplement configuration class as a singleton
+
 ## v0.2.1 (2024-06-22)
 
 ### Fix
