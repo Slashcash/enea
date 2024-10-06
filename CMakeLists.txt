@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.27.0)
 include(cmake/parseVariables.cmake)
 project(
   ${SOFTWARE_NAME}
-  VERSION ${SOFTWARE_VERSION}
+  VERSION "${SOFTWARE_TAG}"
   LANGUAGES CXX)
 
 # Using C++20

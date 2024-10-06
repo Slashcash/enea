@@ -36,7 +36,7 @@ done
 SCAN_PATH=${SCAN_PATH:-$DEFAULT_PATH}
 
 # Check if $SCAN_PATH looks like a valid source folder
-if ! check_path_validity "$SCAN_PATH/.env"; then
+if ! check_path_validity "$SCAN_PATH"; then
   exit 1
 fi
 

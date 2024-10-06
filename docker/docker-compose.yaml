@@ -1,0 +1,14 @@
+services:
+  enea_build:
+    image: enea_build
+    container_name: enea_build_container
+    environment:
+      - ENEA_WORK_FOLDER=/enea
+      - LOCAL_USER_ID=${DOCKER_USER_ID:-9001}
+      - LOCAL_USER_PASSWORD=${DOCKER_USER_PASSWORD}
+    volumes:
+      - ../:/enea
+    working_dir: /enea
+    command: /bin/bash
+    tty: true
+    stdin_open: true

@@ -58,7 +58,9 @@ The project ships with a Docker container which can be used to containerize the 
 
 - Launch Docker container:
 
-    `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
+    `$ ./scripts/launch_build_container.sh`
+
+    You will be prompted for a password. This will be the password for the user of your Docker container. You may need this password for the build process.
 
 - Choose the hardware architecture you want to build for:
 
@@ -85,7 +87,9 @@ While not recommended you may want to build *Enea* without packing it. In order 
 
 - Launch Docker container:
 
-    `$ docker run --rm -v .:/enea -w /enea -ti enea_build /bin/bash`
+    `$ ./scripts/launch_build_container.sh`
+
+    You will be prompted for a password. This will be the password for the user of your Docker container. You may need this password for the build process.
 
 - Install custom conan configuration
 
