@@ -256,7 +256,7 @@ fi
 . $SOURCE_DIR/.env
 
 # Downloading the icon file
-icon_url="https://enea.geniorio.it/$SOFTWARE_VERSION/icon/icon.png"
+icon_url="https://enea.geniorio.it/resources/icon/icon.png"
 icon_path="$downloads_dir/icon.png"
 if ! download_file "$icon_url" "$icon_path"; then
     exit 1
