@@ -17,3 +17,4 @@ jobs:
       with:
         architecture: ${{ matrix.arch }}
         build_dependencies: ${{ inputs.build_dependencies }}
+        build_author: "Manual Build from Github Actions"

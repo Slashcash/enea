@@ -75,3 +75,10 @@ if(NOT ${SOFTWARE_TAG} MATCHES "^([0-9]+)\\.([0-9]+)\\.([0-9]+)$")
     FATAL_ERROR "SOFTWARE_TAG variable does not contain a valid version number."
   )
 endif()
+
+# Setting and validating project builder
+set(SOFTWARE_BUILDER "$ENV{SOFTWARE_BUILDER}")
+
+if("${SOFTWARE_BUILDER}" STREQUAL "")
+  set(SOFTWARE_BUILDER "Manual Build")
+endif()

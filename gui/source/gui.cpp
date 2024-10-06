@@ -37,7 +37,7 @@ void Gui::run()
 
     // Drawing bottom info
     const float PROGRAM_INFO_X = view.getSize().x / 96.0F;
-    const float PROGRAM_INFO_Y = view.getSize().y / 1.05F;
+    const float PROGRAM_INFO_Y = view.getSize().y / 1.08F;
     ProgramInfo programInfo;
     programInfo.setPosition(PROGRAM_INFO_X, PROGRAM_INFO_Y);
 

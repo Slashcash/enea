@@ -11,6 +11,11 @@ on:
         required: true
         type: boolean
 
+      build_author:
+        description: 'The author of the build'
+        required: true
+        type: string
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -60,6 +65,9 @@ jobs:
 
     - name: Install Conan
       uses: turtlebrowser/get-conan@main
+
+    - name: Write build author
+      run: echo "SOFTWARE_BUILDER=${{ inputs.build_author }}" >> .env
 
     - name: Generate .AppImage
       run: |
