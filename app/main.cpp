@@ -19,7 +19,7 @@ int main()
         // Loading log level from environment variable
         spdlog::cfg::load_env_levels();
 
-        spdlog::info("Starting {} v{}", projectName, projectVersion);
+        spdlog::info("Starting {} {}", projectName, projectVersion);
 
         // Searching for advmame
         spdlog::info("Searching for advanceMAME on the system");
@@ -62,7 +62,7 @@ int main()
         Gui gui(romList);
         gui.run();
 
-        spdlog::info("Stopping {} v{}", projectName, projectVersion);
+        spdlog::info("Stopping {} {}", projectName, projectVersion);
         return 0;
     }
     catch (const Exception& excep)

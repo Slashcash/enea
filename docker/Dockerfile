@@ -25,8 +25,19 @@ RUN apt update && apt install -y \
     git \
     pkg-config \
     wget \
+    curl \
     file \
-    sudo
+    sudo \
+    gosu
 
 # Install conan
 RUN pip install conan
+
+# Copy entrypoint script
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# Set container root password to enea
+RUN printf "enea\nenea" | passwd root

@@ -203,7 +203,7 @@ ENEA_ARCH=${ENEA_ARCH:-$DEFAULT_ENEA_ARCH}
 BUILD_DEPS=${BUILD_DEPS:-$DEFAULT_BUILD_DEPS}
 
 # Checking if the folder really contains enea source folder
-if ! check_path_validity "$SOURCE_DIR/.env"; then
+if ! check_path_validity "$SOURCE_DIR"; then
   exit 1
 fi
 
@@ -251,9 +251,6 @@ mkdir -p "$base_temp_dir"
 if ! is_path_writable "$base_temp_dir"; then
   exit 1
 fi
-
-# Sourcing environment
-. $SOURCE_DIR/.env
 
 # Downloading the icon file
 icon_url="https://enea.geniorio.it/resources/icon/icon.png"

@@ -23,6 +23,7 @@ repos:
     exclude: 'db/romdb.json'
   - id: check-executables-have-shebangs
   - id: check-shebang-scripts-are-executable
+    exclude: '^docker/entrypoint\.sh$'
   - id: end-of-file-fixer
     exclude: '.*\.patch$'
   - id: mixed-line-ending

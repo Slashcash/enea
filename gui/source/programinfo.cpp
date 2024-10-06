@@ -17,7 +17,7 @@ ProgramInfo::ProgramInfo()
     auto softwareInfo = std::make_shared<TextNode>();
     softwareInfo->element().setFont(FontManager::get().getResource(FONT_PATH));
     softwareInfo->element().setCharacterSize(FONT_SIZE);
-    softwareInfo->element().setString(fmt::format("{} v{}", projectName, projectVersion));
+    softwareInfo->element().setString(fmt::format("{} {}", projectName, projectVersion));
     softwareInfo->element().setFillColor(sf::Color::Red);
     addChild(softwareInfo);
 

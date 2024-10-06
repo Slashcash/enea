@@ -19,9 +19,9 @@ is_path_writable() {
     fi
 }
 
-# Function to check if we are running inside the source folder (assuming it's valid if we find our .env file)
+# Function to check if we are running inside the source folder (assuming it's valid if we find our .enea file)
 check_path_validity() {
-    local env_file="$1"
+    local env_file="$1/.enea"
     local path=$(dirname "$env_file")
     local inspect_env="grep -q \"^SOFTWARE_NAME=Enea$\" \"$env_file\""
     if [ "is_path_readable \"$path\"" ] && [ -f "$env_file" ] && [ "$inspect_env" ]; then
