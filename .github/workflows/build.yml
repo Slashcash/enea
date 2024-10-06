@@ -16,71 +16,107 @@ on:
     tags: [ "v[0-9]+.[0-9]+.[0-9]+" ]
 
 jobs:
-    build:
-      name: Build
-      strategy:
-        matrix:
-          arch: [x86_64, aarch64, armv7hf]
-      uses: ./.github/workflows/build-workflow.yml
-      with:
-        architecture: ${{ matrix.arch }}
-        build_dependencies: ${{ github.event_name == 'schedule' }}
-        embed_update_info: ${{ github.event_name == 'push' }}
-        build_author: >-
-          ${{ github.event_name == 'schedule' && 'Nightly build' ||
-          (github.event_name == 'pull_request' && format('Pull Request #{0} test build', github.event.number) ||
-          (github.event_name == 'push' && 'Official Release' ||
-          'Unknown')) }}
+  dependencies_need_build:
+    runs-on: ubuntu-22.04
+    name: Check if dependency rebuild is needed
+    env:
+      GITHUB_EVENT_NAME: ${{ github.event_name }}
+    outputs:
+      build_dependencies: ${{ steps.dependency-rebuild.outputs.need-build }}
 
-    deploy:
-      if: ${{ github.event_name == 'push' }}
-      needs: build
-      permissions:
-        contents: write
-      runs-on: ubuntu-22.04
-      name: Deploy
-      steps:
-        - name: Checkout repository
-          uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-          # (needed due to this issue: https://github.com/actions/checkout/issues/1471)
-        - name: Fetch tags
-          run: git fetch --prune --unshallow --tags
+      - name: Check if PR is conan related
+        id: conan-related-pr
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            conanfile.py
+            conan.lock
+            conan/**
 
-        - uses: little-core-labs/get-git-tag@v3.0.1
-          id: tagName
-          name: Get git tag
+      - name: Check if we need dependency rebuild
+        id: dependency-rebuild
+        run: |
+          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ]]; then
+            echo "This is either a scheduled or a push run, rebuilding dependencies"
+            echo "need-build=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          if [[ "${{ steps.conan-related-pr.outputs.any_changed }}" == 'true' ]]; then
+            echo "Conan files were modified, rebuilding dependencies"
+            echo "need-build=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
 
-        - uses: actions/setup-python@v1
-          name: Setup Python
+  build:
+    name: Build
+    needs: dependencies_need_build
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64, armv7hf]
+    uses: ./.github/workflows/build-workflow.yml
+    with:
+      architecture: ${{ matrix.arch }}
+      build_dependencies: ${{ needs.dependencies_need_build.outputs.build_dependencies == 'true' }}
+      embed_update_info: ${{ github.event_name == 'push' }}
+      build_author: >-
+        ${{ github.event_name == 'schedule' && 'Nightly build' ||
+        (github.event_name == 'pull_request' && format('Pull Request #{0} test build', github.event.number) ||
+        (github.event_name == 'push' && 'Official Release' ||
+        'Unknown')) }}
 
-        - uses: BSFishy/pip-action@v1
-          name: Install commitizen
-          with:
-            packages: Commitizen
+  deploy:
+    if: ${{ github.event_name == 'push' }}
+    needs: build
+    permissions:
+      contents: write
+    runs-on: ubuntu-22.04
+    name: Deploy
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        - name: Get incremental changelog
-          run: cz changelog --file-name body.md ${{ steps.tagName.outputs.tag }}
+        # (needed due to this issue: https://github.com/actions/checkout/issues/1471)
+      - name: Fetch tags
+        run: git fetch --prune --unshallow --tags
 
-        - name: Create draft release
-          id: create_release
-          uses: actions/create-release@v1
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          with:
-            tag_name: ${{ steps.tagName.outputs.tag }}
-            release_name: ${{ format('Enea {0}', steps.tagName.outputs.tag) }}
-            draft: true
-            prerelease: false
-            body_path: ${{ github.workspace }}/body.md
+      - uses: little-core-labs/get-git-tag@v3.0.1
+        id: tagName
+        name: Get git tag
 
-        - name: Download build result
-          uses: actions/download-artifact@v4
-          with:
-            path: ${{ github.workspace }}/deploy
+      - uses: actions/setup-python@v1
+        name: Setup Python
 
-        - uses: shogo82148/actions-upload-release-asset@v1
-          name: Upload files
-          with:
-            upload_url: ${{ steps.create_release.outputs.upload_url }}
-            asset_path: ${{ github.workspace }}/deploy/Enea-*/*
+      - uses: BSFishy/pip-action@v1
+        name: Install commitizen
+        with:
+          packages: Commitizen
+
+      - name: Get incremental changelog
+        run: cz changelog --file-name body.md ${{ steps.tagName.outputs.tag }}
+
+      - name: Create draft release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tagName.outputs.tag }}
+          release_name: ${{ format('Enea {0}', steps.tagName.outputs.tag) }}
+          draft: true
+          prerelease: false
+          body_path: ${{ github.workspace }}/body.md
+
+      - name: Download build result
+        uses: actions/download-artifact@v4
+        with:
+          path: ${{ github.workspace }}/deploy
+
+      - uses: shogo82148/actions-upload-release-asset@v1
+        name: Upload files
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/deploy/Enea-*/*
