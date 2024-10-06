@@ -16,7 +16,7 @@ class ProgramInfo : public Node
  private:
     static constexpr std::string_view FONT_PATH = "fonts/inter.ttf";
     static constexpr unsigned int FONT_SIZE = 16;
-    static constexpr float SPACING = 5.0F;
+    static constexpr float SPACING = 8.0F;
 
     void inline drawEffective(sf::RenderTarget& target, sf::RenderStates states) const override
     {

@@ -21,6 +21,14 @@ ProgramInfo::ProgramInfo()
     softwareInfo->element().setFillColor(sf::Color::Red);
     addChild(softwareInfo);
 
+    auto builderInfo = std::make_shared<TextNode>();
+    builderInfo->element().setFont(FontManager::get().getResource(FONT_PATH));
+    builderInfo->element().setCharacterSize(FONT_SIZE);
+    builderInfo->element().setString(std::string(projectBuilder));
+    builderInfo->element().setFillColor(sf::Color::Red);
+    builderInfo->setPosition(0, softwareInfo->element().getGlobalBounds().height + SPACING);
+    softwareInfo->addChild(builderInfo);
+
     Emulator emulator;
     if (auto info = emulator.info(); info)
     {
@@ -29,7 +37,7 @@ ProgramInfo::ProgramInfo()
         emulatorInfo->element().setCharacterSize(FONT_SIZE);
         emulatorInfo->element().setString(fmt::format("{} {}", info->name, info->version));
         emulatorInfo->element().setFillColor(sf::Color::Red);
-        emulatorInfo->setPosition(0, softwareInfo->element().getGlobalBounds().height + SPACING);
-        addChild(emulatorInfo);
+        emulatorInfo->setPosition(0, builderInfo->element().getGlobalBounds().height + SPACING);
+        builderInfo->addChild(emulatorInfo);
     }
 }

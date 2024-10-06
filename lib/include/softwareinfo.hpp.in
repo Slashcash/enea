@@ -6,5 +6,6 @@
 static constexpr std::string_view projectName = "@SOFTWARE_NAME@";
 static constexpr std::string_view executableName = "@EXECUTABLE@";
 static constexpr std::string_view projectVersion = "@SOFTWARE_VERSION@";
+static constexpr std::string_view projectBuilder = "@SOFTWARE_BUILDER@";
 
 #endif // SOFTWAREINFO_HPP

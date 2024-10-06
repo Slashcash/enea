@@ -25,6 +25,11 @@ jobs:
       with:
         architecture: ${{ matrix.arch }}
         build_dependencies: ${{ github.event_name == 'schedule' }}
+        build_author: >-
+          ${{ github.event_name == 'schedule' && 'Nightly build' ||
+          (github.event_name == 'pull_request' && format('Pull Request #{0} test build', github.event.number) ||
+          (github.event_name == 'push' && 'Official Release' ||
+          'Unknown')) }}
 
     deploy:
       if: ${{ github.event_name == 'push' }}
