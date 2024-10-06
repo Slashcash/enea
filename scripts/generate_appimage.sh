@@ -346,7 +346,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-advmame_package_folder="$(conan cache path advmame/$ADVMAME_VERSION:$(conan list -p "arch=$CONAN_ARCH" "advmame/$ADVMAME_VERSION:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
+advmame_package_folder="$(conan cache path advmame/3.10:$(conan list -p "arch=$CONAN_ARCH" "advmame/3.10:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
 ENEA_EXEC="$SOURCE_DIR/build/Release/app/enea"
 ADVMAME_EXEC="$advmame_package_folder/bin/advmame"
 
