@@ -25,6 +25,7 @@ jobs:
       with:
         architecture: ${{ matrix.arch }}
         build_dependencies: ${{ github.event_name == 'schedule' }}
+        embed_update_info: ${{ github.event_name == 'push' }}
         build_author: >-
           ${{ github.event_name == 'schedule' && 'Nightly build' ||
           (github.event_name == 'pull_request' && format('Pull Request #{0} test build', github.event.number) ||

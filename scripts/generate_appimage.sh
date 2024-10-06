@@ -5,6 +5,7 @@ DEFAULT_SOURCE_DIR="$( cd "$(dirname "$0/..")" >/dev/null 2>&1 ; pwd -P )"
 DEFAULT_OUTPUT_DIR="$DEFAULT_SOURCE_DIR"
 DEFAULT_ENEA_ARCH="x86_64"
 DEFAULT_BUILD_DEPS="missing"
+DEFAULT_GENERATE_UPDATE_INFO=false
 
 # temporary folders
 base_temp_dir="/tmp/enea_appimage"
@@ -145,11 +146,12 @@ list_dependencies() {
 
 # Function to display usage help
 function display_help {
-  echo "Usage: $(basename "$0") [-s <source_folder>] [-o <output_directory>] [-a <architecture>]"
+  echo "Usage: $(basename "$0") [OPTIONS] [-s <source_folder>] [-o <output_directory>] [-a <architecture>]"
   echo "  -s  Specify the source folder for enea"
   echo "  -o  Specify the output path"
   echo "  -a  Specify build architecture (either x86_64, aarch64 or armv7hf)"
   echo "  -b  Build all dependencies from scratch"
+  echo "  -u  Embed update info into the AppImage"
   echo "  -h  Display this help message"
 }
 
@@ -167,7 +169,7 @@ trap cleanup EXIT
 source $(dirname $0)/common.sh
 
 # Parse command line options
-while getopts "s:o:a:hb" opt; do
+while getopts "s:o:a:hbu" opt; do
   case "$opt" in
     s)
       SOURCE_DIR=$(realpath "$OPTARG")
@@ -185,6 +187,9 @@ while getopts "s:o:a:hb" opt; do
     b)
       BUILD_DEPS="*"
       ;;
+    u)
+      GENERATE_UPDATE_INFO=true
+      ;;
     \?)
       display_help
       exit 1
@@ -201,6 +206,7 @@ SOURCE_DIR=${SOURCE_DIR:-$DEFAULT_SOURCE_DIR}
 OUTPUT_DIR=${OUTPUT_DIR:-$DEFAULT_OUTPUT_DIR}
 ENEA_ARCH=${ENEA_ARCH:-$DEFAULT_ENEA_ARCH}
 BUILD_DEPS=${BUILD_DEPS:-$DEFAULT_BUILD_DEPS}
+GENERATE_UPDATE_INFO=${GENERATE_UPDATE_INFO:-$DEFAULT_GENERATE_UPDATE_INFO}
 
 # Checking if the folder really contains enea source folder
 if ! check_path_validity "$SOURCE_DIR"; then
@@ -369,7 +375,12 @@ appimage_name="Enea-$ENEA_ARCH.AppImage"
 appimage_output="$OUTPUT_DIR/$appimage_name"
 echo "Generating "$appimage_output""
 export LDAI_OUTPUT="$appimage_output"
-export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Slashcash|enea|latest|$appimage_name.zsync"
+
+# Generate update info only if requested
+if [ "$GENERATE_UPDATE_INFO" = true ]; then
+  export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Slashcash|enea|latest|$appimage_name.zsync"
+fi
+
 export NO_STRIP=1
 export ARCH="$APPIMAGE_ARCH"
 
