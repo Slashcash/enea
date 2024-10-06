@@ -16,6 +16,11 @@ on:
         required: true
         type: string
 
+      embed_update_info:
+          description: 'Whether or not to embed update info into the AppImage'
+          required: true
+          type: boolean
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -57,6 +62,12 @@ jobs:
           echo "BUILD_DEPS=" >> $GITHUB_ENV
         fi
 
+        if [[ "${{ inputs.embed_update_info }}" == "true" ]]; then
+          echo "UPDATE_INFO=-u" >> $GITHUB_ENV
+        else
+          echo "UPDATE_INFO=" >> $GITHUB_ENV
+        fi
+
     - name: Add arm Ubuntu sources
       if: ${{ inputs.architecture != 'x86_64' }}
       uses: ryankurte/action-apt@master
@@ -74,6 +85,7 @@ jobs:
         ${{ github.workspace }}/scripts/generate_appimage.sh \
           -a ${{ env.ENEA_ARCH }} \
           ${{ env.BUILD_DEPS }}
+          ${{ env.UPDATE_INFO }}
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
