@@ -24,7 +24,7 @@ endfunction()
 parse_environment(FILEPATH "${CMAKE_CURRENT_SOURCE_DIR}/.env")
 
 # Setting and validating project name
-set(SOFTWARE_NAME "$ENV{SOFTWARE_NAME}")
+set(SOFTWARE_NAME "Enea")
 
 if(NOT ${SOFTWARE_NAME} MATCHES "^[A-Za-z]+$")
   message(
