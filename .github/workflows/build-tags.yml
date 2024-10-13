@@ -1,13 +1,7 @@
 name: Build
-run-name: >-
-  ${{ github.event_name == 'schedule' && 'Nightly build' ||
-  (github.event_name == 'push' && 'Deploy build' ||
-  ' ') }}
+run-name: Deploy Build
 
 on:
-  schedule:
-    - cron: "30 01 * * *"
-
   push:
     tags: [ "v[0-9]+.[0-9]+.[0-9]+" ]
 
@@ -21,14 +15,10 @@ jobs:
     with:
       architecture: ${{ matrix.arch }}
       build_dependencies: true
-      embed_update_info: ${{ github.event_name == 'push' }}
-      build_author: >-
-        ${{ github.event_name == 'schedule' && 'Nightly build' ||
-        (github.event_name == 'push' && 'Official Release' ||
-        'Unknown') }}
+      embed_update_info: true
+      build_author: Official Release
 
   deploy:
-    if: ${{ github.event_name == 'push' }}
     needs: build
     permissions:
       contents: write
