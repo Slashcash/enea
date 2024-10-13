@@ -1,14 +1,10 @@
 name: Build
 run-name: >-
   ${{ github.event_name == 'schedule' && 'Nightly build' ||
-  (github.event_name == 'pull_request' && format('Pull Request #{0} test build', github.event.number) ||
   (github.event_name == 'push' && 'Deploy build' ||
-  ' ')) }}
+  ' ') }}
 
 on:
-  pull_request:
-    branches: [ "main" ]
-
   schedule:
     - cron: "30 01 * * *"
 
@@ -16,57 +12,20 @@ on:
     tags: [ "v[0-9]+.[0-9]+.[0-9]+" ]
 
 jobs:
-  dependencies_need_build:
-    runs-on: ubuntu-22.04
-    name: Check if dependency rebuild is needed
-    env:
-      GITHUB_EVENT_NAME: ${{ github.event_name }}
-    outputs:
-      build_dependencies: ${{ steps.dependency-rebuild.outputs.need-build }}
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Check if PR is conan related
-        id: conan-related-pr
-        uses: tj-actions/changed-files@v45
-        with:
-          files: |
-            conanfile.py
-            conan.lock
-            conan/**
-
-      - name: Check if we need dependency rebuild
-        id: dependency-rebuild
-        run: |
-          if [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ]]; then
-            echo "This is either a scheduled or a push run, rebuilding dependencies"
-            echo "need-build=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-          if [[ "${{ steps.conan-related-pr.outputs.any_changed }}" == 'true' ]]; then
-            echo "Conan files were modified, rebuilding dependencies"
-            echo "need-build=true" >> $GITHUB_OUTPUT
-            exit 0
-          fi
-
   build:
     name: Build
-    needs: dependencies_need_build
     strategy:
       matrix:
         arch: [x86_64, aarch64, armv7hf]
     uses: ./.github/workflows/build-workflow.yml
     with:
       architecture: ${{ matrix.arch }}
-      build_dependencies: ${{ needs.dependencies_need_build.outputs.build_dependencies == 'true' }}
+      build_dependencies: true
       embed_update_info: ${{ github.event_name == 'push' }}
       build_author: >-
         ${{ github.event_name == 'schedule' && 'Nightly build' ||
-        (github.event_name == 'pull_request' && format('Pull Request #{0} test build', github.event.number) ||
         (github.event_name == 'push' && 'Official Release' ||
-        'Unknown')) }}
+        'Unknown') }}
 
   deploy:
     if: ${{ github.event_name == 'push' }}

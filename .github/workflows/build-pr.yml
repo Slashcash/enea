@@ -1,0 +1,39 @@
+name: Build Pull Requests
+run-name: ${{ format('Pull Request #{0} test build', github.event.number) }}
+
+on:
+    pull_request:
+      branches: [ "main" ]
+
+jobs:
+  dependencies_need_build:
+    runs-on: ubuntu-22.04
+    name: Check if dependency rebuild is needed
+    outputs:
+      build_dependencies: ${{ steps.conan-related-pr.outputs.any_changed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check if PR is conan related
+        id: conan-related-pr
+        uses: tj-actions/changed-files@v45
+        with:
+          files: |
+            conanfile.py
+            conan.lock
+            conan/**
+
+  build:
+    name: Build
+    needs: dependencies_need_build
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64, armv7hf]
+    uses: ./.github/workflows/build-workflow.yml
+    with:
+      architecture: ${{ matrix.arch }}
+      build_dependencies: ${{ needs.dependencies_need_build.outputs.build_dependencies == 'true' }}
+      embed_update_info: false
+      build_author: ${{ format('Pull Request #{0} test build', github.event.number) }}
