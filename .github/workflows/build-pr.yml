@@ -2,8 +2,8 @@ name: Build Pull Requests
 run-name: "${{ format('Pull Request #{0} test build', github.event.number) }}"
 
 on:
-    pull_request:
-      branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
 jobs:
   dependencies_need_build:
@@ -34,6 +34,6 @@ jobs:
     uses: ./.github/workflows/build-workflow.yml
     with:
       architecture: ${{ matrix.arch }}
-      build_dependencies: ${{ needs.dependencies_need_build.outputs.build_dependencies }}
+      build_dependencies: ${{ needs.dependencies_need_build.outputs.build_dependencies == 'true' }}
       embed_update_info: false
       build_author: "${{ format('Pull Request #{0} test build', github.event.number) }}"

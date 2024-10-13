@@ -1,0 +1,19 @@
+name: Build Nightly
+run-name: Nightly Build
+
+on:
+  schedule:
+    - cron: "30 01 * * *"
+
+jobs:
+  build:
+    name: Build
+    strategy:
+      matrix:
+        arch: [x86_64, aarch64, armv7hf]
+    uses: ./.github/workflows/build-workflow.yml
+    with:
+      architecture: ${{ matrix.arch }}
+      build_dependencies: true
+      embed_update_info: false
+      build_author: Nightly Build

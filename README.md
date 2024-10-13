@@ -1,4 +1,4 @@
-![example workflow](https://github.com/Slashcash/enea/actions/workflows/build.yml/badge.svg?event=schedule;branch=main)
+![nightly workflow](https://github.com/Slashcash/enea/actions/workflows/build-nightly.yml/badge.svg?branch=main)
 
 [![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -15,7 +15,7 @@ You can then just launch the software by clicking on it or through a terminal, e
 `$ ./Enea-x86_64.AppImage`
 
 ### Nightly builds
-We also host some [nightly built binaries](https://github.com/Slashcash/enea/actions/workflows/build.yml?query=event%3Aschedule). They can be useful if you need a recently built binary of *Enea*.
+We also host some [nightly built binaries](https://github.com/Slashcash/enea/actions/workflows/build-nightly.yml). They can be useful if you need a recently built binary of *Enea*.
 
 ## Using
 Roms and screenshots are searched in:
