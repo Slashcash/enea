@@ -84,7 +84,7 @@ jobs:
       run: |
         ${{ github.workspace }}/scripts/generate_appimage.sh \
           -a ${{ env.ENEA_ARCH }} \
-          ${{ env.BUILD_DEPS }}
+          ${{ env.BUILD_DEPS }} \
           ${{ env.UPDATE_INFO }}
 
     - name: Upload artifacts

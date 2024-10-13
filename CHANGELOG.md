@@ -1,3 +1,14 @@
+## v0.3.0 (2024-10-13)
+
+### Feat
+
+- show build author in bottom left corner of the gui
+- show git commit of build in bottom left corner of gui
+
+### Fix
+
+- enable framebuffer when launching a game
+
 ## v0.2.2 (2024-10-05)
 
 ### Fix
