@@ -22,7 +22,7 @@ Roms and screenshots are searched in:
 
 `~/.enea/roms`
 
-You are supposed to fill this folder with roms and screenshot yourself. **If no rom is found Enea will simply exit at startup.** Be sure to provide at least a rom.
+You are supposed to fill this folder with roms and screenshot yourself. Be sure to provide at least a rom.
 
 Control mapping as follows:
 
