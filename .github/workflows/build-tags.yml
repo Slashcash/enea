@@ -1,4 +1,4 @@
-name: Build
+name: Build Tags
 run-name: Deploy Build
 
 on:
