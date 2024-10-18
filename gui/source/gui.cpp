@@ -47,6 +47,18 @@ void Gui::run()
     RomMenu romMenu(mRomList);
     romMenu.setPosition(ROM_MENU_X, ROM_MENU_Y);
 
+    // Drawing No Rom Found text
+    const float NO_ROM_FOUND_X = view.getSize().x / 2;
+    const float NO_ROM_FOUND_Y = view.getSize().y / 2;
+    TextNode noRomFound;
+    noRomFound.element().setFont(FontManager::get().getResource("fonts/inter.ttf"));
+    noRomFound.element().setCharacterSize(32);
+    noRomFound.element().setString("No rom found");
+    noRomFound.element().setFillColor(sf::Color::Red);
+    noRomFound.element().setOrigin(noRomFound.element().getGlobalBounds().width / 2,
+                                   noRomFound.element().getGlobalBounds().height / 2);
+    noRomFound.element().setPosition(NO_ROM_FOUND_X, NO_ROM_FOUND_Y);
+
     // Creating sounds
     sf::Sound selectionSound;
     selectionSound.setBuffer(SoundManager::get().getResource("audio/move.wav"));
@@ -71,11 +83,14 @@ void Gui::run()
         }
     });
 
-    inputmanager.select.connect([&romMenu, &launchSound]() {
-        launchSound.play();
-        if (auto err = romMenu.launch(); err)
+    inputmanager.select.connect([this, &romMenu, &launchSound]() {
+        if (!mRomList.empty())
         {
-            spdlog::error("Error launching rom: {}", magic_enum::enum_name(*err));
+            launchSound.play();
+            if (auto err = romMenu.launch(); err)
+            {
+                spdlog::error("Error launching rom: {}", magic_enum::enum_name(*err));
+            }
         }
     });
 
@@ -85,7 +100,7 @@ void Gui::run()
 
         window.clear();
         window.draw(programInfo);
-        window.draw(romMenu);
+        mRomList.empty() ? window.draw(noRomFound) : window.draw(romMenu);
         window.display();
     }
 }
