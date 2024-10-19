@@ -6,8 +6,29 @@ on:
     tags: [ "v[0-9]+.[0-9]+.[0-9]+" ]
 
 jobs:
+  branch-name:
+    runs-on: ubuntu-22.04
+    name: Get the running branch name
+    outputs:
+      running-branch: ${{ steps.get-branch.outputs.branch }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get current branch
+        id: get-branch
+        run: |
+          raw=$(git branch -r --contains ${{ github.ref }})
+          branch="$(echo ${raw//origin\//} | tr -d '\n')"
+          echo "{name}=branch" >> $GITHUB_OUTPUT
+          echo "Branches where this tag exists : $branch."
+
   build:
     name: Build
+    needs: branch-name
+    if: contains(${{ needs.branch-name.outputs.running-branch }}, 'main')
     strategy:
       matrix:
         arch: [x86_64, aarch64, armv7hf]
@@ -19,11 +40,14 @@ jobs:
       build_author: Official Release
 
   deploy:
-    needs: build
+    needs:
+      - build
+      - branch-name
     permissions:
       contents: write
     runs-on: ubuntu-22.04
     name: Deploy
+    if: contains(${{ needs.branch-name.outputs.running-branch }}, 'main')
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
