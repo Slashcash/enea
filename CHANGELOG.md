@@ -1,3 +1,9 @@
+## v0.3.1 (2024-10-19)
+
+### Fix
+
+- stop exiting if no rom is found in search folder
+
 ## v0.3.0 (2024-10-13)
 
 ### Feat
