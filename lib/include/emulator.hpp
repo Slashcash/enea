@@ -8,6 +8,8 @@
 #include "rom.hpp"
 #include "systemcommand.hpp"
 
+class InputDevice;
+
 class Emulator
 {
  public:
@@ -22,7 +24,6 @@ class Emulator
         using Exception::Exception;
     };
 
- private:
     // the values of these enums are reflecting advmame naming
     enum class Input
     {
@@ -50,16 +51,23 @@ class Emulator
         p2_button6,
         coin2,
         start2,
-        ui_pause
+        ui_pause,
+        ui_cancel
     };
 
-    static const std::unordered_map<Input, std::string> mKeyboardInput;
+ private:
+    static constexpr unsigned int MAX_PLAYERS = 2;
 
     [[nodiscard]] virtual SystemCommand::Result launch(const std::string& arguments) const;
     [[nodiscard]] virtual bool romExists(const Rom& rom) const;
     [[nodiscard]] virtual bool romIsReadable(const Rom& rom) const;
-    [[nodiscard]] static std::string inputString(const Input& input);
-    [[nodiscard]] std::string controlString() const;
+    [[nodiscard]] static std::string inputString(const InputDevice& device, const Input& input);
+    [[nodiscard]] static unsigned int getNumberInputDevices(const std::vector<InputDevice>& availableInputs);
+    [[nodiscard]] static unsigned int getNumberOfPlayers(const std::vector<InputDevice>& availableInputs);
+    [[nodiscard]] static unsigned int mapInputToPlayerNumber(const Input& input);
+    [[nodiscard]] static std::optional<InputDevice>
+    mapDeviceToPlayerNumber(const std::vector<InputDevice>& availableInput, const unsigned int playerNum);
+    [[nodiscard]] static std::string controlString(const std::vector<InputDevice>& availableInputs);
 
  public:
     enum class Error
@@ -67,7 +75,8 @@ class Emulator
         ROM_FILE_NOT_FOUND,
         ROM_FILE_NOT_READABLE,
         ROM_PATH_INVALID,
-        EMULATOR_ERROR
+        EMULATOR_ERROR,
+        NO_VALID_INPUT
     };
 
     Emulator() = default;
@@ -75,7 +84,7 @@ class Emulator
     Emulator(Emulator&& emulator) = delete;
 
     [[nodiscard]] std::optional<EmulatorInfo> info() const;
-    [[nodiscard]] std::optional<Error> run(const Rom& rom) const;
+    [[nodiscard]] std::optional<Error> run(const Rom& rom, const std::vector<InputDevice>& availableInputs) const;
 
     Emulator& operator=(const Emulator& emulator) = delete;
     Emulator& operator=(Emulator&& emulator) = delete;

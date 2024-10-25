@@ -4,7 +4,10 @@
 #include <functional>
 #include <list>
 
+#include <SFML/Window/Event.hpp>
 #include <rocket.hpp>
+
+#include "inputdevice.hpp"
 
 namespace sf {
 class Event;
@@ -16,6 +19,9 @@ class RenderWindow;
 class InputManager
 {
  private:
+    // This is pretty much a limitation of SFML, it is anyway a sufficiently high number for us
+    static constexpr unsigned int MAX_JOYSTICK = sf::Joystick::Count;
+
     using InputFunction = std::function<bool(const sf::Event& event)>;
     using Signal = rocket::signal<void()>;
 
@@ -26,14 +32,19 @@ class InputManager
     };
 
     std::list<Reaction> mReactions;
+    std::vector<InputDevice> mAvailableInputs;
+
     [[nodiscard]] virtual std::list<sf::Event> events(sf::RenderWindow& window) const;
+    void addInputDevice(const InputDevice& device);
+    void removeInputDevice(const InputDevice& device);
 
  public:
     InputManager();
     InputManager(const InputManager& manager) = delete;
     InputManager(InputManager&& manager) = delete;
 
-    void manage(sf::RenderWindow& window) const;
+    void manage(sf::RenderWindow& window);
+    std::vector<InputDevice> getInputDevices() const;
 
     InputManager& operator=(const InputManager& manager) = delete;
     InputManager& operator=(InputManager&& manager) = delete;

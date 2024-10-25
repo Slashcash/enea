@@ -5,6 +5,7 @@
 #include <magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
+#include "inputdevice.hpp"
 #include "inputmanager.hpp"
 #include "programinfo.hpp"
 #include "rommenu.hpp"
@@ -83,11 +84,12 @@ void Gui::run()
         }
     });
 
-    inputmanager.select.connect([this, &romMenu, &launchSound]() {
+    inputmanager.select.connect([this, &inputmanager, &romMenu, &launchSound]() {
         if (!mRomList.empty())
         {
             launchSound.play();
-            if (auto err = romMenu.launch(); err)
+            Emulator emulator;
+            if (auto err = emulator.run(*(romMenu.selectedRom()), inputmanager.getInputDevices()); err)
             {
                 spdlog::error("Error launching rom: {}", magic_enum::enum_name(*err));
             }
