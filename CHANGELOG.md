@@ -1,3 +1,14 @@
+## v0.4.0 (2024-10-26)
+
+### Feat
+
+- add support for ps4 controller
+
+### Refactor
+
+- improve RomMedia class
+- improve RomInfo class
+
 ## v0.3.1 (2024-10-19)
 
 ### Fix
