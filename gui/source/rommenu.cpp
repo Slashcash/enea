@@ -154,13 +154,7 @@ bool RomMenu::selectionUp()
     return setSelected(mSelected - 1);
 }
 
-std::optional<Emulator::Error> RomMenu::launch()
+std::optional<Rom> RomMenu::selectedRom() const
 {
-    if (mRoms.empty())
-    {
-        return std::nullopt;
-    }
-
-    Emulator emulator;
-    return emulator.run(mRoms[mSelected]);
+    return mRoms[mSelected];
 }

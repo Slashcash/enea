@@ -17,6 +17,8 @@ add_library(
   source/rominfo.cpp
   include/rommedia.hpp
   source/rommedia.cpp
+  include/inputdevice.hpp
+  source/inputdevice.cpp
   include/utils.hpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)

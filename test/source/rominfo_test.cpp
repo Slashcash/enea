@@ -62,7 +62,7 @@ TEST(RomInfo, fromJsonMissingYear)
     EXPECT_TRUE(romInfo.isBios && *(romInfo.isBios) == ROM_IS_BIOS);
 }
 
-TEST(RomINfo, fromJsonMissingManufacturer)
+TEST(RomInfo, fromJsonMissingManufacturer)
 {
     /*
         Building RomInfo from a json which has an incomplete set of information. It misses rom manufacturer.

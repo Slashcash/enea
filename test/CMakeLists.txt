@@ -12,6 +12,8 @@ add_executable(
   mock/systemcommand_mock.hpp
   source/systemcommand_test.cpp
   source/rom_test.cpp
+  mock/emulator_mock.hpp
+  source/emulator_test.cpp
   mock/inputmanager_mock.hpp
   # source/inputmanager_test.cpp
   # TODO: Re-enable once we figure out how to run in a docker without X11

@@ -38,7 +38,7 @@ class RomMenu : public Node
 
     [[nodiscard]] bool selectionDown();
     [[nodiscard]] bool selectionUp();
-    [[nodiscard]] std::optional<Emulator::Error> launch();
+    [[nodiscard]] std::optional<Rom> selectedRom() const;
 };
 
 #endif
