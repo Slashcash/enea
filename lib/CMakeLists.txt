@@ -1,7 +1,6 @@
 add_library(
   ${EXECUTABLE}Lib
-  include/romdb.hpp
-  source/romdb.cpp
+  include/database.hpp
   include/rom.hpp
   source/rom.cpp
   include/configuration.hpp

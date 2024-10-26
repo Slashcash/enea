@@ -8,7 +8,6 @@
 #include "emulator.hpp"
 #include "gui.hpp"
 #include "rom.hpp"
-#include "romdb.hpp"
 #include "romsource.hpp"
 #include "softwareinfo.hpp"
 

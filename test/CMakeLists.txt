@@ -3,8 +3,8 @@ enable_testing()
 
 add_executable(
   ${EXECUTABLE}Test
-  mock/romdb_mock.hpp
-  source/romdb_test.cpp
+  mock/database_mock.hpp
+  source/database_test.cpp
   mock/configuration_mock.hpp
   source/configuration_test.cpp
   mock/romsource_mock.hpp

@@ -26,12 +26,12 @@ root = tree.getroot()
 games = []
 
 roms = {
-    'roms': games
+    'values': games
 }
 
 for game in root.findall('game'):
     game_data = {
-        'name': game.get('name'),
+        'key': game.get('name'),
         'info': {
         }
     }

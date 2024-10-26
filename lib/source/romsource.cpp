@@ -9,7 +9,7 @@
 
 #include <spdlog/spdlog.h>
 
-#include "romdb.hpp"
+#include "database.hpp"
 #include "rommedia.hpp"
 #include "softwareinfo.hpp"
 
@@ -151,7 +151,7 @@ bool RomSource::fileIsRom(const std::filesystem::path& path)
 std::optional<RomInfo> RomSource::romInfo(const std::filesystem::path& path) const
 {
     spdlog::trace("Querying rom database for: {}", path.stem().string());
-    return RomDatabase::get().find(path);
+    return RomDatabase::get("romdb/romdb.json").find(path.stem().string());
 }
 
 std::optional<std::string> RomSource::lastFolderModification(const std::filesystem::path& path) const
