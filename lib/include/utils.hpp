@@ -3,6 +3,19 @@
 
 #include <nlohmann/json.hpp>
 
+template <typename T>
+concept OptionalCompatible = requires { typename std::optional<T>; };
+
+template <typename T>
+concept JsonConvertible = requires(T value) {
+    { nlohmann::json{value} };
+};
+
+template <typename T>
+concept JsonConstructible = requires(nlohmann::json json) {
+    T{json}; // Check if T can be constructed from a nlohmann::json
+};
+
 namespace utils {
 /**
  * @brief Helper function that adds a value wrapped in an std::optional into a json.
@@ -14,6 +27,7 @@ namespace utils {
  * @param value the std::optional supposedly containing the value
  */
 template <typename T>
+    requires JsonConvertible<T> && OptionalCompatible<T>
 inline void addOptionalToJson(nlohmann::json& json, const std::string_view& field, const std::optional<T>& value)
 {
     if (value)
@@ -31,6 +45,7 @@ inline void addOptionalToJson(nlohmann::json& json, const std::string_view& fiel
  * @return The value found in the json, if any
  */
 template <typename T>
+    requires JsonConstructible<T> && OptionalCompatible<T>
 inline std::optional<T> getValueFromJson(const nlohmann::json& json, const std::string_view& field)
 {
     try
