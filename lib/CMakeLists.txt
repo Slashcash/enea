@@ -18,12 +18,16 @@ add_library(
   source/rommedia.cpp
   include/inputdevice.hpp
   source/inputdevice.cpp
-  include/utils.hpp)
+  include/utils.hpp
+  include/inputbutton.hpp
+  source/inputbutton.cpp
+  include/inputmapping.hpp
+  source/inputmapping.cpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
 target_link_libraries(
   ${EXECUTABLE}Lib
-  PUBLIC spdlog::spdlog nlohmann_json::nlohmann_json rocket::rocket
+  PUBLIC sfml-window spdlog::spdlog nlohmann_json::nlohmann_json rocket::rocket
          magic_enum::magic_enum ${RESOURCE_LIBRARY})
 
 # Generating files

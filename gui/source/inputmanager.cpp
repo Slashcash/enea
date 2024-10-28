@@ -7,7 +7,7 @@
 InputManager::InputManager()
 {
     // We surely have a keyboard as a first input method
-    addInputDevice(InputDevice{InputDevice::Type::Keyboard, 0, "Standard Keyboard"});
+    addDevice(Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"});
 
     // Finding connected joysticks
     for (unsigned int it = 0; it < MAX_JOYSTICK; it++)
@@ -15,7 +15,7 @@ InputManager::InputManager()
         if (sf::Joystick::isConnected(it))
         {
             auto id = sf::Joystick::getIdentification(it);
-            addInputDevice(InputDevice{InputDevice::Type::Joystick, it, id.name});
+            addDevice(Input::Device{Input::Device::Type::Joystick, it, id.name});
         }
     }
 
@@ -26,18 +26,7 @@ InputManager::InputManager()
     mReactions.emplace_back(
         [this](const sf::Event& event) {
             auto device = mAvailableInputs.begin();
-            if (device->getType() == InputDevice::Type::Keyboard)
-            {
-                // NOLINTNEXTLINE
-                return event.type == sf::Event::KeyPressed && event.key.scancode == sf::Keyboard::Scan::Escape;
-            }
-            else if (device->getType() == InputDevice::Type::Joystick)
-            {
-                return event.type == sf::Event::JoystickButtonPressed &&
-                       event.joystickButton.joystickId == device->getId() && event.joystickButton.button == 10;
-            }
-
-            return false;
+            return device->checkEvent(Input::Frontend::Command::Esc, event);
         },
         &closeWindow);
 
@@ -45,18 +34,7 @@ InputManager::InputManager()
     mReactions.emplace_back(
         [this](const sf::Event& event) {
             auto device = mAvailableInputs.begin();
-            if (device->getType() == InputDevice::Type::Keyboard)
-            {
-                // NOLINTNEXTLINE
-                return event.type == sf::Event::KeyPressed && event.key.scancode == sf::Keyboard::Scan::Up;
-            }
-            else if (device->getType() == InputDevice::Type::Joystick)
-            {
-                return event.type == sf::Event::JoystickMoved && event.joystickMove.joystickId == device->getId() &&
-                       event.joystickMove.axis == sf::Joystick::Axis::PovY && event.joystickMove.position == -100;
-            }
-
-            return false;
+            return device->checkEvent(Input::Frontend::Command::Up, event);
         },
         &goUp);
 
@@ -64,18 +42,7 @@ InputManager::InputManager()
     mReactions.emplace_back(
         [this](const sf::Event& event) {
             auto device = mAvailableInputs.begin();
-            if (device->getType() == InputDevice::Type::Keyboard)
-            {
-                // NOLINTNEXTLINE
-                return event.type == sf::Event::KeyPressed && event.key.scancode == sf::Keyboard::Scan::Down;
-            }
-            else if (device->getType() == InputDevice::Type::Joystick)
-            {
-                return event.type == sf::Event::JoystickMoved && event.joystickMove.joystickId == device->getId() &&
-                       event.joystickMove.axis == sf::Joystick::Axis::PovY && event.joystickMove.position == 100;
-            }
-
-            return false;
+            return device->checkEvent(Input::Frontend::Command::Down, event);
         },
         &goDown);
 
@@ -83,18 +50,7 @@ InputManager::InputManager()
     mReactions.emplace_back(
         [this](const sf::Event& event) {
             auto device = mAvailableInputs.begin();
-            if (device->getType() == InputDevice::Type::Keyboard)
-            {
-                // NOLINTNEXTLINE
-                return event.type == sf::Event::KeyPressed && event.key.scancode == sf::Keyboard::Scan::Enter;
-            }
-            else if (device->getType() == InputDevice::Type::Joystick)
-            {
-                return event.type == sf::Event::JoystickButtonPressed &&
-                       event.joystickButton.joystickId == device->getId() && event.joystickButton.button == 0;
-            }
-
-            return false;
+            return device->checkEvent(Input::Frontend::Command::Enter, event);
         },
         &select);
 }
@@ -128,28 +84,28 @@ void InputManager::manage(sf::RenderWindow& window)
         if (event.type == sf::Event::JoystickConnected)
         {
             auto id = sf::Joystick::getIdentification(event.joystickConnect.joystickId);
-            addInputDevice(InputDevice{InputDevice::Type::Joystick, event.joystickConnect.joystickId, id.name});
+            addDevice(Input::Device{Input::Device::Type::Joystick, event.joystickConnect.joystickId, id.name});
         }
 
         // Checking if a joystick has been disconnected
         if (event.type == sf::Event::JoystickDisconnected)
         {
             auto id = sf::Joystick::getIdentification(event.joystickConnect.joystickId);
-            removeInputDevice(InputDevice{InputDevice::Type::Joystick, event.joystickConnect.joystickId, id.name});
+            removeDevice(Input::Device{Input::Device::Type::Joystick, event.joystickConnect.joystickId, id.name});
         }
     }
 }
 
-std::vector<InputDevice> InputManager::getInputDevices() const
+std::vector<Input::Device> InputManager::getDevices() const
 {
     return mAvailableInputs;
 }
 
-void InputManager::addInputDevice(const InputDevice& device)
+void InputManager::addDevice(const Input::Device& device)
 {
     mAvailableInputs.push_back(device);
     std::ranges::sort(mAvailableInputs,
-                      [](const InputDevice& first, const InputDevice& second) { return first < second; });
+                      [](const Input::Device& first, const Input::Device& second) { return first < second; });
 
     auto active = mAvailableInputs.begin();
     spdlog::trace("New input device discovered: {} {} ({}), Active input device: {} {} ({})",
@@ -157,11 +113,11 @@ void InputManager::addInputDevice(const InputDevice& device)
                   magic_enum::enum_name(active->getType()), active->getId(), active->getName());
 }
 
-void InputManager::removeInputDevice(const InputDevice& device)
+void InputManager::removeDevice(const Input::Device& device)
 {
     // We are using partitions instead of remove here so we can still log the removed devices
     auto removedDevice =
-        std::ranges::partition(mAvailableInputs, [&device](const InputDevice& dev) { return device == dev; });
+        std::ranges::partition(mAvailableInputs, [&device](const Input::Device& dev) { return device == dev; });
     auto active = removedDevice.begin();
     for (auto removed = mAvailableInputs.begin(); removed != active; ++removed)
     {

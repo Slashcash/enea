@@ -89,7 +89,7 @@ void Gui::run()
         {
             launchSound.play();
             Emulator emulator;
-            if (auto err = emulator.run(*(romMenu.selectedRom()), inputmanager.getInputDevices()); err)
+            if (auto err = emulator.run(*(romMenu.selectedRom()), inputmanager.getDevices()); err)
             {
                 spdlog::error("Error launching rom: {}", magic_enum::enum_name(*err));
             }

@@ -68,7 +68,8 @@ TEST_F(EmulatorFixture, DISABLED_run)
     EXPECT_CALL(emulator, launch(LAUNCH_COMMAND)).WillOnce(testing::Return(SystemCommand::Result(0, "")));
 
     EXPECT_FALSE(
-        emulator.run(rom, std::vector<InputDevice>{InputDevice{InputDevice::Type::Keyboard, 0, "Standard Keyboard"}})
+        emulator
+            .run(rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}})
             .has_value());
 }
 
@@ -76,8 +77,8 @@ TEST_F(EmulatorFixture, runRomNonExistant)
 {
     EXPECT_CALL(emulator, romExists(rom)).WillOnce(testing::Return(false));
 
-    auto runError =
-        emulator.run(rom, std::vector<InputDevice>{InputDevice{InputDevice::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError = emulator.run(
+        rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::ROM_FILE_NOT_FOUND);
 }
@@ -87,8 +88,8 @@ TEST_F(EmulatorFixture, runRomNonReadable)
     EXPECT_CALL(emulator, romExists(rom)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, romIsReadable(rom)).WillOnce(testing::Return(false));
 
-    auto runError =
-        emulator.run(rom, std::vector<InputDevice>{InputDevice{InputDevice::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError = emulator.run(
+        rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::ROM_FILE_NOT_READABLE);
 }
@@ -98,8 +99,9 @@ TEST_F(EmulatorFixture, runRomPathNoStem)
     EXPECT_CALL(emulator, romExists(romPathInvalid)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, romIsReadable(romPathInvalid)).WillOnce(testing::Return(true));
 
-    auto runError = emulator.run(
-        romPathInvalid, std::vector<InputDevice>{InputDevice{InputDevice::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError =
+        emulator.run(romPathInvalid,
+                     std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::ROM_PATH_INVALID);
 }
@@ -110,8 +112,8 @@ TEST_F(EmulatorFixture, DISABLED_runEmulatorError)
     EXPECT_CALL(emulator, romIsReadable(rom)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, launch(LAUNCH_COMMAND)).WillOnce(testing::Return(SystemCommand::Result(1, "")));
 
-    auto runError =
-        emulator.run(rom, std::vector<InputDevice>{InputDevice{InputDevice::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError = emulator.run(
+        rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::EMULATOR_ERROR);
 }

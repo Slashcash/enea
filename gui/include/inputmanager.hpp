@@ -32,11 +32,11 @@ class InputManager
     };
 
     std::list<Reaction> mReactions;
-    std::vector<InputDevice> mAvailableInputs;
+    std::vector<Input::Device> mAvailableInputs;
 
     [[nodiscard]] virtual std::list<sf::Event> events(sf::RenderWindow& window) const;
-    void addInputDevice(const InputDevice& device);
-    void removeInputDevice(const InputDevice& device);
+    void addDevice(const Input::Device& device);
+    void removeDevice(const Input::Device& device);
 
  public:
     InputManager();
@@ -44,7 +44,7 @@ class InputManager
     InputManager(InputManager&& manager) = delete;
 
     void manage(sf::RenderWindow& window);
-    std::vector<InputDevice> getInputDevices() const;
+    std::vector<Input::Device> getDevices() const;
 
     InputManager& operator=(const InputManager& manager) = delete;
     InputManager& operator=(InputManager&& manager) = delete;

@@ -24,29 +24,29 @@ bool Emulator::romIsReadable(const Rom& rom) const
             (perms & fs::perms::others_read) != fs::perms::none);
 }
 
-unsigned int Emulator::getNumberInputDevices(const std::vector<InputDevice>& availableInputs)
+unsigned int Emulator::getNumberDevices(const std::vector<Input::Device>& availableInputs)
 {
     unsigned int result = 0;
     for (const auto& input : availableInputs)
     {
-        input.getType() == InputDevice::Type::Keyboard ? result += 2 : result += 1;
+        input.getType() == Input::Device::Type::Keyboard ? result += 2 : result += 1;
     }
 
     return result;
 }
 
-std::optional<InputDevice> Emulator::mapDeviceToPlayerNumber(const std::vector<InputDevice>& availableInput,
-                                                             const unsigned int playerNum)
+std::optional<Input::Device> Emulator::mapDeviceToPlayerNumber(const std::vector<Input::Device>& availableInput,
+                                                               const unsigned int playerNum)
 {
     // We reconstruct the vector for convenience, for our emulator everytime the
     // availableInput vector contains a keyboard it can be effectively considered as two separate
     // input device (as it can accomodate two players)
-    std::vector<InputDevice> buffer;
+    std::vector<Input::Device> buffer;
 
     for (const auto& device : availableInput)
     {
         buffer.push_back(device);
-        if (device.getType() == InputDevice::Type::Keyboard)
+        if (device.getType() == Input::Device::Type::Keyboard)
         {
             buffer.push_back(device);
         }
@@ -54,23 +54,23 @@ std::optional<InputDevice> Emulator::mapDeviceToPlayerNumber(const std::vector<I
 
     std::ranges::sort(buffer);
 
-    return playerNum > 0 && playerNum <= buffer.size() ? std::optional<InputDevice>(buffer[playerNum - 1])
+    return playerNum > 0 && playerNum <= buffer.size() ? std::optional<Input::Device>(buffer[playerNum - 1])
                                                        : std::nullopt;
 }
 
-unsigned int Emulator::getNumberOfPlayers(const std::vector<InputDevice>& availableInputs)
+unsigned int Emulator::getNumberOfPlayers(const std::vector<Input::Device>& availableInputs)
 {
-    return std::min(getNumberInputDevices(availableInputs), MAX_PLAYERS);
+    return std::min(getNumberDevices(availableInputs), MAX_PLAYERS);
 }
 
-std::string Emulator::inputString(const InputDevice& device, const Input& input)
+std::string Emulator::inputString(const Input::Device& device, const Input::Emulator::Command& command)
 {
-    return device.getEmulatorInputString(input);
+    return device.getEmulatorInputString(command);
 }
 
-unsigned int Emulator::mapInputToPlayerNumber(const Input& input)
+unsigned int Emulator::mapInputToPlayerNumber(const Input::Emulator::Command& command)
 {
-    auto inputString = magic_enum::enum_name(input);
+    auto inputString = magic_enum::enum_name(command);
     if (inputString.starts_with("p1") || inputString.starts_with("ui") || inputString == "coin1" ||
         inputString == "start1")
     {
@@ -86,25 +86,26 @@ unsigned int Emulator::mapInputToPlayerNumber(const Input& input)
     }
 }
 
-std::string Emulator::controlString(const std::vector<InputDevice>& availableInputs)
+std::string Emulator::controlString(const std::vector<Input::Device>& availableInputs)
 {
     std::string result;
     auto playerNum = getNumberOfPlayers(availableInputs);
-    magic_enum::enum_for_each<Input>([&availableInputs, &playerNum, &result](const Input val) {
-        if (auto player = mapInputToPlayerNumber(val); player <= playerNum)
-        {
-            auto inputDevice = mapDeviceToPlayerNumber(availableInputs, player);
-            if (inputDevice)
+    magic_enum::enum_for_each<Input::Emulator::Command>(
+        [&availableInputs, &playerNum, &result](const Input::Emulator::Command val) {
+            if (auto player = mapInputToPlayerNumber(val); player <= playerNum)
             {
-                result += fmt::format("-input_map[{}] {} ", magic_enum::enum_name(val), inputString(*inputDevice, val));
+                auto Device = mapDeviceToPlayerNumber(availableInputs, player);
+                if (Device)
+                {
+                    result += fmt::format("-input_map[{}] {} ", magic_enum::enum_name(val), inputString(*Device, val));
+                }
             }
-        }
-    });
+        });
     // Erasing last character as it probably contains a space anyway
     return result.substr(0, result.size() - 1);
 }
 
-std::optional<Emulator::Error> Emulator::run(const Rom& rom, const std::vector<InputDevice>& availableInputs) const
+std::optional<Emulator::Error> Emulator::run(const Rom& rom, const std::vector<Input::Device>& availableInputs) const
 {
     // Checking if the file exists
     if (!romExists(rom))
@@ -126,7 +127,7 @@ std::optional<Emulator::Error> Emulator::run(const Rom& rom, const std::vector<I
     }
 
     // If there is no input available we exit with an error
-    if (getNumberInputDevices(availableInputs) == 0)
+    if (getNumberDevices(availableInputs) == 0)
     {
         return Emulator::Error::NO_VALID_INPUT;
     }
