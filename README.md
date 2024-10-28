@@ -30,7 +30,7 @@ Control mapping as follows:
 ---
 | UP       | DOWN       | Launch rom | Exit |
 |----------|------------|------------|------|
-| Arrow Up | Arrow Down | Enter      | Esc  |
+| Arrow Up | Arrow Down | 1      | Esc  |
 
 *In game (Player 1)*
 ---

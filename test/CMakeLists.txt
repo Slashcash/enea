@@ -24,7 +24,9 @@ add_executable(
   source/resourcemanager_test.cpp
   source/rominfo_test.cpp
   source/rommedia_test.cpp
-  source/utils_test.cpp)
+  source/utils_test.cpp
+  source/inputbutton_test.cpp
+  source/inputmapping_test.cpp)
 
 target_link_libraries(
   ${EXECUTABLE}Test PRIVATE GTest::gtest_main GTest::gmock ${EXECUTABLE}Lib
