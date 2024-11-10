@@ -13,5 +13,5 @@ void to_json(nlohmann::json& json, const RomMedia& media)
 void from_json(const nlohmann::json& json, RomMedia& media)
 {
     // Finding screenshot
-    media.screenshot = utils::getValueFromJson<std::filesystem::path>(json, RomMedia::SCREENSHOT_JSON_FIELD);
+    media.screenshot = utils::getOptionalValueFromJson<std::filesystem::path>(json, RomMedia::SCREENSHOT_JSON_FIELD);
 }

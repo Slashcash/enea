@@ -34,7 +34,7 @@ std::vector<Rom> RomSource::scan() const
 
     if (!isFolder(mRomFolder))
     {
-        throw Excep("Scan path is not a folder");
+        throw RomSource::Exception("Scan path is not a folder");
     }
 
     spdlog::debug("Getting last modification time for: {}", mRomFolder.string());
@@ -43,7 +43,7 @@ std::vector<Rom> RomSource::scan() const
     // If unable to get the folder last modification date we throw
     if (!lastModification)
     {
-        throw Excep(fmt::format("Unable to get last folder modification for: {}", mRomFolder.string()));
+        throw RomSource::Exception(fmt::format("Unable to get last folder modification for: {}", mRomFolder.string()));
     }
 
     // If unable to load data from cache we phisycally scan the folder

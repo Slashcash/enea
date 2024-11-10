@@ -19,11 +19,11 @@ void to_json(nlohmann::json& json, const RomInfo& info)
 void from_json(const nlohmann::json& json, RomInfo& info)
 {
     // Finding rom title
-    info.title = utils::getValueFromJson<std::string>(json, RomInfo::TITLE_JSON_FIELD);
+    info.title = utils::getOptionalValueFromJson<std::string>(json, RomInfo::TITLE_JSON_FIELD);
     // Finding rom year
-    info.year = utils::getValueFromJson<std::string>(json, RomInfo::YEAR_JSON_FIELD);
+    info.year = utils::getOptionalValueFromJson<std::string>(json, RomInfo::YEAR_JSON_FIELD);
     // Finding rom manufacturer
-    info.manufacturer = utils::getValueFromJson<std::string>(json, RomInfo::MANUFACTURER_JSON_FIELD);
+    info.manufacturer = utils::getOptionalValueFromJson<std::string>(json, RomInfo::MANUFACTURER_JSON_FIELD);
     // Finding if rom is a bios
-    info.isBios = utils::getValueFromJson<bool>(json, RomInfo::ISBIOS_JSON_FIELD);
+    info.isBios = utils::getOptionalValueFromJson<bool>(json, RomInfo::ISBIOS_JSON_FIELD);
 }

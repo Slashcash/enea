@@ -4,10 +4,8 @@
 
 #include <fmt/format.h>
 #include <magic_enum.hpp>
-#include <magic_enum_utility.hpp>
 #include <spdlog/spdlog.h>
 
-#include "inputdevice.hpp"
 #include "systemcommand.hpp"
 
 bool Emulator::romExists(const Rom& rom) const
@@ -24,88 +22,7 @@ bool Emulator::romIsReadable(const Rom& rom) const
             (perms & fs::perms::others_read) != fs::perms::none);
 }
 
-unsigned int Emulator::getNumberDevices(const std::vector<Input::Device>& availableInputs)
-{
-    unsigned int result = 0;
-    for (const auto& input : availableInputs)
-    {
-        input.getType() == Input::Device::Type::Keyboard ? result += 2 : result += 1;
-    }
-
-    return result;
-}
-
-std::optional<Input::Device> Emulator::mapDeviceToPlayerNumber(const std::vector<Input::Device>& availableInput,
-                                                               const unsigned int playerNum)
-{
-    // We reconstruct the vector for convenience, for our emulator everytime the
-    // availableInput vector contains a keyboard it can be effectively considered as two separate
-    // input device (as it can accomodate two players)
-    std::vector<Input::Device> buffer;
-
-    for (const auto& device : availableInput)
-    {
-        buffer.push_back(device);
-        if (device.getType() == Input::Device::Type::Keyboard)
-        {
-            buffer.push_back(device);
-        }
-    }
-
-    std::ranges::sort(buffer);
-
-    return playerNum > 0 && playerNum <= buffer.size() ? std::optional<Input::Device>(buffer[playerNum - 1])
-                                                       : std::nullopt;
-}
-
-unsigned int Emulator::getNumberOfPlayers(const std::vector<Input::Device>& availableInputs)
-{
-    return std::min(getNumberDevices(availableInputs), MAX_PLAYERS);
-}
-
-std::string Emulator::inputString(const Input::Device& device, const Input::Emulator::Command& command)
-{
-    return device.getEmulatorInputString(command);
-}
-
-unsigned int Emulator::mapInputToPlayerNumber(const Input::Emulator::Command& command)
-{
-    auto inputString = magic_enum::enum_name(command);
-    if (inputString.starts_with("p1") || inputString.starts_with("ui") || inputString == "coin1" ||
-        inputString == "start1")
-    {
-        return 1;
-    }
-    else if (inputString.starts_with("p2") || inputString == "coin2" || inputString == "start2")
-    {
-        return 2;
-    }
-    else
-    {
-        throw Emulator::Excep("Unsupported number of players");
-    }
-}
-
-std::string Emulator::controlString(const std::vector<Input::Device>& availableInputs)
-{
-    std::string result;
-    auto playerNum = getNumberOfPlayers(availableInputs);
-    magic_enum::enum_for_each<Input::Emulator::Command>(
-        [&availableInputs, &playerNum, &result](const Input::Emulator::Command val) {
-            if (auto player = mapInputToPlayerNumber(val); player <= playerNum)
-            {
-                auto Device = mapDeviceToPlayerNumber(availableInputs, player);
-                if (Device)
-                {
-                    result += fmt::format("-input_map[{}] {} ", magic_enum::enum_name(val), inputString(*Device, val));
-                }
-            }
-        });
-    // Erasing last character as it probably contains a space anyway
-    return result.substr(0, result.size() - 1);
-}
-
-std::optional<Emulator::Error> Emulator::run(const Rom& rom, const std::vector<Input::Device>& availableInputs) const
+std::optional<Emulator::Error> Emulator::run(const Rom& rom, const std::string& inputString) const
 {
     // Checking if the file exists
     if (!romExists(rom))
@@ -127,31 +44,13 @@ std::optional<Emulator::Error> Emulator::run(const Rom& rom, const std::vector<I
     }
 
     // If there is no input available we exit with an error
-    if (getNumberDevices(availableInputs) == 0)
+    if (inputString.empty())
     {
         return Emulator::Error::NO_VALID_INPUT;
     }
 
-    auto players = getNumberOfPlayers(availableInputs);
-    std::string inputLog;
-    for (auto it = 1; it <= players; it++)
-    {
-        auto device = mapDeviceToPlayerNumber(availableInputs, it);
-        if (device)
-        {
-            inputLog += fmt::format("Player {} will use {} {} ({})", it, magic_enum::enum_name(device->getType()),
-                                    device->getId(), device->getName());
-
-            if (it < players)
-            {
-                inputLog += ", ";
-            }
-        }
-    }
-    spdlog::debug(inputLog);
-
     // Launching emulator
-    auto cmdString = fmt::format("-misc_quiet -nomisc_safequit {} -dir_rom {} {}", controlString(availableInputs),
+    auto cmdString = fmt::format("-misc_quiet -nomisc_safequit {} -dir_rom {} {}", inputString,
                                  romPath.parent_path().string(), romPath.stem().string());
 
     if (launch(cmdString).exitcode != 0)
@@ -200,7 +99,7 @@ std::optional<Emulator::EmulatorInfo> Emulator::info() const
             {launchOutput.substr(0, spacePos), launchOutput.substr(spacePos + 1, newlinePos - spacePos - 1)});
     }
 
-    catch ([[maybe_unused]] const SystemCommand::Excep& ex)
+    catch ([[maybe_unused]] const SystemCommand::Exception& ex)
     {
         return std::nullopt;
     }

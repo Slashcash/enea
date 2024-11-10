@@ -19,7 +19,7 @@ std::filesystem::path Conf::baseDirectory() const
     auto home = homeDirectory();
     if (!home)
     {
-        throw Conf::Excep("HOME folder path cannot be retrieved");
+        throw Conf::Exception("HOME folder path cannot be retrieved");
     }
 
     return *home / ("." + std::string(executableName));

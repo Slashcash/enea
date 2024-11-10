@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <utility>
 
-#include "inputdevice.hpp"
+#include "input/device.hpp"
 
 static const std::string EMULATOR_NAME = "AdvanceMAME";
 static const std::string EMULATOR_VERSION = "3.9-77-g5f301c84";
@@ -13,8 +13,8 @@ static const std::string EMULATOR_VERSION_OUTPUT =
 static const std::string EMULATOR_VERSION_UNEXPECTED_OUTPUT = "UNEXPECTED OUTPUT";
 static const std::filesystem::path ROM_PATH = std::filesystem::absolute("sf2.zip");
 static const std::filesystem::path ROM_PATH_INVALID = "";
-static const std::string LAUNCH_COMMAND = fmt::format(
-    "-misc_quiet -nomisc_safequit -input_map[p1_up] keyboard[0,up] -input_map[p1_down] keyboard[0,down] "
+static const std::string INPUT_STRING =
+    "-input_map[p1_up] keyboard[0,up] -input_map[p1_down] keyboard[0,down] "
     "-input_map[p1_left] keyboard[0,left] -input_map[p1_right] keyboard[0,right] -input_map[p1_button1] "
     "keyboard[0,7_pad] -input_map[p1_button2] keyboard[0,8_pad] -input_map[p1_button3] keyboard[0,9_pad] "
     "-input_map[p1_button4] keyboard[0,4_pad] -input_map[p1_button5] keyboard[0,5_pad] -input_map[p1_button6] "
@@ -23,9 +23,12 @@ static const std::string LAUNCH_COMMAND = fmt::format(
     "keyboard[0,d] -input_map[p2_button1] keyboard[0,i] -input_map[p2_button2] keyboard[0,o] -input_map[p2_button3] "
     "keyboard[0,p] -input_map[p2_button4] keyboard[0,j] -input_map[p2_button5] keyboard[0,k] -input_map[p2_button6] "
     "keyboard[0,l] -input_map[coin2] keyboard[0,4] -input_map[start2] keyboard[0,2] -input_map[ui_pause] keyboard[0,9] "
-    "-input_map[ui_cancel] keyboard[0,esc]"
-    "-dir_rom {} {}",
-    ROM_PATH.parent_path().string(), ROM_PATH.stem().string());
+    "-input_map[ui_cancel] keyboard[0,esc]";
+
+static const std::string LAUNCH_COMMAND =
+    fmt::format("-misc_quiet -nomisc_safequit {} "
+                "-dir_rom {} {}",
+                INPUT_STRING, ROM_PATH.parent_path().string(), ROM_PATH.stem().string());
 
 class EmulatorFixture : public ::testing::Test
 {
@@ -67,18 +70,14 @@ TEST_F(EmulatorFixture, DISABLED_run)
     EXPECT_CALL(emulator, romIsReadable(rom)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, launch(LAUNCH_COMMAND)).WillOnce(testing::Return(SystemCommand::Result(0, "")));
 
-    EXPECT_FALSE(
-        emulator
-            .run(rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}})
-            .has_value());
+    EXPECT_FALSE(emulator.run(rom, INPUT_STRING).has_value());
 }
 
 TEST_F(EmulatorFixture, runRomNonExistant)
 {
     EXPECT_CALL(emulator, romExists(rom)).WillOnce(testing::Return(false));
 
-    auto runError = emulator.run(
-        rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError = emulator.run(rom, INPUT_STRING);
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::ROM_FILE_NOT_FOUND);
 }
@@ -88,8 +87,7 @@ TEST_F(EmulatorFixture, runRomNonReadable)
     EXPECT_CALL(emulator, romExists(rom)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, romIsReadable(rom)).WillOnce(testing::Return(false));
 
-    auto runError = emulator.run(
-        rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError = emulator.run(rom, INPUT_STRING);
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::ROM_FILE_NOT_READABLE);
 }
@@ -99,9 +97,7 @@ TEST_F(EmulatorFixture, runRomPathNoStem)
     EXPECT_CALL(emulator, romExists(romPathInvalid)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, romIsReadable(romPathInvalid)).WillOnce(testing::Return(true));
 
-    auto runError =
-        emulator.run(romPathInvalid,
-                     std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError = emulator.run(romPathInvalid, INPUT_STRING);
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::ROM_PATH_INVALID);
 }
@@ -112,8 +108,7 @@ TEST_F(EmulatorFixture, DISABLED_runEmulatorError)
     EXPECT_CALL(emulator, romIsReadable(rom)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, launch(LAUNCH_COMMAND)).WillOnce(testing::Return(SystemCommand::Result(1, "")));
 
-    auto runError = emulator.run(
-        rom, std::vector<Input::Device>{Input::Device{Input::Device::Type::Keyboard, 0, "Standard Keyboard"}});
+    auto runError = emulator.run(rom, INPUT_STRING);
     ASSERT_TRUE(runError.has_value());
     EXPECT_EQ(*(runError), Emulator::Error::EMULATOR_ERROR);
 }

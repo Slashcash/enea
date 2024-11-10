@@ -43,9 +43,9 @@ template <SFMLLoadable T> class ResourceManager
     }
 
  public:
-    class Excep : public Exception
+    class Exception : public enea::Exception
     {
-        using Exception::Exception;
+        using enea::Exception::Exception;
     };
 
     ResourceManager() = default;
@@ -66,7 +66,7 @@ template <SFMLLoadable T> class ResourceManager
             return mResourceMap.insert(std::make_pair(path, *resource)).first->second;
         }
 
-        throw Excep(fmt::format("Cannot load resource {}", path.string()));
+        throw ResourceManager::Exception(fmt::format("Cannot load resource {}", path.string()));
     }
 
     ResourceManager& operator=(const ResourceManager& resourcemanager) = delete;

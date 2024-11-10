@@ -95,6 +95,9 @@ set(RESOURCE_URL "https://enea.geniorio.it/resources")
 # Rom database
 add_resource(IDENTIFIER "${CMAKE_SOURCE_DIR}/db/romdb.json" FOLDER "romdb")
 
+# Input database
+add_resource(IDENTIFIER "${CMAKE_SOURCE_DIR}/db/inputdb.json" FOLDER "inputdb")
+
 # Font
 add_resource(IDENTIFIER "${RESOURCE_URL}/fonts/inter.ttf" FOLDER "fonts")
 
