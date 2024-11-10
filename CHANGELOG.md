@@ -1,3 +1,9 @@
+## v0.6.0 (2024-11-10)
+
+### Feat
+
+- upgrade advmame to version 4.0
+
 ## v0.5.0 (2024-11-10)
 
 ### Feat
