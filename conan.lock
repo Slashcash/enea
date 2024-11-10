@@ -45,7 +45,7 @@
         "brotli/1.1.0#d56d7bb9ca722942aba17369cb5c0519%1721762343.0",
         "automake/1.16.5#058bda3e21c36c9aa8425daf3c1faf50%1721762342.0",
         "autoconf/2.71#f9307992909d7fb3df459340f1932809%1721762342.0",
-        "advmame/3.10#154812ceb4be54006cdeb1b3df3df5fe%1728815242.0"
+        "advmame/4.0#25e1e1892950c7b588e881233ba5e974%1731273128.0"
     ],
     "build_requires": [
         "zlib/1.3.1#f52e03ae3d251dec704634230cd806a2%1721762497.0",
