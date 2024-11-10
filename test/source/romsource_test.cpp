@@ -59,7 +59,7 @@ TEST_F(RomSourceFixture, scanNoCache)
     EXPECT_EQ(romSource.cacheFolder(), CACHE_FOLDER);
 
     EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(false));
-    EXPECT_THROW(romSource.scan(), RomSource::Excep);
+    EXPECT_THROW(romSource.scan(), RomSource::Exception);
 
     /*
         Ask for a scan on a rom source with no cache available.
@@ -101,7 +101,7 @@ TEST_F(RomSourceFixture, scanNoCache)
     */
     EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
     EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(romSource.scan(), RomSource::Excep);
+    EXPECT_THROW(romSource.scan(), RomSource::Exception);
 }
 
 TEST_F(RomSourceFixture, scanCache)

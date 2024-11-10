@@ -17,9 +17,9 @@ class Conf
     [[nodiscard]] std::filesystem::path baseDirectory() const;
 
  public:
-    class Excep : public Exception
+    class Exception : public enea::Exception
     {
-        using Exception::Exception;
+        using enea::Exception::Exception;
     };
 
     Conf() = default;

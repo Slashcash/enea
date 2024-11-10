@@ -56,9 +56,9 @@ class RomSource
     static constexpr std::string_view ROMS_JSON_FIELD = "roms";
     static constexpr std::string_view VERSION_JSON_FIELD = "version";
 
-    class Excep : public Exception
+    class Exception : public enea::Exception
     {
-        using Exception::Exception;
+        using enea::Exception::Exception;
     };
 
     RomSource() = delete;

@@ -14,7 +14,7 @@ TEST_F(ResourceManagerFixture, get)
     EXPECT_CALL(resourcemanager, loadFromFile(RESOURCE_PATH))
         .WillOnce(testing::Return(ResourceManager<sf::Font>::MemoryRegion{nullptr, 0}));
     EXPECT_CALL(resourcemanager, loadFromMemory(::testing::_)).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(auto res = resourcemanager.getResource(RESOURCE_PATH), ResourceManagerMock::Excep);
+    EXPECT_THROW(auto res = resourcemanager.getResource(RESOURCE_PATH), ResourceManagerMock::Exception);
 
     // Correctly loading file
     EXPECT_CALL(resourcemanager, loadFromFile(RESOURCE_PATH))

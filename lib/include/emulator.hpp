@@ -8,10 +8,7 @@
 #include "rom.hpp"
 #include "systemcommand.hpp"
 
-namespace Input {
-class Device;
-
-namespace Emulator {
+namespace Input::Emulator {
 // the values of these enums are reflecting advmame naming
 enum class Command
 {
@@ -42,9 +39,7 @@ enum class Command
     ui_pause,
     ui_cancel
 };
-} // namespace Emulator
-
-} // namespace Input
+} // namespace Input::Emulator
 
 class Emulator
 {
@@ -55,24 +50,10 @@ class Emulator
         std::string version;
     };
 
-    class Excep : public Exception
-    {
-        using Exception::Exception;
-    };
-
  private:
-    static constexpr unsigned int MAX_PLAYERS = 2;
-
     [[nodiscard]] virtual SystemCommand::Result launch(const std::string& arguments) const;
     [[nodiscard]] virtual bool romExists(const Rom& rom) const;
     [[nodiscard]] virtual bool romIsReadable(const Rom& rom) const;
-    [[nodiscard]] static std::string inputString(const Input::Device& device, const Input::Emulator::Command& command);
-    [[nodiscard]] static unsigned int getNumberDevices(const std::vector<Input::Device>& availableInputs);
-    [[nodiscard]] static unsigned int getNumberOfPlayers(const std::vector<Input::Device>& availableInputs);
-    [[nodiscard]] static unsigned int mapInputToPlayerNumber(const Input::Emulator::Command& command);
-    [[nodiscard]] static std::optional<Input::Device>
-    mapDeviceToPlayerNumber(const std::vector<Input::Device>& availableInput, const unsigned int playerNum);
-    [[nodiscard]] static std::string controlString(const std::vector<Input::Device>& availableInputs);
 
  public:
     enum class Error
@@ -89,7 +70,7 @@ class Emulator
     Emulator(Emulator&& emulator) = delete;
 
     [[nodiscard]] std::optional<EmulatorInfo> info() const;
-    [[nodiscard]] std::optional<Error> run(const Rom& rom, const std::vector<Input::Device>& availableInputs) const;
+    [[nodiscard]] std::optional<Error> run(const Rom& rom, const std::string& inputString) const;
 
     Emulator& operator=(const Emulator& emulator) = delete;
     Emulator& operator=(Emulator&& emulator) = delete;

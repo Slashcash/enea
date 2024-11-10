@@ -10,6 +10,7 @@
 #include <optional>
 #include <string>
 
+#include "database.hpp"
 #include "exception.hpp"
 #include "rominfo.hpp"
 #include "rommedia.hpp"
@@ -31,9 +32,9 @@ class Rom
     static constexpr std::string_view INFO_JSON_FIELD = "info";
     static constexpr std::string_view MEDIA_JSON_FIELD = "media";
 
-    class Excep : public Exception
+    class Exception : public enea::Exception
     {
-        using Exception::Exception;
+        using enea::Exception::Exception;
     };
 
     Rom() = delete;
@@ -67,7 +68,7 @@ template <> struct adl_serializer<Rom>
         }
         catch (const json::exception& e)
         {
-            throw Rom::Excep("Rom constructed from invalid json, mandatory path field is missing");
+            throw Rom::Exception("Rom constructed from invalid json, mandatory path field is missing");
         }
 
         // Finding rom info
@@ -112,5 +113,7 @@ template <> struct adl_serializer<Rom>
     }
 };
 } // namespace nlohmann
+
+using RomDatabase = DB<std::string, RomInfo>;
 
 #endif // ROM_HPP

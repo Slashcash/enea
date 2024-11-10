@@ -18,7 +18,7 @@ SystemCommand::Result SystemCommand::launchCmd() const
 
     if (pipe == nullptr)
     {
-        throw Excep("Unable to open process pipe");
+        throw Exception("Unable to open process pipe");
     }
 
     while (feof(pipe) == 0)

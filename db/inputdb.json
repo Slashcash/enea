@@ -1,0 +1,276 @@
+{
+    "values": [
+        {
+            "info": {
+                "frontend": {
+                    "Up": {
+                        "axis": {
+                            "axis": 1,
+                            "range": -100
+                        }
+                    },
+                    "Down": {
+                        "axis": {
+                            "axis": 1,
+                            "range": 100
+                        }
+                    },
+                    "Enter": {
+                        "joystickButton": 11
+                    },
+                    "Esc": {
+                        "joystickButton": 12
+                    }
+                },
+                "emulator": {
+                    "coin1": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "coin2": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "p1_button1": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p1_button2": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p1_button3": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p1_button4": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p1_button5": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p1_button6": {
+                        "definition": "tr2",
+                        "type": "joystick_button"
+                    },
+                    "p1_down": {
+                        "definition": "0,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p1_left": {
+                        "definition": "0,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p1_right": {
+                        "definition": "0,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p1_up": {
+                        "definition": "0,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "p2_button1": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p2_button2": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p2_button3": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p2_button4": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p2_button5": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p2_button6": {
+                        "definition": "tr2",
+                        "type": "joystick_button"
+                    },
+                    "p2_down": {
+                        "definition": "0,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p2_left": {
+                        "definition": "0,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p2_right": {
+                        "definition": "0,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p2_up": {
+                        "definition": "0,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "start1": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
+                    "start2": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
+                    "ui_cancel": {
+                        "definition": "mode",
+                        "type": "joystick_button"
+                    },
+                    "ui_pause": {
+                        "definition": "thumbl",
+                        "type": "joystick_button"
+                    }
+                }
+            },
+            "key": {
+                "name": ". MAYFLASH Arcade Fightstick F500 V2",
+                "productId": 6172,
+                "type": 0,
+                "vendorId": 121
+            }
+        },
+        {
+            "info": {
+                "frontend": {
+                    "Up": {
+                        "axis": {
+                            "axis": 7,
+                            "range": -100
+                        }
+                    },
+                    "Down": {
+                        "axis": {
+                            "axis": 7,
+                            "range": 100
+                        }
+                    },
+                    "Enter": {
+                        "joystickButton": 9
+                    },
+                    "Esc": {
+                        "joystickButton": 10
+                    }
+                },
+                "emulator": {
+                    "coin1": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "coin2": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "p1_button1": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p1_button2": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p1_button3": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p1_button4": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p1_button5": {
+                        "definition": "tl",
+                        "type": "joystick_button"
+                    },
+                    "p1_button6": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p1_down": {
+                        "definition": "1,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p1_left": {
+                        "definition": "1,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p1_right": {
+                        "definition": "1,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p1_up": {
+                        "definition": "1,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "p2_button1": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p2_button2": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p2_button3": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p2_button4": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p2_button5": {
+                        "definition": "tl",
+                        "type": "joystick_button"
+                    },
+                    "p2_button6": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p2_down": {
+                        "definition": "1,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p2_left": {
+                        "definition": "1,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p2_right": {
+                        "definition": "1,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p2_up": {
+                        "definition": "1,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "start1": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
+                    "start2": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
+                    "ui_cancel": {
+                        "definition": "mode",
+                        "type": "joystick_button"
+                    },
+                    "ui_pause": {
+                        "definition": "thumbl",
+                        "type": "joystick_button"
+                    }
+                }
+            },
+            "key": {
+                "name": "Wireless Controller",
+                "productId": 51,
+                "type": 0,
+                "vendorId": 32903
+            }
+        }
+    ]
+}

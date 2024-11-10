@@ -64,7 +64,7 @@ int main()
         spdlog::info("Stopping {} {}", projectName, projectVersion);
         return 0;
     }
-    catch (const Exception& excep)
+    catch (const enea::Exception& excep)
     {
         spdlog::error(excep.what());
     }

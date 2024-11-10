@@ -137,7 +137,7 @@ void RomMenu::reorganize()
                 infoText->addChild(screenshotSprite);
             }
         }
-        catch (const ResourceManager<sf::Texture>::Excep& excep)
+        catch (const ResourceManager<sf::Texture>::Exception& excep)
         {
             // Don't do anything is no screenshot is available, it's fine
         }

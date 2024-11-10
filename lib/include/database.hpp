@@ -100,7 +100,7 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
         // If the db does not contain the "values" or it is not an array element we deem it invalid
         if (!json.contains(VALUES_JSON_FIELD) || !json[VALUES_JSON_FIELD].is_array())
         {
-            throw Database::Excep("Invalid database (does not contain values)");
+            throw Database::Exception("Invalid database (does not contain values)");
         }
 
         for (auto values = json[VALUES_JSON_FIELD]; const auto& value : values)
@@ -108,7 +108,7 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
             // If not enough information we deem the database invalid
             if (!value.contains(KEY_JSON_FIELD) || !value.contains(INFO_JSON_FIELD))
             {
-                throw Database::Excep("Invalid database (contains invalid value)");
+                throw Database::Exception("Invalid database (contains invalid value)");
             }
 
             // If we throw when converting the value from a json we deem the database invalid
@@ -118,7 +118,7 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
             }
             catch (const std::exception&)
             {
-                throw Database::Excep("Invalid database (contains invalid value)");
+                throw Database::Exception("Invalid database (contains invalid value)");
             }
         }
 
@@ -146,7 +146,7 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
         }
         catch (...)
         {
-            throw Database::Excep("Unable to load rom database");
+            throw Database::Exception("Unable to load database");
         }
 
         nlohmann::json json;
@@ -157,16 +157,16 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
         }
         catch (...)
         {
-            throw Database::Excep("Unable to parse rom database from json");
+            throw Database::Exception("Unable to parse database from json");
         }
 
         return json;
     }
 
  public:
-    class Excep : public Exception
+    class Exception : public enea::Exception
     {
-        using Exception::Exception;
+        using enea::Exception::Exception;
     };
 
     /**
@@ -219,7 +219,5 @@ template <DatabaseKey Key, DatabaseValue Value> class DB
         return db;
     }
 };
-
-using RomDatabase = DB<std::string, RomInfo>;
 
 #endif // DATABASE_HPP

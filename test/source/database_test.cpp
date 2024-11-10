@@ -18,7 +18,7 @@ TEST_F(DatabaseFixture, findDatabaseNoValues)
     */
     const nlohmann::json json{{"test", "invalid"}};
     EXPECT_CALL(db, loadFromFile(DB_PATH)).WillOnce(testing::Return(json));
-    EXPECT_THROW(db.find("sf2"), DatabaseMock::Excep);
+    EXPECT_THROW(db.find("sf2"), DatabaseMock::Exception);
 }
 
 TEST_F(DatabaseFixture, findDatabaseNoArray)
@@ -29,7 +29,7 @@ TEST_F(DatabaseFixture, findDatabaseNoArray)
     */
     const nlohmann::json json{{"values", "invalid"}};
     EXPECT_CALL(db, loadFromFile(DB_PATH)).WillOnce(testing::Return(json));
-    EXPECT_THROW(db.find("sf2"), DatabaseMock::Excep);
+    EXPECT_THROW(db.find("sf2"), DatabaseMock::Exception);
 }
 
 TEST_F(DatabaseFixture, findDatabaseNoKey)
@@ -41,7 +41,7 @@ TEST_F(DatabaseFixture, findDatabaseNoKey)
     */
     const nlohmann::json json{{"values", {{"invalid", "value"}}}};
     EXPECT_CALL(db, loadFromFile(DB_PATH)).WillOnce(testing::Return(json));
-    EXPECT_THROW(db.find("sf2"), DatabaseMock::Excep);
+    EXPECT_THROW(db.find("sf2"), DatabaseMock::Exception);
 }
 
 TEST_F(DatabaseFixture, findDatabaseNoValue)
@@ -53,7 +53,7 @@ TEST_F(DatabaseFixture, findDatabaseNoValue)
     */
     const nlohmann::json json{{"values", {{{"key", "id"}, {"invalid", "value"}}}}};
     EXPECT_CALL(db, loadFromFile(DB_PATH)).WillOnce(testing::Return(json));
-    EXPECT_THROW(db.find("sf2"), DatabaseMock::Excep);
+    EXPECT_THROW(db.find("sf2"), DatabaseMock::Exception);
 }
 
 TEST_F(DatabaseFixture, findDatabaseLoadFailed)
@@ -66,7 +66,7 @@ TEST_F(DatabaseFixture, findDatabaseLoadFailed)
     */
     const nlohmann::json json{{"values", {{{"key", "id"}, {"invalid", "value"}}}}};
     EXPECT_CALL(db, loadFromFile(DB_PATH)).WillOnce(testing::Return(json));
-    EXPECT_THROW(db.find("sf2"), DatabaseMock::Excep);
+    EXPECT_THROW(db.find("sf2"), DatabaseMock::Exception);
     EXPECT_CALL(db, loadFromFile(DB_PATH)).Times(0);
     EXPECT_EQ(db.find("sf2"), std::nullopt);
 }

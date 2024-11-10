@@ -1,7 +1,10 @@
 #ifndef UTILS_HPP
 #define UTILS_HPP
 
+#include <magic_enum.hpp>
 #include <nlohmann/json.hpp>
+
+#include "exception.hpp"
 
 template <typename T>
 concept OptionalCompatible = requires { typename std::optional<T>; };
@@ -46,7 +49,7 @@ inline void addOptionalToJson(nlohmann::json& json, const std::string_view& fiel
  */
 template <typename T>
     requires JsonConstructible<T> && OptionalCompatible<T>
-inline std::optional<T> getValueFromJson(const nlohmann::json& json, const std::string_view& field)
+inline std::optional<T> getOptionalValueFromJson(const nlohmann::json& json, const std::string_view& field)
 {
     try
     {
@@ -57,6 +60,40 @@ inline std::optional<T> getValueFromJson(const nlohmann::json& json, const std::
         return std::nullopt;
     }
 }
+
+template <typename T>
+    requires JsonConstructible<T>
+inline T getMandatoryValueFromJson(const nlohmann::json& json, const std::string_view& field)
+{
+    return convert<T>(getMandatoryValueFromJson<nlohmann::json>(json, field));
+}
+
+template <>
+inline nlohmann::json getMandatoryValueFromJson<nlohmann::json>(const nlohmann::json& json,
+                                                                const std::string_view& field)
+{
+    if (!json.contains(field))
+    {
+        throw enea::json::MissingMandatoryFieldException(json, field);
+    }
+
+    return json.at(field);
+}
+
+template <typename T>
+    requires JsonConstructible<T>
+inline T convert(const nlohmann::json& json)
+{
+    try
+    {
+        return json.template get<T>();
+    }
+    catch ([[maybe_unudsed]] const nlohmann::json::type_error& excep)
+    {
+        throw enea::json::CannotConvertException<T>(json);
+    }
+}
+
 } // namespace utils
 
 #endif // UTILS_HPP

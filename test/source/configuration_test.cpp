@@ -44,7 +44,7 @@ TEST_F(ConfigurationFixture, romDirectory_noHome)
         Expectation: We throw an exception.
     */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(config.romDirectory(), Conf::Excep);
+    EXPECT_THROW(config.romDirectory(), Conf::Exception);
 }
 
 TEST_F(ConfigurationFixture, cacheFile_noHome)
@@ -54,5 +54,5 @@ TEST_F(ConfigurationFixture, cacheFile_noHome)
         Expectation: We throw an exception.
     */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(config.cacheDirectory(), Conf::Excep);
+    EXPECT_THROW(config.cacheDirectory(), Conf::Exception);
 }

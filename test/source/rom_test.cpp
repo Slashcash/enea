@@ -60,7 +60,7 @@ TEST(Rom, fromJson)
     */
     EXPECT_THROW(
         (Rom{nlohmann::json{{Rom::INFO_JSON_FIELD, INFO_SET_COMPLETE}, {Rom::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}}}),
-        Rom::Excep);
+        Rom::Exception);
 
     /*
         Building Rom from a json which contains all the information except for the rom title.

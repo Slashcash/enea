@@ -20,9 +20,9 @@ class SystemCommand
     [[nodiscard]] virtual Result launchCmd() const;
 
  public:
-    class Excep : public Exception
+    class Exception : public enea::Exception
     {
-        using Exception::Exception;
+        using enea::Exception::Exception;
     };
 
     SystemCommand() = delete;
