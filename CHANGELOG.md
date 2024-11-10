@@ -1,3 +1,15 @@
+## v0.5.0 (2024-11-10)
+
+### Feat
+
+- add native support for Mayflash F500 V2
+
+### Refactor
+
+- do not use a fixed mapping for inputs
+- improve information retrieval from internal databases
+- add requirements for templates on some utility functions
+
 ## v0.4.0 (2024-10-26)
 
 ### Feat
