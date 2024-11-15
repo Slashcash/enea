@@ -1,7 +1,9 @@
 #ifndef ROMINFO_HPP
 #define ROMINFO_HPP
 
+#include <fmt/format.h>
 #include <nlohmann/json.hpp>
+
 /**
  * @brief This struct represents a set of information about a rom. This information
  * is generally retrieved from a rom database (currently the database is stored as a json format
@@ -62,6 +64,12 @@ struct RomInfo
      *
      */
     std::optional<bool> isBios;
+
+    [[nodiscard]] inline std::string toString() const
+    {
+        // This is just temporary, we should really have a more complete toString implementation
+        return title ? *title : "Unknown Title";
+    }
 };
 
 /**
@@ -80,5 +88,13 @@ void to_json(nlohmann::json& json, const RomInfo& info);
  * @param info the output RomInfo struct
  */
 void from_json(const nlohmann::json& json, RomInfo& info);
+
+template <> struct fmt::formatter<RomInfo> : fmt::formatter<string_view>
+{
+    auto format(const RomInfo& romInfo, fmt::format_context& ctx) const -> fmt::format_context::iterator
+    {
+        return fmt::formatter<string_view>::format(romInfo.toString(), ctx);
+    }
+};
 
 #endif // ROMINFO_HPP

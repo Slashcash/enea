@@ -78,6 +78,4 @@ class Manager
 };
 } // namespace Input
 
-using InputDeviceDatabase = DB<Input::Identification, Input::Mapping>;
-
 #endif // INPUTMANAGER_HPP

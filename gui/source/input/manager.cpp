@@ -19,7 +19,7 @@ Input::Manager::Manager()
             Input::Identification identification{
                 .type{Input::Type::Joystick}, .name{id.name}, .vendorId{id.vendorId}, .productId{id.productId}};
             spdlog::info("Querying input database for: {}", identification);
-            auto mapping = Input::Database::get("inputdb/inputdb.json").find(identification);
+            auto mapping = Input::Database::get().find(identification);
             if (mapping)
             {
                 spdlog::info("Found predetermined mapping for: {}", identification);
@@ -100,7 +100,7 @@ void Input::Manager::manage(sf::RenderWindow& window)
             Input::Identification identification{
                 .type{Input::Type::Joystick}, .name{id.name}, .vendorId{id.vendorId}, .productId{id.productId}};
             spdlog::info("Querying input database for: {}", identification);
-            auto mapping = Input::Database::get("inputdb/inputdb.json").find(identification);
+            auto mapping = Input::Database::get().find(identification);
             if (mapping)
             {
                 spdlog::info("Found predetermined mapping for: {}", identification);

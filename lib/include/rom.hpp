@@ -114,6 +114,7 @@ template <> struct adl_serializer<Rom>
 };
 } // namespace nlohmann
 
-using RomDatabase = DB<std::string, RomInfo>;
+static constexpr char dbPath[] = "romdb/romdb.json";
+using RomDatabase = DB<std::string, RomInfo, dbPath>;
 
 #endif // ROM_HPP

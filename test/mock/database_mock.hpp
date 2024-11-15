@@ -9,7 +9,7 @@ class DatabaseMock : public Database<std::string, std::string>
 {
  public:
     using Database::Database;
-    MOCK_METHOD(nlohmann::json, loadFromFile, (const std::string&), (override, const));
+    MOCK_METHOD(std::optional<nlohmann::json>, load, (), (override, const));
 };
 
 #endif // DATABASEBMOCK_HPP
