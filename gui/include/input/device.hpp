@@ -57,7 +57,8 @@ class Device
     [[nodiscard]] std::optional<Input::Frontend::Button> getFrontendButton(const Frontend::Command& command) const;
 };
 
-using Database = DB<Input::Identification, Input::Mapping>;
+static constexpr char dbPath[] = "romdb/romdb.json";
+using Database = DB<Input::Identification, Input::Mapping, dbPath>;
 
 } // namespace Input
 

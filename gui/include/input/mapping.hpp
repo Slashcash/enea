@@ -70,6 +70,12 @@ class Mapping
      * @return std::optional<Frontend::Button> the associated button mapping, if any
      */
     [[nodiscard]] std::optional<Frontend::Button> getButton(Input::Frontend::Command command) const;
+
+    [[nodiscard]] inline std::string toString() const
+    {
+        // This is just temporary, we should really have a more complete toString implementation
+        return "Joystick Mapping";
+    }
 };
 } // namespace Input
 
@@ -166,5 +172,13 @@ template <> struct adl_serializer<Input::Mapping>
     }
 };
 } // namespace nlohmann
+
+template <> struct fmt::formatter<Input::Mapping> : fmt::formatter<string_view>
+{
+    auto format(const Input::Mapping& mapping, fmt::format_context& ctx) const -> fmt::format_context::iterator
+    {
+        return fmt::formatter<string_view>::format(mapping.toString(), ctx);
+    }
+};
 
 #endif
