@@ -37,6 +37,7 @@ jobs:
       architecture: ${{ matrix.arch }}
       build_dependencies: true
       embed_update_info: true
+      sign_artifacts: true
       build_author: Official Release
 
   deploy:

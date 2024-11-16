@@ -146,10 +146,11 @@ list_dependencies() {
 
 # Function to display usage help
 function display_help {
-  echo "Usage: $(basename "$0") [OPTIONS] [-s <source_folder>] [-o <output_directory>] [-a <architecture>]"
+  echo "Usage: $(basename "$0") [OPTIONS] [-s <source_folder>] [-o <output_directory>] [-a <architecture>] [-g <gpg_id>] [-bu]"
   echo "  -s  Specify the source folder for enea"
   echo "  -o  Specify the output path"
   echo "  -a  Specify build architecture (either x86_64, aarch64 or armv7hf)"
+  echo "  -g  Specify a gpg key ID that will be used to sign the AppImage"
   echo "  -b  Build all dependencies from scratch"
   echo "  -u  Embed update info into the AppImage"
   echo "  -h  Display this help message"
@@ -169,7 +170,7 @@ trap cleanup EXIT
 source $(dirname $0)/common.sh
 
 # Parse command line options
-while getopts "s:o:a:hbu" opt; do
+while getopts "s:o:g:a:hbu" opt; do
   case "$opt" in
     s)
       SOURCE_DIR=$(realpath "$OPTARG")
@@ -179,6 +180,9 @@ while getopts "s:o:a:hbu" opt; do
       ;;
     a)
       ENEA_ARCH="$OPTARG"
+      ;;
+    g)
+      GPG_SIGNATURE_ID="$OPTARG"
       ;;
     h)
       display_help
@@ -379,6 +383,12 @@ export LDAI_OUTPUT="$appimage_output"
 # Generate update info only if requested
 if [ "$GENERATE_UPDATE_INFO" = true ]; then
   export LDAI_UPDATE_INFORMATION="gh-releases-zsync|Slashcash|enea|latest|$appimage_name.zsync"
+fi
+
+# Sign AppImage if needed
+if [ -n "$GPG_SIGNATURE_ID" ]; then
+  export LDAI_SIGN=1
+  export LDAI_SIGN_KEY="$GPG_SIGNATURE_ID"
 fi
 
 export NO_STRIP=1

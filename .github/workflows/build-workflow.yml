@@ -21,6 +21,12 @@ on:
           required: true
           type: boolean
 
+      sign_artifacts:
+          description: 'Whether or not to sign the AppImage'
+          required: false
+          default: false
+          type: boolean
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -33,6 +39,13 @@ jobs:
       # We use the git tag to embed the version string into the executable
     - name: Fetch tags
       run: git fetch --prune --unshallow --tags
+
+    - name: Import GPG key
+      id: import_gpg
+      if: ${{ inputs.sign_artifacts }}
+      uses: crazy-max/ghaction-import-gpg@v6
+      with:
+        gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
 
     - name: Validate inputs
       run: |
@@ -68,6 +81,12 @@ jobs:
           echo "UPDATE_INFO=" >> $GITHUB_ENV
         fi
 
+        if [[ "${{ inputs.sign_artifacts }}" == "true" ]]; then
+          echo "SIGN_ARTIFACTS=-g ${{ steps.import_gpg.outputs.keyid }}" >> $GITHUB_ENV
+        else
+          echo "SIGN_ARTIFACTS=" >> $GITHUB_ENV
+        fi
+
     - name: Add arm Ubuntu sources
       if: ${{ inputs.architecture != 'x86_64' }}
       uses: ryankurte/action-apt@master
@@ -85,7 +104,8 @@ jobs:
         ${{ github.workspace }}/scripts/generate_appimage.sh \
           -a ${{ env.ENEA_ARCH }} \
           ${{ env.BUILD_DEPS }} \
-          ${{ env.UPDATE_INFO }}
+          ${{ env.UPDATE_INFO }} \
+          ${{ env.SIGN_ARTIFACTS }}
 
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
