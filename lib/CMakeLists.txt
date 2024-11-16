@@ -16,7 +16,8 @@ add_library(
   source/rominfo.cpp
   include/rommedia.hpp
   source/rommedia.cpp
-  include/utils.hpp)
+  include/utils.hpp
+  include/singleton.hpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
 target_link_libraries(

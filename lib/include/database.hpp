@@ -5,6 +5,8 @@
 #include <nlohmann/json.hpp>
 #include <spdlog/spdlog.h>
 
+#include "singleton.hpp"
+
 CMRC_DECLARE(resources);
 
 template <typename Key>
@@ -165,17 +167,6 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
     };
 };
 
-template <DatabaseKey Key, DatabaseValue Value, const char* dbPath> class DB
-{
- public:
-    DB() = delete;
-
-    [[nodiscard]] inline static Database<Key, Value>& get()
-    {
-        static Database<Key, Value> db{dbPath};
-
-        return db;
-    }
-};
+template <typename Key, typename Value, const char* dbPath> using DB = Singleton<Database<Key, Value>, dbPath>;
 
 #endif // DATABASE_HPP
