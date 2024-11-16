@@ -1,3 +1,18 @@
+## v0.7.0 (2024-11-16)
+
+### Feat
+
+- sign release artifacts with GPG
+
+### Fix
+
+- stop crashing randomly when connecting a joystick
+
+### Refactor
+
+- add a separate singleton class
+- rewrite database class for better log experience
+
 ## v0.6.0 (2024-11-10)
 
 ### Feat
