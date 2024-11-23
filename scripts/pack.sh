@@ -12,7 +12,7 @@ function display_help {
   echo "Usage: $(basename "$0") [OPTIONS] [-s <source_folder>] [-o <output_directory>] [-a <architecture>] [-g <gpg_id>] [-bu]"
   echo "  -s  Specify the source folder for enea"
   echo "  -o  Specify the output path"
-  echo "  -a  Specify build architecture (either Linux-x86_64, Linux-aarch64 or Linux-armv7hf)"
+  echo "  -a  Specify build architecture (either Linux-x86_64, Linux-aarch64 or Linux-armv7hf or Windows)"
   echo "  -g  Specify a gpg key ID that will be used to sign the packaged software (only available for Linux)"
   echo "  -b  Build all dependencies from scratch"
   echo "  -u  Embed update info into the packaged software (only availabe for Linux)"
@@ -72,8 +72,11 @@ elif [ "$ENEA_ARCH_ARG" == "Linux-armv7hf" ]; then
 elif [ "$ENEA_ARCH_ARG" == "Linux-aarch64" ]; then
     ARCH_ARG="-a aarch64"
     SCRIPT="$(dirname "$0")/generate_appimage.sh"
+elif [ "$ENEA_ARCH_ARG" == "Windows" ]; then
+    ARCH_ARG="-a x86_64"
+    SCRIPT="$(dirname "$0")/generate_windows_executable.sh"
 else
-  echo "Error: build architecture must be either 'Linux-x86_64', 'Linux-aarch64' or 'Linux-armv7hf'."
+  echo "Error: build architecture must be either 'Linux-x86_64', 'Linux-aarch64', 'Linux-armv7hf' or 'Windows'"
   exit 1
 fi
 
