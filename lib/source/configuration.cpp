@@ -6,10 +6,23 @@
 
 std::optional<std::filesystem::path> Conf::homeDirectory() const
 {
+#ifdef TARGET_OS_LINUX
     if (auto* envValue = std::getenv("HOME"); envValue != nullptr)
     {
         return envValue;
     }
+
+#elif defined(TARGET_OS_WINDOWS)
+    auto* homeDrive = std::getenv("HOMEDRIVE");
+    auto* homePath = std::getenv("HOMEPATH");
+    if (homeDrive != nullptr && homePath != nullptr)
+    {
+        return std::string(homeDrive) + std::string(homePath);
+    }
+
+#else
+#error "Unknown target OS. Compilation halted."
+#endif
 
     return std::nullopt;
 }

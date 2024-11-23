@@ -8,6 +8,15 @@ project(
   VERSION "${SOFTWARE_TAG}"
   LANGUAGES CXX)
 
+# Discovering target OS
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  add_definitions(-DTARGET_OS_LINUX)
+elseif(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+  add_definitions(-DTARGET_OS_WINDOWS)
+else()
+  message(FATAL_ERROR "Target OS: ${CMAKE_SYSTEM_NAME} is not supported")
+endif()
+
 # Using C++20
 set(CMAKE_CXX_STANDARD 20)
 
