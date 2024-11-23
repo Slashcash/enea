@@ -91,7 +91,13 @@ jobs:
           path: ${{ github.workspace }}/deploy
 
       - uses: shogo82148/actions-upload-release-asset@v1
-        name: Upload files
+        name: Upload release files
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ github.workspace }}/deploy/Enea-*/*
+
+      - uses: shogo82148/actions-upload-release-asset@v1
+        name: Upload README file
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ github.workspace }}/README.md
