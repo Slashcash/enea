@@ -17,12 +17,12 @@ on:
         type: string
 
       embed_update_info:
-          description: 'Whether or not to embed update info into the AppImage'
+          description: 'Whether or not to embed update info into the packaged executable (only available for Linux)'
           required: true
           type: boolean
 
       sign_artifacts:
-          description: 'Whether or not to sign the AppImage'
+          description: 'Whether or not to sign the packaged software (only available for Linux)'
           required: false
           default: false
           type: boolean
@@ -49,23 +49,23 @@ jobs:
 
     - name: Validate inputs
       run: |
-        if [[ "${{ inputs.architecture }}" == "x86_64" ]]; then
-          echo "ENEA_ARCH=x86_64" >> $GITHUB_ENV
-          echo "ENEA_CONAN_ARCH=x86_64" >> $GITHUB_ENV
+        if [[ "${{ inputs.architecture }}" == "Linux-x86_64" ]]; then
+          echo "ENEA_ARCH=Linux-x86_64" >> $GITHUB_ENV
+          echo "IMAGE_ARCH=x86_64" >> $GITHUB_ENV
           echo "ENEA_LINUX_ARCH=x86_64" >> $GITHUB_ENV
           echo "Valid architecture: ${{ inputs.architecture }}"
-        elif [[ "${{ inputs.architecture }}" == "aarch64" ]]; then
-          echo "ENEA_ARCH=aarch64" >> $GITHUB_ENV
-          echo "ENEA_CONAN_ARCH=armv8" >> $GITHUB_ENV
+        elif [[ "${{ inputs.architecture }}" == "Linux-aarch64" ]]; then
+          echo "ENEA_ARCH=Linux-aarch64" >> $GITHUB_ENV
+          echo "IMAGE_ARCH=aarch64" >> $GITHUB_ENV
           echo "ENEA_LINUX_ARCH=arm64" >> $GITHUB_ENV
           echo "Valid architecture: ${{ inputs.architecture }}"
-        elif [[ "${{ inputs.architecture }}" == "armv7hf" ]]; then
-          echo "ENEA_ARCH=armv7hf" >> $GITHUB_ENV
-          echo "ENEA_CONAN_ARCH=armv7hf" >> $GITHUB_ENV
+        elif [[ "${{ inputs.architecture }}" == "Linux-armv7hf" ]]; then
+          echo "ENEA_ARCH=Linux-armv7hf" >> $GITHUB_ENV
+          echo "IMAGE_ARCH=armv7hf" >> $GITHUB_ENV
           echo "ENEA_LINUX_ARCH=armhf" >> $GITHUB_ENV
           echo "Valid architecture: ${{ inputs.architecture }}"
         else
-          echo "Invalid architecture ${{ inputs.architecture }}. Choose 'x86_64', 'armv7hf' or 'aarch64'"
+          echo "Invalid architecture ${{ inputs.architecture }}. Choose 'Linux-x86_64', 'Linux-armv7hf' or 'Linux-aarch64'"
           exit 1
         fi
 
@@ -88,7 +88,7 @@ jobs:
         fi
 
     - name: Add arm Ubuntu sources
-      if: ${{ inputs.architecture != 'x86_64' }}
+      if: ${{ inputs.architecture != 'Linux-x86_64' }}
       uses: ryankurte/action-apt@master
       with:
         arch: ${{ env.ENEA_LINUX_ARCH }}
@@ -99,9 +99,9 @@ jobs:
     - name: Write build author
       run: echo "SOFTWARE_BUILDER=${{ inputs.build_author }}" >> .env
 
-    - name: Generate .AppImage
+    - name: Pack software
       run: |
-        ${{ github.workspace }}/scripts/generate_appimage.sh \
+        ${{ github.workspace }}/scripts/pack.sh \
           -a ${{ env.ENEA_ARCH }} \
           ${{ env.BUILD_DEPS }} \
           ${{ env.UPDATE_INFO }} \
@@ -110,6 +110,6 @@ jobs:
     - name: Upload artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: Enea-${{ env.ENEA_ARCH }}
-        path: ${{ github.workspace }}/Enea-${{ env.ENEA_ARCH }}.AppImage*
+        name: Enea-${{ env.IMAGE_ARCH }}.AppImage
+        path: ${{ github.workspace }}/Enea-${{ env.IMAGE_ARCH }}.AppImage*
         if-no-files-found: error

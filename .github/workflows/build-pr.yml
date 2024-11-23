@@ -30,7 +30,7 @@ jobs:
     needs: dependencies_need_build
     strategy:
       matrix:
-        arch: [x86_64, aarch64, armv7hf]
+        arch: [Linux-x86_64, Linux-aarch64, Linux-armv7hf]
     uses: ./.github/workflows/build-workflow.yml
     with:
       architecture: ${{ matrix.arch }}

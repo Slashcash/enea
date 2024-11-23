@@ -31,7 +31,7 @@ jobs:
     if: contains(${{ needs.branch-name.outputs.running-branch }}, 'main')
     strategy:
       matrix:
-        arch: [x86_64, aarch64, armv7hf]
+        arch: [Linux-x86_64, Linux-aarch64, Linux-armv7hf]
     uses: ./.github/workflows/build-workflow.yml
     secrets: inherit
     with:
