@@ -11,7 +11,7 @@ add_executable(
   source/romsource_test.cpp
   mock/systemcommand_mock.hpp
   source/systemcommand_test.cpp
-  source/rom_test.cpp
+  source/romgame_test.cpp
   mock/emulator_mock.hpp
   source/emulator_test.cpp
   mock/inputmanager_mock.hpp

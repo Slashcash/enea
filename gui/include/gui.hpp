@@ -3,7 +3,7 @@
 
 #include <list>
 
-#include "rom.hpp"
+#include "rom/game.hpp"
 
 class Gui
 {
@@ -12,11 +12,11 @@ class Gui
     static constexpr unsigned int SCENE_HEIGHT = 1080;
     static constexpr unsigned int MAX_FRAME_RATE = 30;
 
-    std::vector<Rom> mRomList;
+    std::vector<Rom::Game> mRomList;
 
  public:
     Gui() = delete;
-    explicit Gui(const std::vector<Rom>& romList);
+    explicit Gui(const std::vector<Rom::Game>& romList);
 
     void run();
 };

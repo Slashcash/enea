@@ -34,8 +34,8 @@ class EmulatorFixture : public ::testing::Test
 {
  protected:
     EmulatorMock emulator;
-    Rom rom{ROM_PATH};
-    Rom romPathInvalid{ROM_PATH_INVALID};
+    Rom::Game rom{ROM_PATH};
+    Rom::Game romPathInvalid{ROM_PATH_INVALID};
 };
 
 TEST_F(EmulatorFixture, info)

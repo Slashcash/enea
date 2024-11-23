@@ -7,7 +7,7 @@
 #include "configuration.hpp"
 #include "emulator.hpp"
 #include "gui.hpp"
-#include "rom.hpp"
+#include "rom/game.hpp"
 #include "romsource.hpp"
 #include "softwareinfo.hpp"
 
@@ -49,7 +49,7 @@ int main()
         // Searching for roms
         spdlog::info("Searching for roms and media");
         RomSource romSource(romPath, cachePath);
-        std::vector<Rom> romList = romSource.scan();
+        std::vector<Rom::Game> romList = romSource.scan();
 
         spdlog::info("Saving cache information");
         if (!romSource.saveOnCache())

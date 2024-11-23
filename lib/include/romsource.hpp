@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "exception.hpp"
-#include "rom.hpp"
+#include "rom/game.hpp"
 #include "rominfo.hpp"
 
 /**
@@ -26,7 +26,7 @@ class RomSource
     struct Cache
     {
         std::string lastModified;
-        std::vector<Rom> roms;
+        std::vector<Rom::Game> roms;
     };
 
     std::filesystem::path mRomFolder;
@@ -44,8 +44,8 @@ class RomSource
     // some scenarios
     [[nodiscard]] virtual std::string_view version() const;
     [[nodiscard]] ScanResult scanResult(const std::filesystem::path& path) const;
-    [[nodiscard]] std::vector<Rom> physicalScan() const;
-    [[nodiscard]] std::optional<std::vector<Rom>> cacheScan(std::string_view lastModified) const;
+    [[nodiscard]] std::vector<Rom::Game> physicalScan() const;
+    [[nodiscard]] std::optional<std::vector<Rom::Game>> cacheScan(std::string_view lastModified) const;
     [[nodiscard]] std::filesystem::path cacheFile() const;
     [[nodiscard]] static bool fileIsImage(const std::filesystem::path& path);
     [[nodiscard]] static bool fileIsRom(const std::filesystem::path& path);
@@ -68,7 +68,7 @@ class RomSource
 
     [[nodiscard]] std::filesystem::path romFolder() const;
     [[nodiscard]] std::filesystem::path cacheFolder() const;
-    [[nodiscard]] std::vector<Rom> scan() const;
+    [[nodiscard]] std::vector<Rom::Game> scan() const;
     [[nodiscard]] bool saveOnCache() const;
 
     RomSource& operator=(const RomSource& romsource) = delete;

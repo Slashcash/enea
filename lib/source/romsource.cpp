@@ -28,9 +28,9 @@ std::filesystem::path RomSource::cacheFolder() const
     return mCacheFolder;
 }
 
-std::vector<Rom> RomSource::scan() const
+std::vector<Rom::Game> RomSource::scan() const
 {
-    std::vector<Rom> result;
+    std::vector<Rom::Game> result;
 
     if (!isFolder(mRomFolder))
     {
@@ -57,9 +57,9 @@ std::vector<Rom> RomSource::scan() const
     return result;
 }
 
-std::vector<Rom> RomSource::physicalScan() const
+std::vector<Rom::Game> RomSource::physicalScan() const
 {
-    std::vector<Rom> result;
+    std::vector<Rom::Game> result;
     spdlog::debug("Searching for roms and media in: {}", mRomFolder.string());
     // Physically scanning the folder
     for (auto files = scanResult(mRomFolder); const auto& rom : files.roms)
@@ -151,7 +151,7 @@ bool RomSource::fileIsRom(const std::filesystem::path& path)
 std::optional<RomInfo> RomSource::romInfo(const std::filesystem::path& path) const
 {
     spdlog::trace("Querying rom database for: {}", path.stem().string());
-    return RomDatabase::get().find(path.stem().string());
+    return Rom::Database::get().find(path.stem().string());
 }
 
 std::optional<std::string> RomSource::lastFolderModification(const std::filesystem::path& path) const
@@ -257,9 +257,9 @@ std::optional<nlohmann::json> RomSource::readCacheFile(const std::filesystem::pa
     return json;
 }
 
-std::optional<std::vector<Rom>> RomSource::cacheScan(const std::string_view lastModified) const
+std::optional<std::vector<Rom::Game>> RomSource::cacheScan(const std::string_view lastModified) const
 {
-    std::vector<Rom> result;
+    std::vector<Rom::Game> result;
 
     spdlog::debug("Trying to read cache file at: {}", cacheFile().string());
     auto cache = readCacheFile(cacheFile());
