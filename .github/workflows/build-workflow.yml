@@ -64,8 +64,11 @@ jobs:
           echo "IMAGE_ARCH=armv7hf" >> $GITHUB_ENV
           echo "ENEA_LINUX_ARCH=armhf" >> $GITHUB_ENV
           echo "Valid architecture: ${{ inputs.architecture }}"
+        elif [[ "${{ inputs.architecture }}" == "Windows" ]]; then
+          echo "ENEA_ARCH=Windows" >> $GITHUB_ENV
+          echo "Valid architecture: ${{ inputs.architecture }}"
         else
-          echo "Invalid architecture ${{ inputs.architecture }}. Choose 'Linux-x86_64', 'Linux-armv7hf' or 'Linux-aarch64'"
+          echo "Invalid architecture ${{ inputs.architecture }}. Choose 'Linux-x86_64', 'Linux-armv7hf', 'Linux-aarch64' or Windows"
           exit 1
         fi
 
@@ -88,7 +91,7 @@ jobs:
         fi
 
     - name: Add arm Ubuntu sources
-      if: ${{ inputs.architecture != 'Linux-x86_64' }}
+      if: ${{ inputs.architecture != 'Linux-x86_64' && inputs.architecture != 'Windows' }}
       uses: ryankurte/action-apt@master
       with:
         arch: ${{ env.ENEA_LINUX_ARCH }}
@@ -108,6 +111,7 @@ jobs:
           ${{ env.SIGN_ARTIFACTS }}
 
     - name: Upload artifacts
+      if: ${{ inputs.architecture != 'Windows' }}
       uses: actions/upload-artifact@v4
       with:
         name: Enea-${{ env.IMAGE_ARCH }}.AppImage

@@ -10,7 +10,7 @@ jobs:
     name: Build
     strategy:
       matrix:
-        arch: [Linux-x86_64, Linux-aarch64, Linux-armv7hf]
+        arch: [Linux-x86_64, Linux-aarch64, Linux-armv7hf, Windows]
     uses: ./.github/workflows/build-workflow.yml
     with:
       architecture: ${{ matrix.arch }}
