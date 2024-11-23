@@ -40,7 +40,7 @@ class EmulatorFixture : public ::testing::Test
 
 TEST_F(EmulatorFixture, info)
 {
-    EXPECT_CALL(emulator, launch("--version"))
+    EXPECT_CALL(emulator, launch("-version"))
         .WillOnce(testing::Return(SystemCommand::Result(0, EMULATOR_VERSION_OUTPUT)));
     auto info = emulator.info();
     ASSERT_TRUE(info.has_value());
@@ -50,7 +50,7 @@ TEST_F(EmulatorFixture, info)
 
 TEST_F(EmulatorFixture, infoEmulatorCallFails)
 {
-    EXPECT_CALL(emulator, launch("--version"))
+    EXPECT_CALL(emulator, launch("-version"))
         .WillOnce(testing::Return(SystemCommand::Result(1, EMULATOR_VERSION_OUTPUT)));
     auto info = emulator.info();
     ASSERT_FALSE(info.has_value());
@@ -58,7 +58,7 @@ TEST_F(EmulatorFixture, infoEmulatorCallFails)
 
 TEST_F(EmulatorFixture, infoEmulatorUnexpectedOutput)
 {
-    EXPECT_CALL(emulator, launch("--version"))
+    EXPECT_CALL(emulator, launch("-version"))
         .WillOnce(testing::Return(SystemCommand::Result(0, EMULATOR_VERSION_UNEXPECTED_OUTPUT)));
     auto info = emulator.info();
     ASSERT_FALSE(info.has_value());
