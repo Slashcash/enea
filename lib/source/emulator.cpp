@@ -71,7 +71,7 @@ std::optional<Emulator::EmulatorInfo> Emulator::info() const
 {
     try
     {
-        auto [exitValue, launchOutput] = launch("--version");
+        auto [exitValue, launchOutput] = launch("-version");
 
         // If launching the advmame version fails we assume emulator is not available
         if (exitValue != 0)
