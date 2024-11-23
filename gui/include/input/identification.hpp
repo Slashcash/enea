@@ -86,7 +86,10 @@ struct Identification
                            productId);
     }
 
-    [[nodiscard]] bool operator==(const Identification&) const = default;
+    [[nodiscard]] bool operator==(const Identification& id) const
+    {
+        return id.productId == this->productId && id.vendorId == this->vendorId;
+    };
 };
 
 /**

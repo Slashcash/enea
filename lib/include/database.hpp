@@ -120,6 +120,7 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
             }
         }
 
+        spdlog::debug("{} Operation successful", parseLog);
         return true;
     }
 
