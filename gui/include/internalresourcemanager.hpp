@@ -19,7 +19,7 @@ template <SFMLLoadable T> class InternalResourceManager : public ResourceManager
         cmrc::file resourceFile;
         try
         {
-            resourceFile = embeddedFS.open(path);
+            resourceFile = embeddedFS.open(path.string());
         }
         catch ([[maybe_unused]] const std::system_error& exception)
         {

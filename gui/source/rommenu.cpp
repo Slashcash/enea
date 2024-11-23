@@ -15,8 +15,8 @@ RomMenu::RomMenu(const std::vector<Rom>& roms)
         std::string firstTitle;
         std::string secondTitle;
 
-        first.title() ? firstTitle = *(first.title()) : firstTitle = first.path().stem();
-        second.title() ? secondTitle = *(second.title()) : secondTitle = second.path().stem();
+        first.title() ? firstTitle = *(first.title()) : firstTitle = first.path().stem().string();
+        second.title() ? secondTitle = *(second.title()) : secondTitle = second.path().stem().string();
 
         return firstTitle < secondTitle;
     });
@@ -39,7 +39,7 @@ std::string RomMenu::romName(const Rom& rom)
 {
     std::string result;
 
-    rom.title() ? result = *(rom.title()) : result = rom.path().stem();
+    rom.title() ? result = *(rom.title()) : result = rom.path().stem().string();
     result = result.substr(0, result.find_first_of('('));
 
     return result;
