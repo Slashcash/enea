@@ -1,3 +1,14 @@
+## v0.8.0 (2024-11-23)
+
+### Feat
+
+- switch keyboard control between player 1 and 2
+
+### Fix
+
+- stop using input device name when comparing devices
+- switch from --version to -version when retrieving advMAME version
+
 ## v0.7.0 (2024-11-16)
 
 ### Feat
