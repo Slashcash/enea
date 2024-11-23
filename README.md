@@ -36,13 +36,13 @@ Control mapping as follows:
 ---
 |   P1 UP  |   P1 DOWN  |   P1 LEFT  |   P1 RIGHT  |       Action buttons      | P1 START | P1 Insert Coin | Exit Game |
 |:--------:|:----------:|:----------:|:-----------:|:-------------------------:|:--------:|:--------------:|:---------:|
-| Arrow Up | Arrow Down | Arrow Left | Arrow Right | 7, 8, 9, 4, 5, 6 (keypad) |     1    |        3       |    Esc    |
+|     w    |      s     |      a     |      d      |     i, o, p, j, k, l      |     1    |        3       |    Esc    |
 
 *In game (Player 2)*
 ---
 | P2 UP | P2 DOWN | P2 LEFT | P2 RIGHT |  Action buttons  | P2 START | P2 Insert Coin |
 |:-----:|:-------:|:-------:|:--------:|:----------------:|:--------:|:--------------:|
-|   w   |    s    |    a    |     d    | i, o, p, j, k, l |     2    |        4       |
+|   up  |  down   |  left   |   right  | 7, 8, 9, 4, 5, 6 |     2    |        4       |
 
 Please note that you will need an AdvanceMAME compatible romset for games to work.
 
