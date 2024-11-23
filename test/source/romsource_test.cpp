@@ -29,7 +29,7 @@ static const nlohmann::json CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST
                                        {RomSource::VERSION_JSON_FIELD, projectVersion},
                                        {
                                            RomSource::ROMS_JSON_FIELD,
-                                           {Rom{ROM_PATH, INFO_SET_COMPLETE, {SCREENSHOT_PATH}}},
+                                           {Rom::Game{ROM_PATH, INFO_SET_COMPLETE, {SCREENSHOT_PATH}}},
                                        }};
 
 static const nlohmann::json EMPTY_CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST_EDIT},

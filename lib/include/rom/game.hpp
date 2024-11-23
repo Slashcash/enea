@@ -1,5 +1,5 @@
-#ifndef ROM_HPP
-#define ROM_HPP
+#ifndef ROMGAME_HPP
+#define ROMGAME_HPP
 
 #include <filesystem>
 #include <map>
@@ -15,12 +15,13 @@
 #include "rominfo.hpp"
 #include "rommedia.hpp"
 
+namespace Rom {
 /**
  * @brief This struct represents a game rom within the context of this software. Roms are meant to be
  * launched by AdvMAME and are generally identified by their path on the filesystem.
  * This class also stores information related to roms and the medias associated to it.
  */
-class Rom
+class Game
 {
  private:
     std::filesystem::path mPath;
@@ -37,9 +38,9 @@ class Rom
         using enea::Exception::Exception;
     };
 
-    Rom() = delete;
-    explicit Rom(std::filesystem::path path);
-    explicit Rom(std::filesystem::path path, RomInfo info, RomMedia media);
+    Game() = delete;
+    explicit Game(std::filesystem::path path);
+    explicit Game(std::filesystem::path path, RomInfo info, RomMedia media);
 
     [[nodiscard]] std::filesystem::path path() const;
 
@@ -52,30 +53,34 @@ class Rom
     [[nodiscard]] RomMedia media() const;
     [[nodiscard]] std::optional<std::filesystem::path> screenshot() const;
 
-    [[nodiscard]] bool operator==(const Rom& rom) const;
+    [[nodiscard]] bool operator==(const Game& game) const;
 };
 
+static constexpr char dbPath[] = "romdb/romdb.json";
+using Database = DB<std::string, RomInfo, dbPath>;
+} // namespace Rom
+
 namespace nlohmann {
-template <> struct adl_serializer<Rom>
+template <> struct adl_serializer<Rom::Game>
 {
-    static Rom from_json(const json& json)
+    static Rom::Game from_json(const json& json)
     {
         // Finding rom path
         std::filesystem::path romPath;
         try
         {
-            json.at(Rom::PATH_JSON_FIELD).get_to(romPath);
+            json.at(Rom::Game::PATH_JSON_FIELD).get_to(romPath);
         }
         catch (const json::exception& e)
         {
-            throw Rom::Exception("Rom constructed from invalid json, mandatory path field is missing");
+            throw Rom::Game::Exception("Rom constructed from invalid json, mandatory path field is missing");
         }
 
         // Finding rom info
         RomInfo romInfo;
         try
         {
-            romInfo = json.at(Rom::INFO_JSON_FIELD).get<RomInfo>();
+            romInfo = json.at(Rom::Game::INFO_JSON_FIELD).get<RomInfo>();
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
@@ -86,35 +91,32 @@ template <> struct adl_serializer<Rom>
         RomMedia romMedia;
         try
         {
-            romMedia = json.at(Rom::MEDIA_JSON_FIELD).get<RomMedia>();
+            romMedia = json.at(Rom::Game::MEDIA_JSON_FIELD).get<RomMedia>();
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
             // Do not do anything, no media is allowed
         }
 
-        Rom rom{romPath, romInfo, romMedia};
+        Rom::Game rom{romPath, romInfo, romMedia};
 
         return rom;
     }
 
-    static void to_json(json& json, Rom const& rom)
+    static void to_json(json& json, Rom::Game const& rom)
     {
         json.clear();
 
         // Setting rom path
-        json[Rom::PATH_JSON_FIELD] = rom.path();
+        json[Rom::Game::PATH_JSON_FIELD] = rom.path();
 
         // Setting rom info
-        json[Rom::INFO_JSON_FIELD] = rom.info();
+        json[Rom::Game::INFO_JSON_FIELD] = rom.info();
 
         // Setting rom media
-        json[Rom::MEDIA_JSON_FIELD] = rom.media();
+        json[Rom::Game::MEDIA_JSON_FIELD] = rom.media();
     }
 };
 } // namespace nlohmann
 
-static constexpr char dbPath[] = "romdb/romdb.json";
-using RomDatabase = DB<std::string, RomInfo, dbPath>;
-
-#endif // ROM_HPP
+#endif // ROMGAME_HPP

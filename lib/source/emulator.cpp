@@ -8,12 +8,12 @@
 
 #include "systemcommand.hpp"
 
-bool Emulator::romExists(const Rom& rom) const
+bool Emulator::romExists(const Rom::Game& rom) const
 {
     return std::filesystem::is_regular_file(rom.path());
 }
 
-bool Emulator::romIsReadable(const Rom& rom) const
+bool Emulator::romIsReadable(const Rom::Game& rom) const
 {
     namespace fs = std::filesystem;
 
@@ -22,7 +22,7 @@ bool Emulator::romIsReadable(const Rom& rom) const
             (perms & fs::perms::others_read) != fs::perms::none);
 }
 
-std::optional<Emulator::Error> Emulator::run(const Rom& rom, const std::string& inputString) const
+std::optional<Emulator::Error> Emulator::run(const Rom::Game& rom, const std::string& inputString) const
 {
     // Checking if the file exists
     if (!romExists(rom))

@@ -5,7 +5,7 @@
 #include <string>
 #include <unordered_map>
 
-#include "rom.hpp"
+#include "rom/game.hpp"
 #include "systemcommand.hpp"
 
 namespace Input::Emulator {
@@ -52,8 +52,8 @@ class Emulator
 
  private:
     [[nodiscard]] virtual SystemCommand::Result launch(const std::string& arguments) const;
-    [[nodiscard]] virtual bool romExists(const Rom& rom) const;
-    [[nodiscard]] virtual bool romIsReadable(const Rom& rom) const;
+    [[nodiscard]] virtual bool romExists(const Rom::Game& rom) const;
+    [[nodiscard]] virtual bool romIsReadable(const Rom::Game& rom) const;
 
  public:
     enum class Error
@@ -70,7 +70,7 @@ class Emulator
     Emulator(Emulator&& emulator) = delete;
 
     [[nodiscard]] std::optional<EmulatorInfo> info() const;
-    [[nodiscard]] std::optional<Error> run(const Rom& rom, const std::string& inputString) const;
+    [[nodiscard]] std::optional<Error> run(const Rom::Game& rom, const std::string& inputString) const;
 
     Emulator& operator=(const Emulator& emulator) = delete;
     Emulator& operator=(Emulator&& emulator) = delete;

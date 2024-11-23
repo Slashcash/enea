@@ -4,14 +4,14 @@
 
 #include <spdlog/spdlog.h>
 
-RomMenu::RomMenu(const std::vector<Rom>& roms)
+RomMenu::RomMenu(const std::vector<Rom::Game>& roms)
 {
     for (const auto& rom : roms)
     {
         mRoms.push_back(rom);
     }
 
-    std::ranges::sort(mRoms, [](const Rom& first, const Rom& second) {
+    std::ranges::sort(mRoms, [](const Rom::Game& first, const Rom::Game& second) {
         std::string firstTitle;
         std::string secondTitle;
 
@@ -24,7 +24,7 @@ RomMenu::RomMenu(const std::vector<Rom>& roms)
     reorganize();
 }
 
-std::string RomMenu::shortenedRomName(const Rom& rom)
+std::string RomMenu::shortenedRomName(const Rom::Game& rom)
 {
     auto result = romName(rom);
     if (result.size() > MAX_CHAR_SIZE_NAME)
@@ -35,7 +35,7 @@ std::string RomMenu::shortenedRomName(const Rom& rom)
     return result;
 }
 
-std::string RomMenu::romName(const Rom& rom)
+std::string RomMenu::romName(const Rom::Game& rom)
 {
     std::string result;
 
@@ -154,7 +154,7 @@ bool RomMenu::selectionUp()
     return setSelected(mSelected - 1);
 }
 
-std::optional<Rom> RomMenu::selectedRom() const
+std::optional<Rom::Game> RomMenu::selectedRom() const
 {
     return mRoms[mSelected];
 }

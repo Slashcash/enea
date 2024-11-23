@@ -1,8 +1,8 @@
 add_library(
   ${EXECUTABLE}Lib
   include/database.hpp
-  include/rom.hpp
-  source/rom.cpp
+  include/rom/game.hpp
+  source/rom/game.cpp
   include/configuration.hpp
   source/configuration.cpp
   include/exception.hpp
