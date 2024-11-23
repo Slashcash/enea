@@ -1,0 +1,35 @@
+{% set os, arch, compiler, compiler_version, type = profile_name.split('-') %}
+
+{% if type == "debug" %}
+    {% set loglevel = "trace" %}
+    {% set type = "Debug" %}
+{% else %}
+    {% set loglevel = "info" %}
+    {% set type = "Release" %}
+{% endif %}
+
+[settings]
+os={{ os.capitalize() }}
+arch={{ arch }}
+compiler={{ compiler }}
+compiler.version={{ compiler_version }}
+compiler.libcxx=libstdc++11
+build_type={{ type }}
+compiler.exception=seh
+compiler.threads=posix
+
+[conf]
+tools.system.package_manager:mode=install
+tools.system.package_manager:sudo=True
+
+[tool_requires]
+mingw-w64/8.0.2
+cmake/3.27.0
+
+[runenv]
+SPDLOG_LEVEL={{ loglevel }}
+
+[buildenv]
+CFLAGS+=-fstack-protector
+CXXFLAGS+=-fstack-protector
+LDFLAGS+=-fstack-protector

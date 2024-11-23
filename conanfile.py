@@ -37,7 +37,9 @@ class Recipe(ConanFile):
         self.requires("nlohmann_json/3.11.2")
         self.requires("sfml/2.6.0")
         self.requires("rocket/cci.20200603")
-        self.requires("advmame/4.0")
+        # We do not try to compile advmame on Windows for now
+        if self.settings.os == "Linux":
+            self.requires("advmame/4.0")
 
     def build_requirements(self):
         if not self.conf.get("tools.build:skip_test", default=False):
