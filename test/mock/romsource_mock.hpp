@@ -11,7 +11,7 @@ class RomSourceMock : public RomSource
     using RomSource::RomSource;
     MOCK_METHOD(bool, isFolder, (const std::filesystem::path& path), (const override));
     MOCK_METHOD(std::vector<std::filesystem::path>, scanFolder, (const std::filesystem::path& path), (const override));
-    MOCK_METHOD(std::optional<RomInfo>, romInfo, (const std::filesystem::path& path), (const override));
+    MOCK_METHOD(std::optional<Rom::Info>, romInfo, (const std::filesystem::path& path), (const override));
     MOCK_METHOD(std::optional<std::string>, lastFolderModification, (const std::filesystem::path& path),
                 (const override));
     MOCK_METHOD(bool, writeCacheFile, (const nlohmann::json& json, const std::filesystem::path& path),

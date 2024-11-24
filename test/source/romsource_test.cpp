@@ -20,10 +20,10 @@ static const std::string ROM_YEAR = "1991";
 static const std::string ROM_MANUFACTURER = "Capcom";
 static const bool ROM_IS_BIOS = false;
 
-static const RomInfo INFO_SET_COMPLETE{
+static const Rom::Info INFO_SET_COMPLETE{
     .title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
 
-static const RomInfo INFO_SET_BIOS{.title = "NeoGeo", .year = "1991", .manufacturer = "SNK", .isBios = true};
+static const Rom::Info INFO_SET_BIOS{.title = "NeoGeo", .year = "1991", .manufacturer = "SNK", .isBios = true};
 
 static const nlohmann::json CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST_EDIT},
                                        {RomSource::VERSION_JSON_FIELD, projectVersion},
@@ -81,7 +81,7 @@ TEST_F(RomSourceFixture, scanNoCache)
     ASSERT_EQ(roms.size(), 1);
     const auto& rom = roms[0];
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.info().title && *(rom.info().title) == INFO_SET_COMPLETE.title);
+    EXPECT_TRUE(rom.info().title == INFO_SET_COMPLETE.title);
     EXPECT_TRUE(rom.info().year && *(rom.info().year) == INFO_SET_COMPLETE.year);
     EXPECT_TRUE(rom.info().manufacturer && *(rom.info().manufacturer) == INFO_SET_COMPLETE.manufacturer);
     EXPECT_TRUE(rom.media().screenshot && *(rom.media().screenshot) == SCREENSHOT_PATH);
@@ -118,7 +118,7 @@ TEST_F(RomSourceFixture, scanCache)
     ASSERT_EQ(roms.size(), 1);
     const auto& rom = roms[0];
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.info().title && *(rom.info().title) == INFO_SET_COMPLETE.title);
+    EXPECT_TRUE(rom.info().title == INFO_SET_COMPLETE.title);
     EXPECT_TRUE(rom.info().year && *(rom.info().year) == INFO_SET_COMPLETE.year);
     EXPECT_TRUE(rom.info().manufacturer && *(rom.info().manufacturer) == INFO_SET_COMPLETE.manufacturer);
     EXPECT_TRUE(rom.media().screenshot && *(rom.media().screenshot) == SCREENSHOT_PATH);

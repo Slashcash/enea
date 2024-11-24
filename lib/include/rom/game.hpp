@@ -12,7 +12,7 @@
 
 #include "database.hpp"
 #include "exception.hpp"
-#include "rominfo.hpp"
+#include "rom/info.hpp"
 #include "rommedia.hpp"
 
 namespace Rom {
@@ -25,7 +25,8 @@ class Game
 {
  private:
     std::filesystem::path mPath;
-    RomInfo mInfo;
+    // This info should really become an optional
+    Rom::Info mInfo;
     RomMedia mMedia;
 
  public:
@@ -40,15 +41,11 @@ class Game
 
     Game() = delete;
     explicit Game(std::filesystem::path path);
-    explicit Game(std::filesystem::path path, RomInfo info, RomMedia media);
+    explicit Game(std::filesystem::path path, Rom::Info info, RomMedia media);
 
     [[nodiscard]] std::filesystem::path path() const;
 
-    [[nodiscard]] RomInfo info() const;
-    [[nodiscard]] std::optional<std::string> title() const;
-    [[nodiscard]] std::optional<std::string> year() const;
-    [[nodiscard]] std::optional<std::string> manufacturer() const;
-    [[nodiscard]] std::optional<bool> isBios() const;
+    [[nodiscard]] Rom::Info info() const;
 
     [[nodiscard]] RomMedia media() const;
     [[nodiscard]] std::optional<std::filesystem::path> screenshot() const;
@@ -57,7 +54,7 @@ class Game
 };
 
 static constexpr char dbPath[] = "romdb/romdb.json";
-using Database = DB<std::string, RomInfo, dbPath>;
+using Database = DB<std::string, Rom::Info, dbPath>;
 } // namespace Rom
 
 namespace nlohmann {
@@ -77,10 +74,10 @@ template <> struct adl_serializer<Rom::Game>
         }
 
         // Finding rom info
-        RomInfo romInfo;
+        Rom::Info romInfo;
         try
         {
-            romInfo = json.at(Rom::Game::INFO_JSON_FIELD).get<RomInfo>();
+            romInfo = json.at(Rom::Game::INFO_JSON_FIELD).get<Rom::Info>();
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
