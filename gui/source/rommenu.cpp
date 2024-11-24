@@ -12,11 +12,8 @@ RomMenu::RomMenu(const std::vector<Rom::Game>& roms)
     }
 
     std::ranges::sort(mRoms, [](const Rom::Game& first, const Rom::Game& second) {
-        std::string firstTitle;
-        std::string secondTitle;
-
-        first.title() ? firstTitle = *(first.title()) : firstTitle = first.path().stem().string();
-        second.title() ? secondTitle = *(second.title()) : secondTitle = second.path().stem().string();
+        std::string firstTitle = first.info().title;
+        std::string secondTitle = second.info().title;
 
         return firstTitle < secondTitle;
     });
@@ -39,7 +36,7 @@ std::string RomMenu::romName(const Rom::Game& rom)
 {
     std::string result;
 
-    rom.title() ? result = *(rom.title()) : result = rom.path().stem().string();
+    result = rom.info().title;
     result = result.substr(0, result.find_first_of('('));
 
     return result;
@@ -105,8 +102,8 @@ void RomMenu::reorganize()
         nameText->setPosition(SCREENSHOT_X_OFFSET, SCREENSHOT_Y_OFFSET);
         addChild(nameText);
 
-        auto year = rom.year() ? *(rom.year()) : "Unknown Year";
-        auto manufacturer = rom.manufacturer() ? *(rom.manufacturer()) : "Unknown Manufacturer";
+        auto year = rom.info().year ? *(rom.info().year) : "Unknown Year";
+        auto manufacturer = rom.info().manufacturer ? *(rom.info().manufacturer) : "Unknown Manufacturer";
         auto infoText = std::make_shared<TextNode>();
         infoText->element().setString(fmt::format("{}, {}", year, manufacturer));
         infoText->element().setFont(mFont);

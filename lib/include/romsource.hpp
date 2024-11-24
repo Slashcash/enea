@@ -7,7 +7,7 @@
 
 #include "exception.hpp"
 #include "rom/game.hpp"
-#include "rominfo.hpp"
+#include "rom/info.hpp"
 
 /**
  * @brief This class represents a source folder where to retrieve roms and theirs associated media.
@@ -36,7 +36,7 @@ class RomSource
     [[nodiscard]] virtual bool isFolder(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::vector<std::filesystem::path> scanFolder(const std::filesystem::path& folder) const;
     [[nodiscard]] static std::vector<std::filesystem::path> fileInFolder(const std::filesystem::path& folder);
-    [[nodiscard]] virtual std::optional<RomInfo> romInfo(const std::filesystem::path& path) const;
+    [[nodiscard]] virtual std::optional<Rom::Info> romInfo(const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::optional<std::string> lastFolderModification(const std::filesystem::path& path) const;
     [[nodiscard]] virtual bool writeCacheFile(const nlohmann::json& json, const std::filesystem::path& path) const;
     [[nodiscard]] virtual std::optional<nlohmann::json> readCacheFile(const std::filesystem::path& path) const;

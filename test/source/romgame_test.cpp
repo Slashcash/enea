@@ -12,13 +12,15 @@ static const bool ROM_IS_BIOS = false;
 
 static const std::filesystem::path SCREENSHOT_PATH = std::filesystem::absolute("sf2.png");
 
-static const RomInfo INFO_SET_COMPLETE{
+static const Rom::Info INFO_SET_COMPLETE{
     .title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
-static const RomInfo INFO_SET_TITLE_MISSING{.year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
-static const RomInfo INFO_SET_YEAR_MISSING{.title = ROM_TITLE, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
-static const RomInfo INFO_SET_MANUFACTURER_MISSING{.title = ROM_TITLE, .year = ROM_YEAR, .isBios = ROM_IS_BIOS};
-static const RomInfo INFO_SET_BIOS_MISSING{.title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER};
-static const RomInfo INFO_SET_EMPTY{};
+static const Rom::Info INFO_SET_TITLE_MISSING{
+    .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
+static const Rom::Info INFO_SET_YEAR_MISSING{
+    .title = ROM_TITLE, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
+static const Rom::Info INFO_SET_MANUFACTURER_MISSING{.title = ROM_TITLE, .year = ROM_YEAR, .isBios = ROM_IS_BIOS};
+static const Rom::Info INFO_SET_BIOS_MISSING{.title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER};
+static const Rom::Info INFO_SET_EMPTY{};
 
 static const RomMedia MEDIA_SET_COMPLETE{.screenshot = SCREENSHOT_PATH};
 static const RomMedia MEDIA_SET_SCREENSHOT_MISSING{};
@@ -37,10 +39,7 @@ TEST(Game, fromJson)
                                    {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
+    EXPECT_EQ(rom.info(), INFO_SET_COMPLETE);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -50,10 +49,7 @@ TEST(Game, fromJson)
     rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_FALSE(rom.title());
-    EXPECT_FALSE(rom.year());
-    EXPECT_FALSE(rom.manufacturer());
-    EXPECT_FALSE(rom.isBios());
+    EXPECT_EQ(rom.info(), INFO_SET_EMPTY);
     EXPECT_FALSE(rom.screenshot());
 
     /*
@@ -73,10 +69,7 @@ TEST(Game, fromJson)
                          {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_FALSE(rom.title());
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
+    EXPECT_EQ(rom.info(), INFO_SET_TITLE_MISSING);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -88,10 +81,7 @@ TEST(Game, fromJson)
                          {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_FALSE(rom.year());
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
+    EXPECT_EQ(rom.info(), INFO_SET_YEAR_MISSING);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -103,10 +93,7 @@ TEST(Game, fromJson)
                          {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_FALSE(rom.manufacturer());
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
+    EXPECT_EQ(rom.info(), INFO_SET_MANUFACTURER_MISSING);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -118,10 +105,6 @@ TEST(Game, fromJson)
                          {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_FALSE(rom.isBios());
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -133,10 +116,6 @@ TEST(Game, fromJson)
                          {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_FALSE(rom.title());
-    EXPECT_FALSE(rom.year());
-    EXPECT_FALSE(rom.manufacturer());
-    EXPECT_FALSE(rom.isBios());
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -148,10 +127,6 @@ TEST(Game, fromJson)
                          {Game::MEDIA_JSON_FIELD, MEDIA_SET_SCREENSHOT_MISSING}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_FALSE(rom.screenshot());
 
     /*
@@ -163,10 +138,6 @@ TEST(Game, fromJson)
                          {Game::MEDIA_JSON_FIELD, MEDIA_SET_EMPTY}};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_FALSE(rom.screenshot());
 }
 
@@ -180,17 +151,17 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::TITLE_JSON_FIELD] == ROM_TITLE);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::YEAR_JSON_FIELD] == ROM_YEAR);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
     EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD][RomMedia::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
@@ -203,13 +174,11 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD));
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD));
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD));
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD));
     EXPECT_FALSE(json.contains(Game::MEDIA_JSON_FIELD) &&
                  json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD));
 
@@ -220,17 +189,15 @@ TEST(Game, toJson)
     json = Game{ROM_PATH, INFO_SET_TITLE_MISSING, MEDIA_SET_COMPLETE};
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD));
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::YEAR_JSON_FIELD] == ROM_YEAR);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
     EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD][RomMedia::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
@@ -243,16 +210,16 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::TITLE_JSON_FIELD] == ROM_TITLE);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD));
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
     EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD][RomMedia::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
@@ -265,16 +232,16 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::TITLE_JSON_FIELD] == ROM_TITLE);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::YEAR_JSON_FIELD] == ROM_YEAR);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD));
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
     EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD][RomMedia::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
@@ -287,16 +254,16 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::TITLE_JSON_FIELD] == ROM_TITLE);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::YEAR_JSON_FIELD] == ROM_YEAR);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD));
     EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD][RomMedia::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
@@ -309,13 +276,11 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD));
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD));
     EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD));
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD));
+                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD));
     EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD) &&
                 json[Game::MEDIA_JSON_FIELD][RomMedia::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
@@ -328,17 +293,17 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::TITLE_JSON_FIELD] == ROM_TITLE);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::YEAR_JSON_FIELD] == ROM_YEAR);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
     EXPECT_FALSE(json.contains(Game::MEDIA_JSON_FIELD) &&
                  json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD));
 
@@ -350,17 +315,17 @@ TEST(Game, toJson)
 
     EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::TITLE_JSON_FIELD] == ROM_TITLE);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::YEAR_JSON_FIELD] == ROM_YEAR);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
     EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(RomInfo::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][RomInfo::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
+                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
+                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
     EXPECT_FALSE(json.contains(Game::MEDIA_JSON_FIELD) &&
                  json[Game::MEDIA_JSON_FIELD].contains(RomMedia::SCREENSHOT_JSON_FIELD));
 }
@@ -374,10 +339,6 @@ TEST(Game, fromConstructor)
     Game rom{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_COMPLETE};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -387,10 +348,6 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_FALSE(rom.title());
-    EXPECT_FALSE(rom.year());
-    EXPECT_FALSE(rom.manufacturer());
-    EXPECT_FALSE(rom.isBios());
     EXPECT_FALSE(rom.screenshot());
 
     /*
@@ -400,10 +357,6 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH, INFO_SET_TITLE_MISSING, MEDIA_SET_COMPLETE};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_FALSE(rom.title());
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -413,10 +366,6 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH, INFO_SET_YEAR_MISSING, MEDIA_SET_COMPLETE};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_FALSE(rom.year());
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -426,10 +375,6 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH, INFO_SET_MANUFACTURER_MISSING, MEDIA_SET_COMPLETE};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_FALSE(rom.manufacturer());
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -439,10 +384,6 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH, INFO_SET_BIOS_MISSING, MEDIA_SET_COMPLETE};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_FALSE(rom.isBios());
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -452,10 +393,6 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH, INFO_SET_EMPTY, MEDIA_SET_COMPLETE};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_FALSE(rom.title());
-    EXPECT_FALSE(rom.year());
-    EXPECT_FALSE(rom.manufacturer());
-    EXPECT_FALSE(rom.isBios());
     EXPECT_TRUE(rom.screenshot() && *(rom.screenshot()) == SCREENSHOT_PATH);
 
     /*
@@ -465,10 +402,6 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_SCREENSHOT_MISSING};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_FALSE(rom.screenshot());
 
     /*
@@ -478,9 +411,5 @@ TEST(Game, fromConstructor)
     rom = Game{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_EMPTY};
 
     EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.title() && *(rom.title()) == ROM_TITLE);
-    EXPECT_TRUE(rom.year() && *(rom.year()) == ROM_YEAR);
-    EXPECT_TRUE(rom.manufacturer() && *(rom.manufacturer()) == ROM_MANUFACTURER);
-    EXPECT_TRUE(rom.isBios() && *(rom.isBios()) == ROM_IS_BIOS);
     EXPECT_FALSE(rom.screenshot());
 }

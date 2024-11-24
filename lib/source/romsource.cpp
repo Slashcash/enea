@@ -148,7 +148,7 @@ bool RomSource::fileIsRom(const std::filesystem::path& path)
     return path.extension() == ".zip";
 }
 
-std::optional<RomInfo> RomSource::romInfo(const std::filesystem::path& path) const
+std::optional<Rom::Info> RomSource::romInfo(const std::filesystem::path& path) const
 {
     spdlog::trace("Querying rom database for: {}", path.stem().string());
     return Rom::Database::get().find(path.stem().string());
