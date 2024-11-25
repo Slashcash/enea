@@ -6,60 +6,75 @@
 
 static const std::filesystem::path home = "/home";
 static const std::filesystem::path base = home / ("." + std::string(executableName));
-static const std::filesystem::path roms = base / "roms";
-static const std::filesystem::path cache = base / "cache";
 
-class ConfigurationFixture : public ::testing::Test
+/*
+    Asking for the folder where to store the roms.
+    Expectation: we get an hidden folder constructed with the home directory + .enea + roms.
+*/
+TEST(Configuration, romDirectory)
 {
- protected:
     ConfigurationMock config;
-};
-
-TEST_F(ConfigurationFixture, romDirectory)
-{
-    /*
-        Asking for the folder where to store the roms.
-        Expectation: We get an hidden folder constructed with the home directory + enea.
-    */
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
 
-    EXPECT_EQ(config.romDirectory(), roms);
+    EXPECT_EQ(config.romDirectory(), base / "roms");
 }
 
-TEST_F(ConfigurationFixture, cacheFile)
+/*
+    Asking for the folder where to store the roms but we fail to retrieve home.
+    Expectation: we throw.
+*/
+TEST(Configuration, romDirectoryNoHome)
 {
-    /*
-        Asking for the file where to store the rom cache.
-        Expectation: We get a file name constructed with the home directory + .enea + cache.json.
-    */
+    ConfigurationMock config;
+    EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
+
+    EXPECT_THROW(config.romDirectory(), ConfigurationMock::Exception);
+}
+
+/*
+    Asking for the directory where to store the rom cache.
+    Expectation: we get a directory name constructed with the home directory + .enea + cache.
+*/
+TEST(Configuration, cacheDirectory)
+{
+    ConfigurationMock config;
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
 
-    EXPECT_EQ(config.cacheDirectory(), cache);
+    EXPECT_EQ(config.cacheDirectory(), base / "cache");
 }
 
-TEST_F(ConfigurationFixture, advMameConfigurationFile)
+/*
+    Asking for directory where to store the rom cache but we fail to retrieve home.
+    Expectation: we throw.
+*/
+TEST(Configuration, cacheDirectoryNoHome)
 {
+    ConfigurationMock config;
+    EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
+
+    EXPECT_THROW(config.cacheDirectory(), ConfigurationMock::Exception);
+}
+
+/*
+    Asking for the advMame configuration file.
+    Expectation: we get a file name constructed with home + .enea + advmame.rc
+*/
+TEST(Configuration, advMameConfigurationFile)
+{
+    ConfigurationMock config;
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
 
     EXPECT_EQ(config.advMameConfigurationFile(), base / "advmame.rc");
 }
 
-TEST_F(ConfigurationFixture, romDirectory_noHome)
+/*
+    Asking for the advMame configuration file. but we fail to retrieve home
+    Expectation: we throw.
+*/
+TEST(Configuration, advMameConfigurationFileNoHome)
 {
-    /*
-        Asking for the place where to store the roms but we are unable to get the home directory.
-        Expectation: We throw an exception.
-    */
+    ConfigurationMock config;
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(config.romDirectory(), Conf::Exception);
-}
 
-TEST_F(ConfigurationFixture, cacheFile_noHome)
-{
-    /*
-        Asking for the file where to store the rom cache but we are unable to get the home directory.
-        Expectation: We throw an exception.
-    */
-    EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(config.cacheDirectory(), Conf::Exception);
+    EXPECT_THROW(config.advMameConfigurationFile(), ConfigurationMock::Exception);
 }

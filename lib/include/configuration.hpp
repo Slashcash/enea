@@ -5,11 +5,8 @@
 #include <optional>
 
 #include "exception.hpp"
+#include "singleton.hpp"
 
-/**
- * @brief This class manages the software configuration. Since the configuration
- * is meant to be unique it is then wrapped into a singleton
- */
 class Conf
 {
  private:
@@ -37,16 +34,6 @@ class Conf
     virtual ~Conf() = default;
 };
 
-class Configuration
-{
- public:
-    Configuration() = delete;
-
-    [[nodiscard]] inline static Conf& get()
-    {
-        static Conf conf;
-        return conf;
-    }
-};
+using Configuration = Singleton<Conf>;
 
 #endif // CONFIGURATION_HPP
