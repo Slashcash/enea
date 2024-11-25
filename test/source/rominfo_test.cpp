@@ -27,6 +27,15 @@ TEST(RomInfo, fromCompleteJson)
 }
 
 /*
+    Building RomInfo from an empty json.
+    Expectation: We throw.
+*/
+TEST(RomInfo, fromEmptyJson)
+{
+    EXPECT_THROW((Rom::Info{nlohmann::json{}}), nlohmann::json::exception);
+}
+
+/*
     Building RomInfo from a json which has a missing title.
     Expectation: We throw as title is mandatory information.
 */
@@ -71,21 +80,16 @@ TEST(RomInfo, fromJsonMissingYear)
 
 /*
     Building RomInfo from a json which has an invalid year.
-    Expectation: RomInfo struct has every field correctly set apart for year which should be empty.
+    Expectation: We throw.
 */
 TEST(RomInfo, fromJsonInvalidYear)
 {
-    auto romInfo = nlohmann::json{
-        {Rom::Info::TITLE_JSON_FIELD, ROM_TITLE},
-        {Rom::Info::YEAR_JSON_FIELD, 0},
-        {Rom::Info::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
-        {Rom::Info::ISBIOS_JSON_FIELD,
-         ROM_IS_BIOS}}.template get<Rom::Info>();
-
-    EXPECT_TRUE(romInfo.title == ROM_TITLE);
-    EXPECT_FALSE(romInfo.year);
-    EXPECT_TRUE(romInfo.manufacturer && *(romInfo.manufacturer) == ROM_MANUFACTURER);
-    EXPECT_TRUE(romInfo.isBios && *(romInfo.isBios) == ROM_IS_BIOS);
+    EXPECT_THROW((Rom::Info{nlohmann::json{{Rom::Info::TITLE_JSON_FIELD, ROM_TITLE},
+                                           {Rom::Info::YEAR_JSON_FIELD, 0},
+                                           {Rom::Info::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
+                                           {Rom::Info::ISBIOS_JSON_FIELD, ROM_IS_BIOS}}
+                                .template get<Rom::Info>()}),
+                 nlohmann::json::exception);
 }
 
 /*
@@ -108,22 +112,16 @@ TEST(RomInfo, fromJsonMissingManufacturer)
 
 /*
     Building RomInfo from a json which has an invalid manufacturer.
-    Expectation: RomInfo struct has every field correctly set apart for manufacturer which should be empty
+    Expectation: We throw.
 */
 TEST(RomInfo, fromJsonInvalidManufacturer)
 {
-
-    auto romInfo = nlohmann::json{
-        {Rom::Info::TITLE_JSON_FIELD, ROM_TITLE},
-        {Rom::Info::MANUFACTURER_JSON_FIELD, 0},
-        {Rom::Info::YEAR_JSON_FIELD, ROM_YEAR},
-        {Rom::Info::ISBIOS_JSON_FIELD,
-         ROM_IS_BIOS}}.template get<Rom::Info>();
-
-    EXPECT_TRUE(romInfo.title == ROM_TITLE);
-    EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
-    EXPECT_FALSE(romInfo.manufacturer);
-    EXPECT_TRUE(romInfo.isBios && *(romInfo.isBios) == ROM_IS_BIOS);
+    EXPECT_THROW((Rom::Info{nlohmann::json{{Rom::Info::TITLE_JSON_FIELD, ROM_TITLE},
+                                           {Rom::Info::MANUFACTURER_JSON_FIELD, 0},
+                                           {Rom::Info::YEAR_JSON_FIELD, ROM_YEAR},
+                                           {Rom::Info::ISBIOS_JSON_FIELD, ROM_IS_BIOS}}
+                                .template get<Rom::Info>()}),
+                 nlohmann::json::exception);
 }
 
 /*
@@ -145,20 +143,16 @@ TEST(RomInfo, fromJsonMissingBios)
 
 /*
     Building RomInfo from a json which has an incomplete bios.
-    Expectation: RomInfo struct has every field correctly set apart fo bios which should be empty.
+    Expectation: We throw.
 */
 TEST(RomInfo, fromJsonInvalidBios)
 {
-    auto romInfo = nlohmann::json{{Rom::Info::TITLE_JSON_FIELD, ROM_TITLE},
-                                  {Rom::Info::YEAR_JSON_FIELD, ROM_YEAR},
-                                  {Rom::Info::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
-                                  {Rom::Info::ISBIOS_JSON_FIELD, "invalid"}}
-                       .template get<Rom::Info>();
-
-    EXPECT_TRUE(romInfo.title == ROM_TITLE);
-    EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
-    EXPECT_TRUE(romInfo.manufacturer && *(romInfo.manufacturer) == ROM_MANUFACTURER);
-    EXPECT_FALSE(romInfo.isBios);
+    EXPECT_THROW((Rom::Info{nlohmann::json{{Rom::Info::TITLE_JSON_FIELD, ROM_TITLE},
+                                           {Rom::Info::YEAR_JSON_FIELD, ROM_YEAR},
+                                           {Rom::Info::MANUFACTURER_JSON_FIELD, ROM_MANUFACTURER},
+                                           {Rom::Info::ISBIOS_JSON_FIELD, "invalid"}}
+                                .template get<Rom::Info>()}),
+                 nlohmann::json::exception);
 }
 
 /*

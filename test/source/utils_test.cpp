@@ -67,8 +67,7 @@ TEST(Utils, getEmptyValueFromJson)
         Expectation: an empty value will be returned
     */
     nlohmann::json json;
-    auto optValue = utils::getOptionalValueFromJson<std::string>(json, "field");
-    ASSERT_FALSE(optValue);
+    EXPECT_THROW(utils::getOptionalValueFromJson<std::string>(json, "field"), nlohmann::json::exception);
 }
 
 TEST(Utils, getMandatoryValueFromJson)

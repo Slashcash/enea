@@ -1,85 +1,80 @@
-#include "rommedia.hpp"
+#include "rom/media.hpp"
 
 #include <gtest/gtest.h>
 
 static const std::filesystem::path SCREENSHOT_PATH = std::filesystem::absolute("sf2.png");
 
-TEST(RomMedia, fromJsonComplete)
+/*
+    Building RomMedia from a json which has a complete set of information.
+    Expectation: RomMedia struct has every field correctly set.
+*/
+TEST(RomMedia, fromCompleteJson)
 {
-    /*
-        Building RomMedia from a json which has a complete set of information.
-        Expectation: RomMedia struct has every field correctly set.
-    */
-    auto romMedia = nlohmann::json{{RomMedia::SCREENSHOT_JSON_FIELD, SCREENSHOT_PATH}}.template get<RomMedia>();
+    auto romMedia = nlohmann::json{{Rom::Media::SCREENSHOT_JSON_FIELD, SCREENSHOT_PATH}}.template get<Rom::Media>();
 
     EXPECT_TRUE(romMedia.screenshot && *(romMedia.screenshot) == SCREENSHOT_PATH);
 }
 
+/*
+    Building RomMedia from an empty json.
+    Expectation: We throw.
+*/
+TEST(RomMedia, fromEmptyJson)
+{
+    EXPECT_THROW(nlohmann::json{}.template get<Rom::Media>(), nlohmann::json::exception);
+}
+
+/*
+    Building RomMedia from a json which has an incomplete set of information. It misses the screenshot.
+    Expectation: We throw.
+*/
 TEST(RomMedia, fromJsonMissingScreenshot)
 {
-    /*
-        Building RomMedia from a json which has an incomplete set of information. It misses the screenshot.
-        Expectation: RomMedia struct has every field correctly set apart for screenshot which should be empty.
-    */
-    auto romMedia = nlohmann::json{}.template get<RomMedia>();
-
-    EXPECT_FALSE(romMedia.screenshot);
+    EXPECT_THROW(nlohmann::json{}.template get<Rom::Media>(), nlohmann::json::exception);
 }
 
-TEST(RomMedia, fromJsonRandomData)
+/*
+    Building RomMedia from a json with an invalid screenshot path.
+    Expectation: We throw.
+*/
+TEST(RomMedia, fromJsonInvalidScreenshot)
 {
-    /*
-        Building RomMedia from an invalid json (it contains random data).
-        Expectation: RomMedia struct has no field set.
-    */
-    auto romMedia = nlohmann::json{{"error", "ignored"}}.template get<RomMedia>();
-
-    EXPECT_FALSE(romMedia.screenshot);
+    EXPECT_THROW((nlohmann::json{{Rom::Media::SCREENSHOT_JSON_FIELD, 0}}.template get<Rom::Media>()),
+                 nlohmann::json::exception);
 }
 
-TEST(RomMedia, fromJsonEmpty)
-{
-    /*
-        Building RomMedia from an empty json.
-        Expectation: RomInfo struct has no field set.
-    */
-    auto romMedia = nlohmann::json{}.template get<RomMedia>();
-
-    EXPECT_FALSE(romMedia.screenshot);
-}
-
+/*
+    Building JSON from RomMedia which has a complete set of information.
+    Expectation: the JSON has every field correctly set.
+ */
 TEST(RomMedia, toJsonComplete)
 {
-    /*
-        Building JSON from RomMedia which has a complete set of information.
-        Expectation: the JSON has every field correctly set.
-     */
-    nlohmann::json json = RomMedia{
+    nlohmann::json json = Rom::Media{
         .screenshot = SCREENSHOT_PATH,
     };
 
-    EXPECT_TRUE(json.contains(RomMedia::SCREENSHOT_JSON_FIELD) &&
-                json[RomMedia::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
+    EXPECT_TRUE(json.contains(Rom::Media::SCREENSHOT_JSON_FIELD) &&
+                json[Rom::Media::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
 }
 
+/*
+    Building JSON from RomMedia which has an incomplete set of information. It misses screenshot.
+    Expectation: the JSON has every field correctly set apart for screenshot which should be empty.
+*/
 TEST(RomMedia, toJsonMissingScreenshot)
 {
-    /*
-        Building JSON from RomMedia which has an incomplete set of information. It misses screenshot.
-        Expectation: the JSON has every field correctly set apart for screenshot which should be empty.
-    */
-    nlohmann::json json = RomMedia{};
+    nlohmann::json json = Rom::Media{};
 
-    EXPECT_FALSE(json.contains(RomMedia::SCREENSHOT_JSON_FIELD));
+    EXPECT_FALSE(json.contains(Rom::Media::SCREENSHOT_JSON_FIELD));
 }
 
+/*
+    Building JSON from empty RomMedia.
+    Expectation: the JSON has no field set.
+ */
 TEST(RomMedia, toJsonEmpty)
 {
-    /*
-        Building JSON from empty RomMedia.
-        Expectation: the JSON has no field set.
-     */
-    nlohmann::json json = RomMedia{};
+    nlohmann::json json = Rom::Media{};
 
-    EXPECT_FALSE(json.contains(RomMedia::SCREENSHOT_JSON_FIELD));
+    EXPECT_FALSE(json.contains(Rom::Media::SCREENSHOT_JSON_FIELD));
 }

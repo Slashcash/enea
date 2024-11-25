@@ -13,8 +13,7 @@ add_library(
   include/emulator.hpp
   source/emulator.cpp
   include/rom/info.hpp
-  include/rommedia.hpp
-  source/rommedia.cpp
+  include/rom/media.hpp
   include/utils.hpp
   include/singleton.hpp)
 
