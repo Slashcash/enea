@@ -1,5 +1,6 @@
 #include "rom/game.hpp"
 
+#include "spdlog/spdlog.h"
 #include <gtest/gtest.h>
 #include <nlohmann/json.hpp>
 
@@ -12,385 +13,167 @@ static const bool ROM_IS_BIOS = false;
 
 static const std::filesystem::path SCREENSHOT_PATH = std::filesystem::absolute("sf2.png");
 
-static const Rom::Info INFO_SET_COMPLETE{
+static const Rom::Info INFO_COMPLETE{
     .title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
-static const Rom::Info INFO_SET_TITLE_MISSING{
-    .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
-static const Rom::Info INFO_SET_YEAR_MISSING{
-    .title = ROM_TITLE, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
-static const Rom::Info INFO_SET_MANUFACTURER_MISSING{.title = ROM_TITLE, .year = ROM_YEAR, .isBios = ROM_IS_BIOS};
-static const Rom::Info INFO_SET_BIOS_MISSING{.title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER};
-static const Rom::Info INFO_SET_EMPTY{};
 
-static const Rom::Media MEDIA_SET_COMPLETE{.screenshot = SCREENSHOT_PATH};
-static const Rom::Media MEDIA_SET_SCREENSHOT_MISSING{};
-static const Rom::Media MEDIA_SET_EMPTY{};
+static const Rom::Media MEDIA_COMPLETE{.screenshot = SCREENSHOT_PATH};
 
 using namespace Rom;
 
-TEST(Game, fromJson)
+/*
+    We construct a game.
+    Expectation: the game is correctly constructed.
+*/
+TEST(Game, construct)
 {
-    /*
-        Building Game from a json which contains all the information.
-        Expectation: Game is correctly built and every field is correctly set.
-    */
-    auto rom = Game{nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                                   {Game::INFO_JSON_FIELD, INFO_SET_COMPLETE},
-                                   {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_EQ(rom.info(), INFO_SET_COMPLETE);
-
-    /*
-        Building Game from a json which only contains the rom path.
-        Expectation: Game is correctly built but contains no additional information except from path.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_EQ(rom.info(), INFO_SET_EMPTY);
-
-    /*
-        Building Game from a json which does not contain a path.
-        Expectation: Construction will throw since this should not be allowed.
-    */
-    EXPECT_THROW((Game{nlohmann::json{{Game::INFO_JSON_FIELD, INFO_SET_COMPLETE},
-                                      {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}}}),
-                 Game::Exception);
-
-    /*
-        Building Game from a json which contains all the information except for the rom title.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom title.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                         {Game::INFO_JSON_FIELD, INFO_SET_TITLE_MISSING},
-                         {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_EQ(rom.info(), INFO_SET_TITLE_MISSING);
-
-    /*
-        Building Game from a json which contains all the information except for the rom year.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom year.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                         {Game::INFO_JSON_FIELD, INFO_SET_YEAR_MISSING},
-                         {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_EQ(rom.info(), INFO_SET_YEAR_MISSING);
-
-    /*
-        Building Game from a json which contains all the information except for the rom manufacturer.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom manufacturer.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                         {Game::INFO_JSON_FIELD, INFO_SET_MANUFACTURER_MISSING},
-                         {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_EQ(rom.info(), INFO_SET_MANUFACTURER_MISSING);
-
-    /*
-        Building Game from a json which contains all the information except for the rom bios.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom bios.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                         {Game::INFO_JSON_FIELD, INFO_SET_BIOS_MISSING},
-                         {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-
-    /*
-        Building Game from a json which contains no information.
-        Expectation: Game is correctly built and no information is set.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                         {Game::INFO_JSON_FIELD, INFO_SET_EMPTY},
-                         {Game::MEDIA_JSON_FIELD, MEDIA_SET_COMPLETE}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-
-    /*
-        Building Game from a json which contains all the information except for the screenshot.
-        Expectation: Game is correctly built and every field is correctly set apart from the screenshot.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                         {Game::INFO_JSON_FIELD, INFO_SET_COMPLETE},
-                         {Game::MEDIA_JSON_FIELD, MEDIA_SET_SCREENSHOT_MISSING}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
-
-    /*
-        Building Game from a json which contains no media information.
-        Expectation: Game is correctly built and no media is set.
-    */
-    rom = nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
-                         {Game::INFO_JSON_FIELD, INFO_SET_COMPLETE},
-                         {Game::MEDIA_JSON_FIELD, MEDIA_SET_EMPTY}};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
+    Rom::Game game(ROM_PATH, INFO_COMPLETE, MEDIA_COMPLETE);
+    EXPECT_EQ(game.path(), ROM_PATH);
+    EXPECT_EQ(game.info(), INFO_COMPLETE);
+    EXPECT_TRUE(game.media() && *(game.media()) == MEDIA_COMPLETE);
 }
 
-TEST(Game, toJson)
+/*
+    We construct a game from a complete json.
+    Expectation: the game is correctly constructed.
+*/
+TEST(Game, fromCompleteJson)
 {
-    /*
-        Building a JSON from a rom that contains all the information.
-        Expectation: json contains all the information.
-    */
-    nlohmann::json json = Game{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_COMPLETE};
+    auto game = Game{nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH},
+                                    {Game::INFO_JSON_FIELD, INFO_COMPLETE},
+                                    {Game::MEDIA_JSON_FIELD, MEDIA_COMPLETE}}};
 
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
-    EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD][Rom::Media::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
-
-    /*
-        Building a JSON from a rom that only contains a path.
-        Expectation: json only contains info about the path.
-    */
-    json = Game{ROM_PATH};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD));
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD));
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD));
-    EXPECT_FALSE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                 json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD));
-
-    /*
-        Building a JSON from a rom that contains all the information except for the rom title.
-        Expectation: json contains all the information except for the rom title.
-    */
-    json = Game{ROM_PATH, INFO_SET_TITLE_MISSING, MEDIA_SET_COMPLETE};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
-    EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD][Rom::Media::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
-
-    /*
-        Building a JSON from a rom that contains all the information except the rom year.
-        Expectation: json contains all the information except for the rom year.
-    */
-    json = Game{ROM_PATH, INFO_SET_YEAR_MISSING, MEDIA_SET_COMPLETE};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD));
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
-    EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD][Rom::Media::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
-
-    /*
-        Building a JSON from a rom that contains all the information except the rom manufacturer.
-        Expectation: json contains all the information except for the rom manufacturer.
-    */
-    json = Game{ROM_PATH, INFO_SET_MANUFACTURER_MISSING, MEDIA_SET_COMPLETE};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD));
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
-    EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD][Rom::Media::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
-
-    /*
-        Building a JSON from a rom that contains all the information except for the bios.
-        Expectation: json contains all the information except for the bios.
-    */
-    json = Game{ROM_PATH, INFO_SET_BIOS_MISSING, MEDIA_SET_COMPLETE};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD));
-    EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD][Rom::Media::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
-
-    /*
-        Building a JSON from a rom that contains no rom info.
-        Expectation: json contains no rom info.
-    */
-    json = Game{ROM_PATH, INFO_SET_EMPTY, MEDIA_SET_COMPLETE};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD));
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD));
-    EXPECT_FALSE(json.contains(Game::INFO_JSON_FIELD) &&
-                 json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD));
-    EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD) &&
-                json[Game::MEDIA_JSON_FIELD][Rom::Media::SCREENSHOT_JSON_FIELD] == SCREENSHOT_PATH.string());
-
-    /*
-        Building a JSON from a rom that contains all the information except the screenshot.
-        Expectation: json contains all the information except for the screenshot.
-    */
-    json = Game{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_SCREENSHOT_MISSING};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
-    EXPECT_FALSE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                 json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD));
-
-    /*
-        Building a JSON from a rom that contains no rom media.
-        Expectation: json contains no rom media.
-    */
-    json = Game{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_EMPTY};
-
-    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::TITLE_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::TITLE_JSON_FIELD] == ROM_TITLE);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::YEAR_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::YEAR_JSON_FIELD] == ROM_YEAR);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::MANUFACTURER_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::MANUFACTURER_JSON_FIELD] == ROM_MANUFACTURER);
-    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD].contains(Rom::Info::ISBIOS_JSON_FIELD) &&
-                json[Game::INFO_JSON_FIELD][Rom::Info::ISBIOS_JSON_FIELD] == ROM_IS_BIOS);
-    EXPECT_FALSE(json.contains(Game::MEDIA_JSON_FIELD) &&
-                 json[Game::MEDIA_JSON_FIELD].contains(Rom::Media::SCREENSHOT_JSON_FIELD));
+    EXPECT_EQ(game.path(), ROM_PATH);
+    EXPECT_EQ(game.info(), INFO_COMPLETE);
+    EXPECT_TRUE(game.media() && *(game.media()) == MEDIA_COMPLETE);
 }
 
-TEST(Game, fromConstructor)
+/*
+    We construct a game from an empty json.
+    Expectation: we throw.
+*/
+TEST(Game, fromEmptyJson)
 {
-    /*
-        Building Game from a constructor which contains all the information.
-        Expectation: Game is correctly built and every field is correctly set.
-    */
-    Game rom{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_COMPLETE};
+    EXPECT_THROW((Game{nlohmann::json{}}), nlohmann::json::exception);
+}
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
+/*
+    We construct a game from a json missing the rom path.
+    Expectation: we throw.
+*/
+TEST(Game, fromJsonMissingPath)
+{
+    EXPECT_THROW(
+        (Game{nlohmann::json{{Game::INFO_JSON_FIELD, INFO_COMPLETE}, {Game::MEDIA_JSON_FIELD, MEDIA_COMPLETE}}}),
+        nlohmann::json::exception);
+}
 
-    /*
-        Building Game from a constructor which only contains the rom path.
-        Expectation: Game is correctly built but contains no additional information except from path.
-    */
-    rom = Game{ROM_PATH};
+/*
+    We construct a game from a json with an invalid path.
+    Expectation: we throw.
+*/
+TEST(Game, fromJsonInvalidPath)
+{
+    EXPECT_THROW((Game{nlohmann::json{{Game::PATH_JSON_FIELD, 0},
+                                      {Game::INFO_JSON_FIELD, INFO_COMPLETE},
+                                      {Game::MEDIA_JSON_FIELD, MEDIA_COMPLETE}}}),
+                 nlohmann::json::exception);
+}
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    /*
-        Building Game from a constructor which contains all the information except for the rom title.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom title.
-    */
-    rom = Game{ROM_PATH, INFO_SET_TITLE_MISSING, MEDIA_SET_COMPLETE};
+/*
+    We construct a game from a json with missing info.
+    Expectation: we throw.
+*/
+TEST(Game, fromJsonMissingInfo)
+{
+    EXPECT_THROW((Game{nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH}, {Game::MEDIA_JSON_FIELD, MEDIA_COMPLETE}}}),
+                 nlohmann::json::exception);
+}
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
+/*
+    We construct a game from a json with missing infos.
+    Expectation: we throw.
+*/
+TEST(Game, fromJsonInvalidInfo)
+{
+    EXPECT_THROW(
+        (Game{nlohmann::json{
+            {Game::PATH_JSON_FIELD, ROM_PATH}, {Game::INFO_JSON_FIELD, 0}, {Game::MEDIA_JSON_FIELD, MEDIA_COMPLETE}}}),
+        nlohmann::json::exception);
+}
 
-    /*
-        Building Game from a constructor which contains all the information except for the rom year.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom year.
-    */
-    rom = Game{ROM_PATH, INFO_SET_YEAR_MISSING, MEDIA_SET_COMPLETE};
+/*
+    We construct a game from a json with missing medias.
+    Expectation: the game is correctly constructed as this is an optional field.
+*/
+TEST(Game, fromJsonMissingMedia)
+{
+    auto game = Game{nlohmann::json{{Game::PATH_JSON_FIELD, ROM_PATH}, {Game::INFO_JSON_FIELD, INFO_COMPLETE}}};
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
+    EXPECT_EQ(game.path(), ROM_PATH);
+    EXPECT_EQ(game.info(), INFO_COMPLETE);
+    EXPECT_FALSE(game.media());
+}
 
-    /*
-        Building Game from a json constructor contains all the information except for the rom manufacturer.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom manufacturer.
-    */
-    rom = Game{ROM_PATH, INFO_SET_MANUFACTURER_MISSING, MEDIA_SET_COMPLETE};
+/*
+    We construct a game from a json with invalid media.
+    Expectation: we throw.
+*/
+TEST(Game, fromJsonInvalidMedia)
+{
+    EXPECT_THROW(
+        (Game{nlohmann::json{
+            {Game::PATH_JSON_FIELD, ROM_PATH}, {Game::INFO_JSON_FIELD, INFO_COMPLETE}, {Game::MEDIA_JSON_FIELD, 0}}}),
+        nlohmann::json::exception);
+}
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
+/*
+    We convert a complete game to a json.
+    Expectation: the json is correctly constructed.
+*/
+TEST(Game, toJsonComplete)
+{
+    nlohmann::json json(Rom::Game(ROM_PATH, INFO_COMPLETE, MEDIA_COMPLETE));
 
-    /*
-        Building Game from a constructor which contains all the information except for the rom bios.
-        Expectation: Game is correctly built and every field is correctly set apart from the rom bios.
-    */
-    rom = Game{ROM_PATH, INFO_SET_BIOS_MISSING, MEDIA_SET_COMPLETE};
+    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
+    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
+                json.at(Game::INFO_JSON_FIELD).get<Rom::Info>() == INFO_COMPLETE);
+    EXPECT_TRUE(json.contains(Game::MEDIA_JSON_FIELD) &&
+                json.at(Game::MEDIA_JSON_FIELD).get<Rom::Media>() == MEDIA_COMPLETE);
+}
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
+/*
+    We convert a game with missing media to a json.
+    Expectation: the json is correctly constructed without the media.
+*/
+TEST(Game, toJsonMissingMedia)
+{
+    nlohmann::json json(Rom::Game(ROM_PATH, INFO_COMPLETE));
 
-    /*
-        Building Game from a constructor which contains no information.
-        Expectation: Game is correctly built and no information is set.
-    */
-    rom = Game{ROM_PATH, INFO_SET_EMPTY, MEDIA_SET_COMPLETE};
+    EXPECT_TRUE(json.contains(Game::PATH_JSON_FIELD) && json[Game::PATH_JSON_FIELD] == ROM_PATH.string());
+    EXPECT_TRUE(json.contains(Game::INFO_JSON_FIELD) &&
+                json.at(Game::INFO_JSON_FIELD).get<Rom::Info>() == INFO_COMPLETE);
+    EXPECT_FALSE(json.contains(Game::MEDIA_JSON_FIELD));
+}
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
+/*
+    We compare two games.
+    Expectation: they are equal if their path matches.
+*/
+TEST(Game, compare)
+{
+    // Even though their title don't match we considering matching paths as enough
+    Rom::Game game1(ROM_PATH, INFO_COMPLETE);
+    Rom::Game game2(ROM_PATH, Rom::Info{.title{"Metal Slug"}});
 
-    /*
-        Building Game from a constructor which contains all the information except for the screenshot.
-        Expectation: Game is correctly built and every field is correctly set apart from the screenshot.
-    */
-    rom = Game{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_SCREENSHOT_MISSING};
+    EXPECT_TRUE(game1 == game2);
+}
 
-    EXPECT_EQ(rom.path(), ROM_PATH);
-
-    /*
-        Building Game from a constructor which contains no media information.
-        Expectation: Game is correctly built and no media is set.
-    */
-    rom = Game{ROM_PATH, INFO_SET_COMPLETE, MEDIA_SET_EMPTY};
-
-    EXPECT_EQ(rom.path(), ROM_PATH);
+/*
+    We convert a game to a string.
+    Expectation: The rom title is returned.
+*/
+TEST(Game, toString)
+{
+    Rom::Game game(ROM_PATH, INFO_COMPLETE);
+    EXPECT_EQ(game.toString(), ROM_TITLE);
 }

@@ -11,6 +11,8 @@ struct Media
 {
     static constexpr std::string_view SCREENSHOT_JSON_FIELD = "screenshot";
     std::optional<std::filesystem::path> screenshot;
+
+    bool operator==(const Media&) const = default;
 };
 
 inline void to_json(nlohmann::json& json, const Rom::Media& media)

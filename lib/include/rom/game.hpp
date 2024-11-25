@@ -2,6 +2,7 @@
 #define ROMGAME_HPP
 
 #include <filesystem>
+#include <fmt/format.h>
 #include <map>
 #include <nlohmann/adl_serializer.hpp>
 #include <nlohmann/detail/json_pointer.hpp>
@@ -14,38 +15,30 @@
 #include "exception.hpp"
 #include "rom/info.hpp"
 #include "rom/media.hpp"
+#include "utils.hpp"
 
 namespace Rom {
-/**
- * @brief This struct represents a game rom within the context of this software. Roms are meant to be
- * launched by AdvMAME and are generally identified by their path on the filesystem.
- * This class also stores information related to roms and the medias associated to it.
- */
 class Game
 {
  private:
     std::filesystem::path mPath;
-    // This info should really become an optional
     Rom::Info mInfo;
-    Rom::Media mMedia;
+    std::optional<Rom::Media> mMedia;
 
  public:
     static constexpr std::string_view PATH_JSON_FIELD = "path";
     static constexpr std::string_view INFO_JSON_FIELD = "info";
     static constexpr std::string_view MEDIA_JSON_FIELD = "media";
 
-    class Exception : public enea::Exception
-    {
-        using enea::Exception::Exception;
-    };
-
     Game() = delete;
-    explicit Game(std::filesystem::path path);
-    explicit Game(std::filesystem::path path, Rom::Info info, Rom::Media media);
+    explicit Game(const std::filesystem::path& path, const Rom::Info& info,
+                  const std::optional<Rom::Media>& media = std::nullopt);
 
     [[nodiscard]] std::filesystem::path path() const;
     [[nodiscard]] Rom::Info info() const;
-    [[nodiscard]] Rom::Media media() const;
+    [[nodiscard]] std::optional<Rom::Media> media() const;
+
+    [[nodiscard]] std::string toString() const;
 
     [[nodiscard]] bool operator==(const Game& game) const;
 };
@@ -59,40 +52,11 @@ template <> struct adl_serializer<Rom::Game>
 {
     static Rom::Game from_json(const json& json)
     {
-        // Finding rom path
-        std::filesystem::path romPath;
-        try
-        {
-            json.at(Rom::Game::PATH_JSON_FIELD).get_to(romPath);
-        }
-        catch (const json::exception& e)
-        {
-            throw Rom::Game::Exception("Rom constructed from invalid json, mandatory path field is missing");
-        }
+        auto romPath = json.at(Rom::Game::PATH_JSON_FIELD).get<std::filesystem::path>();
+        auto romInfo = json.at(Rom::Game::INFO_JSON_FIELD).get<Rom::Info>();
+        auto romMedia = utils::getOptionalValueFromJson<Rom::Media>(json, Rom::Game::MEDIA_JSON_FIELD);
 
-        // Finding rom info
-        Rom::Info romInfo;
-        try
-        {
-            romInfo = json.at(Rom::Game::INFO_JSON_FIELD).get<Rom::Info>();
-        }
-        catch ([[maybe_unused]] const json::exception& e)
-        {
-            // Nothing happening if it is not present as this field is optional
-        }
-
-        // Finding rom media
-        Rom::Media romMedia;
-        try
-        {
-            romMedia = json.at(Rom::Game::MEDIA_JSON_FIELD).get<Rom::Media>();
-        }
-        catch ([[maybe_unused]] const json::exception& e)
-        {
-            // Do not do anything, no media is allowed
-        }
-
-        Rom::Game rom{romPath, romInfo, romMedia};
+        Rom::Game rom(romPath, romInfo, romMedia);
 
         return rom;
     }
@@ -108,9 +72,17 @@ template <> struct adl_serializer<Rom::Game>
         json[Rom::Game::INFO_JSON_FIELD] = rom.info();
 
         // Setting rom media
-        json[Rom::Game::MEDIA_JSON_FIELD] = rom.media();
+        utils::addOptionalToJson<Rom::Media>(json, Rom::Game::MEDIA_JSON_FIELD, rom.media());
     }
 };
 } // namespace nlohmann
+
+template <> struct fmt::formatter<Rom::Game> : fmt::formatter<string_view>
+{
+    auto format(const Rom::Game& game, fmt::format_context& ctx) const -> fmt::format_context::iterator
+    {
+        return fmt::formatter<string_view>::format(game.toString(), ctx);
+    }
+};
 
 #endif // ROMGAME_HPP
