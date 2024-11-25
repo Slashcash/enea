@@ -34,8 +34,8 @@ class EmulatorFixture : public ::testing::Test
 {
  protected:
     EmulatorMock emulator;
-    Rom::Game rom{ROM_PATH};
-    Rom::Game romPathInvalid{ROM_PATH_INVALID};
+    Rom::Game rom{ROM_PATH, Rom::Info{.title{"Street Fighter II"}}};
+    Rom::Game romPathInvalid{ROM_PATH_INVALID, Rom::Info{.title{"Street Fighter II"}}};
 };
 
 TEST_F(EmulatorFixture, info)

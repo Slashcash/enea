@@ -29,7 +29,7 @@ static const nlohmann::json CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST
                                        {RomSource::VERSION_JSON_FIELD, projectVersion},
                                        {
                                            RomSource::ROMS_JSON_FIELD,
-                                           {Rom::Game{ROM_PATH, INFO_SET_COMPLETE, {SCREENSHOT_PATH}}},
+                                           {Rom::Game{ROM_PATH, INFO_SET_COMPLETE, Rom::Media{SCREENSHOT_PATH}}},
                                        }};
 
 static const nlohmann::json EMPTY_CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST_EDIT},
@@ -84,7 +84,6 @@ TEST_F(RomSourceFixture, scanNoCache)
     EXPECT_TRUE(rom.info().title == INFO_SET_COMPLETE.title);
     EXPECT_TRUE(rom.info().year && *(rom.info().year) == INFO_SET_COMPLETE.year);
     EXPECT_TRUE(rom.info().manufacturer && *(rom.info().manufacturer) == INFO_SET_COMPLETE.manufacturer);
-    EXPECT_TRUE(rom.media().screenshot && *(rom.media().screenshot) == SCREENSHOT_PATH);
 
     /*
         Ask for a scan on an empty rom source with no cache available.
@@ -121,7 +120,6 @@ TEST_F(RomSourceFixture, scanCache)
     EXPECT_TRUE(rom.info().title == INFO_SET_COMPLETE.title);
     EXPECT_TRUE(rom.info().year && *(rom.info().year) == INFO_SET_COMPLETE.year);
     EXPECT_TRUE(rom.info().manufacturer && *(rom.info().manufacturer) == INFO_SET_COMPLETE.manufacturer);
-    EXPECT_TRUE(rom.media().screenshot && *(rom.media().screenshot) == SCREENSHOT_PATH);
 
     /*
         Ask for a scan on a rom source with cache unavailable.

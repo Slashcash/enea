@@ -1,11 +1,7 @@
 #include "rom/game.hpp"
 
-Rom::Game::Game(std::filesystem::path path) : mPath(std::move(path))
-{
-}
-
-Rom::Game::Game(std::filesystem::path path, Rom::Info info, Rom::Media media)
-    : mPath(std::move(path)), mInfo(std::move(info)), mMedia(std::move(media))
+Rom::Game::Game(const std::filesystem::path& path, const Rom::Info& info, const std::optional<Rom::Media>& media)
+    : mPath(path), mInfo(info), mMedia(media)
 {
 }
 
@@ -19,7 +15,7 @@ Rom::Info Rom::Game::info() const
     return mInfo;
 }
 
-Rom::Media Rom::Game::media() const
+std::optional<Rom::Media> Rom::Game::media() const
 {
     return mMedia;
 }
@@ -27,4 +23,9 @@ Rom::Media Rom::Game::media() const
 bool Rom::Game::operator==(const Game& rom) const
 {
     return this->mPath == rom.mPath;
+}
+
+std::string Rom::Game::toString() const
+{
+    return info().title;
 }
