@@ -6,6 +6,7 @@
 #include <magic_enum.hpp>
 #include <spdlog/spdlog.h>
 
+#include "configuration.hpp"
 #include "systemcommand.hpp"
 
 bool Emulator::romExists(const Rom::Game& rom) const
@@ -50,7 +51,8 @@ std::optional<Emulator::Error> Emulator::run(const Rom::Game& rom, const std::st
     }
 
     // Launching emulator
-    auto cmdString = fmt::format("-misc_quiet -nomisc_safequit {} -dir_rom {} {}", inputString,
+    auto cmdString = fmt::format("-cfg {} -misc_quiet -nomisc_safequit {} -dir_rom {} {}",
+                                 Configuration::get().advMameConfigurationFile().string(), inputString,
                                  romPath.parent_path().string(), romPath.stem().string());
 
     if (launch(cmdString).exitcode != 0)

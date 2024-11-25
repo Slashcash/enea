@@ -28,6 +28,7 @@ class Conf
 
     [[nodiscard]] std::filesystem::path romDirectory() const;
     [[nodiscard]] std::filesystem::path cacheDirectory() const;
+    [[nodiscard]] std::filesystem::path advMameConfigurationFile() const;
 
     Conf& operator=(const Conf& conf) = delete;
     Conf& operator=(Conf&& conf) = delete;

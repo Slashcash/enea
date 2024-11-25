@@ -47,3 +47,8 @@ std::filesystem::path Conf::cacheDirectory() const
 {
     return baseDirectory() / "cache";
 }
+
+std::filesystem::path Conf::advMameConfigurationFile() const
+{
+    return baseDirectory() / "advmame.rc";
+}
