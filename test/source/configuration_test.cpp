@@ -37,6 +37,13 @@ TEST_F(ConfigurationFixture, cacheFile)
     EXPECT_EQ(config.cacheDirectory(), cache);
 }
 
+TEST_F(ConfigurationFixture, advMameConfigurationFile)
+{
+    EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
+
+    EXPECT_EQ(config.advMameConfigurationFile(), base / "advmame.rc");
+}
+
 TEST_F(ConfigurationFixture, romDirectory_noHome)
 {
     /*
