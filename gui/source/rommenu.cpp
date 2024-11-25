@@ -119,7 +119,7 @@ void RomMenu::reorganize()
         // Drawing rom screenshot
         try
         {
-            if (auto screenshot = rom.screenshot(); screenshot)
+            if (auto screenshot = rom.media().screenshot; screenshot)
             {
                 auto screenshotSprite = std::make_shared<SpriteNode>();
                 screenshotSprite->element().setTexture(ScreenShotManager::get().getResource(*screenshot));

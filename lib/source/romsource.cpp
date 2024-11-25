@@ -10,7 +10,7 @@
 #include <spdlog/spdlog.h>
 
 #include "database.hpp"
-#include "rommedia.hpp"
+#include "rom/media.hpp"
 #include "softwareinfo.hpp"
 
 RomSource::RomSource(std::filesystem::path romFolder, std::filesystem::path cacheFolder)
@@ -71,7 +71,7 @@ std::vector<Rom::Game> RomSource::physicalScan() const
         else
         {
             spdlog::trace("Found rom: {}", rom.string());
-            RomMedia media;
+            Rom::Media media;
 
             // Searching if there is an image file with the stem equal to the rom's one, in this case it's a screenshot
             if (auto picture = std::ranges::find_if(files.screenshots,

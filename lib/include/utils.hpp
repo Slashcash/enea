@@ -55,7 +55,7 @@ inline std::optional<T> getOptionalValueFromJson(const nlohmann::json& json, con
     {
         return json.at(field).get<T>();
     }
-    catch ([[maybe_unused]] const nlohmann::json::exception& e)
+    catch ([[maybe_unused]] const nlohmann::json::out_of_range& e)
     {
         return std::nullopt;
     }

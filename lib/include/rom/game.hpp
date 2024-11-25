@@ -13,7 +13,7 @@
 #include "database.hpp"
 #include "exception.hpp"
 #include "rom/info.hpp"
-#include "rommedia.hpp"
+#include "rom/media.hpp"
 
 namespace Rom {
 /**
@@ -27,7 +27,7 @@ class Game
     std::filesystem::path mPath;
     // This info should really become an optional
     Rom::Info mInfo;
-    RomMedia mMedia;
+    Rom::Media mMedia;
 
  public:
     static constexpr std::string_view PATH_JSON_FIELD = "path";
@@ -41,14 +41,11 @@ class Game
 
     Game() = delete;
     explicit Game(std::filesystem::path path);
-    explicit Game(std::filesystem::path path, Rom::Info info, RomMedia media);
+    explicit Game(std::filesystem::path path, Rom::Info info, Rom::Media media);
 
     [[nodiscard]] std::filesystem::path path() const;
-
     [[nodiscard]] Rom::Info info() const;
-
-    [[nodiscard]] RomMedia media() const;
-    [[nodiscard]] std::optional<std::filesystem::path> screenshot() const;
+    [[nodiscard]] Rom::Media media() const;
 
     [[nodiscard]] bool operator==(const Game& game) const;
 };
@@ -85,10 +82,10 @@ template <> struct adl_serializer<Rom::Game>
         }
 
         // Finding rom media
-        RomMedia romMedia;
+        Rom::Media romMedia;
         try
         {
-            romMedia = json.at(Rom::Game::MEDIA_JSON_FIELD).get<RomMedia>();
+            romMedia = json.at(Rom::Game::MEDIA_JSON_FIELD).get<Rom::Media>();
         }
         catch ([[maybe_unused]] const json::exception& e)
         {
