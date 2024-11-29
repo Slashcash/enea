@@ -11,6 +11,7 @@ class Conf
 {
  private:
     [[nodiscard]] virtual std::optional<std::filesystem::path> homeDirectory() const;
+    [[nodiscard]] virtual std::optional<std::filesystem::path> executableDirectory() const;
     [[nodiscard]] std::filesystem::path baseDirectory() const;
 
  public:
@@ -24,6 +25,7 @@ class Conf
     Conf(Conf&& conf) = delete;
 
     [[nodiscard]] std::filesystem::path romDirectory() const;
+    [[nodiscard]] std::filesystem::path bundledRomDirectory() const;
     [[nodiscard]] std::filesystem::path cacheDirectory() const;
     [[nodiscard]] std::filesystem::path advMameConfigurationFile() const;
 

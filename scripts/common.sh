@@ -61,3 +61,25 @@ function download_file {
         return 1
     fi
 }
+
+# Function to download a folder
+function download_folder {
+    local url="$1"
+    local destination="$2"
+
+    # Check if wget is available
+    if ! is_command_available wget; then
+        retun 1
+    fi
+
+    wget -q -r --no-parent -nH --cut-dirs=2 -P "$destination" "$url"
+
+    # Check if the download was successful
+    if [ $? -ne 0 ]; then
+        echo "Error: Failed to download folder from $url"
+        return 1
+    fi
+
+    # Removing directory listing file
+    rm "$destination/${url##*/}"
+}

@@ -27,6 +27,25 @@ std::optional<std::filesystem::path> Conf::homeDirectory() const
     return std::nullopt;
 }
 
+std::optional<std::filesystem::path> Conf::executableDirectory() const
+{
+#ifdef TARGET_OS_LINUX
+    std::error_code ec;
+    if (auto execPath = std::filesystem::read_symlink("/proc/self/exe"); !ec && execPath.has_parent_path())
+    {
+        return execPath.parent_path();
+    }
+
+#elif defined(TARGET_OS_WINDOWS)
+    // We need a good way to check executable path on Windows.
+    return "";
+#else
+#error "Unknown target OS. Compilation halted."
+#endif
+
+    return std::nullopt;
+}
+
 std::filesystem::path Conf::baseDirectory() const
 {
     auto home = homeDirectory();
@@ -41,6 +60,17 @@ std::filesystem::path Conf::baseDirectory() const
 std::filesystem::path Conf::romDirectory() const
 {
     return baseDirectory() / "roms";
+}
+
+std::filesystem::path Conf::bundledRomDirectory() const
+{
+    auto execPath = executableDirectory();
+    if (!execPath)
+    {
+        throw Conf::Exception("Executable path cannot be retrieved");
+    }
+
+    return *execPath / ".." / "share" / std::string(executableName) / "bundled_roms";
 }
 
 std::filesystem::path Conf::cacheDirectory() const

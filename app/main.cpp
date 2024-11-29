@@ -51,6 +51,13 @@ int main()
         RomSource romSource(romPath, cachePath);
         std::vector<Rom::Game> romList = romSource.scan();
 
+        // If we found no roms we search for bundled roms as a fallback
+        if (romList.empty())
+        {
+            RomSource bundledRomSource(Configuration::get().bundledRomDirectory(), cachePath);
+            romList = bundledRomSource.scan();
+        }
+
         spdlog::info("Saving cache information");
         if (!romSource.saveOnCache())
         {

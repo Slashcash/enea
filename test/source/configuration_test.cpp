@@ -5,6 +5,7 @@
 #include "softwareinfo.hpp"
 
 static const std::filesystem::path home = "/home";
+static const std::filesystem::path execDir = "/share";
 static const std::filesystem::path base = home / ("." + std::string(executableName));
 
 /*
@@ -17,6 +18,30 @@ TEST(Configuration, romDirectory)
     EXPECT_CALL(config, homeDirectory()).WillOnce(testing::Return(home));
 
     EXPECT_EQ(config.romDirectory(), base / "roms");
+}
+
+/*
+    Asking for the folder where to store the bundled roms.
+    Expectation: we get an hidden folder constructed with the executable directory + ../share/enea/bundled_roms
+*/
+TEST(Configuration, bundledRomDirectory)
+{
+    ConfigurationMock config;
+    EXPECT_CALL(config, executableDirectory()).WillOnce(testing::Return(execDir));
+
+    EXPECT_EQ(config.bundledRomDirectory(), execDir / ".." / "share" / "enea" / "bundled_roms");
+}
+
+/*
+    Asking for the folder where to store the bundled roms but we fail to retrieve executable directory.
+    Expectation: we throw
+*/
+TEST(Configuration, bundledRomDirectoryNoHome)
+{
+    ConfigurationMock config;
+    EXPECT_CALL(config, executableDirectory()).WillOnce(testing::Return(std::nullopt));
+
+    EXPECT_THROW(config.bundledRomDirectory(), ConfigurationMock::Exception);
 }
 
 /*

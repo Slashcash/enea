@@ -34,7 +34,8 @@ std::vector<Rom::Game> RomSource::scan() const
 
     if (!isFolder(mRomFolder))
     {
-        throw RomSource::Exception("Scan path is not a folder");
+        spdlog::warn("{} is not a scannable folder for roms", mRomFolder.string());
+        return result;
     }
 
     spdlog::debug("Getting last modification time for: {}", mRomFolder.string());
