@@ -11,6 +11,7 @@ class ConfigurationMock : public Conf
     using Conf::Conf;
 
     MOCK_METHOD(std::optional<std::filesystem::path>, homeDirectory, (), (const override));
+    MOCK_METHOD(std::optional<std::filesystem::path>, executableDirectory, (), (const override));
 };
 
 #endif // CONFIGURATIONMOCK_HPP

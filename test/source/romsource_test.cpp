@@ -53,13 +53,13 @@ TEST_F(RomSourceFixture, scanNoCache)
 {
     /*
         Ask for a scan on a rom source which is not a folder.
-        Expectation: we throw an exception.
+        Expectation: returned folder is empty
     */
     EXPECT_EQ(romSource.romFolder(), ROM_FOLDER);
     EXPECT_EQ(romSource.cacheFolder(), CACHE_FOLDER);
 
     EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(false));
-    EXPECT_THROW(romSource.scan(), RomSource::Exception);
+    EXPECT_TRUE(romSource.scan().empty());
 
     /*
         Ask for a scan on a rom source with no cache available.

@@ -10,6 +10,8 @@ DEFAULT_GENERATE_UPDATE_INFO=false
 # temporary folders
 base_temp_dir="/tmp/enea_appimage"
 app_dir="$base_temp_dir/app"
+share_dir="$app_dir/usr/share"
+bundled_roms_dir="$share_dir/enea/bundled_roms"
 downloads_dir="$base_temp_dir/downloads"
 
 declare -a found_deps
@@ -262,10 +264,21 @@ if ! is_path_writable "$base_temp_dir"; then
   exit 1
 fi
 
+mkdir -p "$bundled_roms_dir"
+if ! is_path_writable "$bundled_roms_dir"; then
+  exit 1
+fi
+
 # Downloading the icon file
 icon_url="https://enea.geniorio.it/resources/icon/icon.png"
 icon_path="$downloads_dir/icon.png"
 if ! download_file "$icon_url" "$icon_path"; then
+    exit 1
+fi
+
+# Downloading bundled roms
+bundled_roms_url="https://enea.geniorio.it/resources/bundled_roms"
+if ! download_folder "$bundled_roms_url" "$bundled_roms_dir"; then
     exit 1
 fi
 
