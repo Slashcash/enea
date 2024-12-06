@@ -214,6 +214,14 @@ unsigned int Input::Manager::mapInputToPlayerNumber(const Input::Emulator::Comma
     {
         return 2;
     }
+    else if (inputString.starts_with("p3") || inputString == "coin3" || inputString == "start3")
+    {
+        return 3;
+    }
+    else if (inputString.starts_with("p4") || inputString == "coin4" || inputString == "start4")
+    {
+        return 4;
+    }
     else
     {
         throw Exception("Unsupported number of players");

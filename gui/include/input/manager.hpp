@@ -24,7 +24,7 @@ class Manager
  private:
     // This is pretty much a limitation of SFML, it is anyway a sufficiently high number for us
     static constexpr unsigned int MAX_JOYSTICK = sf::Joystick::Count;
-    static constexpr unsigned int MAX_PLAYERS = 2;
+    static constexpr unsigned int MAX_PLAYERS = 4;
 
     using InputFunction = std::function<bool(const sf::Event& event)>;
     using Signal = rocket::signal<void()>;

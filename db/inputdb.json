@@ -119,6 +119,102 @@
                         "definition": "start",
                         "type": "joystick_button"
                     },
+                    "coin3": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "coin4": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "p3_button1": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p3_button2": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p3_button3": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p3_button4": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p3_button5": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p3_button6": {
+                        "definition": "tr2",
+                        "type": "joystick_button"
+                    },
+                    "p3_down": {
+                        "definition": "0,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p3_left": {
+                        "definition": "0,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p3_right": {
+                        "definition": "0,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p3_up": {
+                        "definition": "0,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "p4_button1": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p4_button2": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p4_button3": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p4_button4": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p4_button5": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p4_button6": {
+                        "definition": "tr2",
+                        "type": "joystick_button"
+                    },
+                    "p4_down": {
+                        "definition": "0,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p4_left": {
+                        "definition": "0,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p4_right": {
+                        "definition": "0,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p4_up": {
+                        "definition": "0,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "start3": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
+                    "start4": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
                     "ui_cancel": {
                         "definition": "mode",
                         "type": "joystick_button"
@@ -252,6 +348,102 @@
                         "type": "joystick_button"
                     },
                     "start2": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
+                    "coin3": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "coin4": {
+                        "definition": "select",
+                        "type": "joystick_button"
+                    },
+                    "p3_button1": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p3_button2": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p3_button3": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p3_button4": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p3_button5": {
+                        "definition": "tl",
+                        "type": "joystick_button"
+                    },
+                    "p3_button6": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p3_down": {
+                        "definition": "1,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p3_left": {
+                        "definition": "1,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p3_right": {
+                        "definition": "1,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p3_up": {
+                        "definition": "1,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "p4_button1": {
+                        "definition": "a",
+                        "type": "joystick_button"
+                    },
+                    "p4_button2": {
+                        "definition": "b",
+                        "type": "joystick_button"
+                    },
+                    "p4_button3": {
+                        "definition": "x",
+                        "type": "joystick_button"
+                    },
+                    "p4_button4": {
+                        "definition": "y",
+                        "type": "joystick_button"
+                    },
+                    "p4_button5": {
+                        "definition": "tl",
+                        "type": "joystick_button"
+                    },
+                    "p4_button6": {
+                        "definition": "tr",
+                        "type": "joystick_button"
+                    },
+                    "p4_down": {
+                        "definition": "1,1,down",
+                        "type": "joystick_digital"
+                    },
+                    "p4_left": {
+                        "definition": "1,0,left",
+                        "type": "joystick_digital"
+                    },
+                    "p4_right": {
+                        "definition": "1,0,right",
+                        "type": "joystick_digital"
+                    },
+                    "p4_up": {
+                        "definition": "1,1,up",
+                        "type": "joystick_digital"
+                    },
+                    "start3": {
+                        "definition": "start",
+                        "type": "joystick_button"
+                    },
+                    "start4": {
                         "definition": "start",
                         "type": "joystick_button"
                     },
