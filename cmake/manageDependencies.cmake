@@ -7,6 +7,9 @@ find_package(magic_enum 0.9.3 REQUIRED)
 # nlohmann_json
 find_package(nlohmann_json 3.11.2 REQUIRED)
 
+# stduuid
+find_package(stduuid 1.2.3 REQUIRED)
+
 # sfml
 find_package(
   SFML 2.6.0
