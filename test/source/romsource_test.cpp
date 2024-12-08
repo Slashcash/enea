@@ -1,195 +1,341 @@
 #include "romsource_mock.hpp"
 
-#include <fmt/format.h>
+static const std::filesystem::path VALID_ROM_PATH = std::filesystem::absolute("sf2.zip");
+static const Rom::Info VALID_ROM_INFO{.title{"Street Fighter II"}, .isBios{false}};
 
-#include "softwareinfo.hpp"
-
-static const std::filesystem::path ROM_FOLDER = std::filesystem::absolute("romfolder");
-static const std::filesystem::path CACHE_FOLDER = std::filesystem::absolute("cachefolder");
-static const std::filesystem::path CACHE_FILE =
-    CACHE_FOLDER / fmt::format("{}{}", std::to_string(std::filesystem::hash_value(ROM_FOLDER)), ".json");
-static const std::filesystem::path ROM_PATH = ROM_FOLDER / "sf2.zip";
-static const std::filesystem::path SCREENSHOT_PATH = ROM_FOLDER / "sf2.png";
-static const std::filesystem::path USELESS_PATH = ROM_FOLDER / "sf2.mp3";
-static const std::filesystem::path NOT_ROM_PATH = ROM_FOLDER / "lollete.zip";
-static const std::filesystem::path BIOS_PATH = ROM_FOLDER / "neogeo.zip";
-static const std::string LAST_EDIT = "1970-01-01 00:00:00";
-
-static const std::string ROM_TITLE = "Street Fighter II: The World Warrior";
-static const std::string ROM_YEAR = "1991";
-static const std::string ROM_MANUFACTURER = "Capcom";
-static const bool ROM_IS_BIOS = false;
-
-static const Rom::Info INFO_SET_COMPLETE{
-    .title = ROM_TITLE, .year = ROM_YEAR, .manufacturer = ROM_MANUFACTURER, .isBios = ROM_IS_BIOS};
-
-static const Rom::Info INFO_SET_BIOS{.title = "NeoGeo", .year = "1991", .manufacturer = "SNK", .isBios = true};
-
-static const nlohmann::json CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST_EDIT},
-                                       {RomSource::VERSION_JSON_FIELD, projectVersion},
-                                       {
-                                           RomSource::ROMS_JSON_FIELD,
-                                           {Rom::Game{ROM_PATH, INFO_SET_COMPLETE, Rom::Media{SCREENSHOT_PATH}}},
-                                       }};
-
-static const nlohmann::json EMPTY_CACHE_JSON{{RomSource::LASTMODIFIED_JSON_FIELD, LAST_EDIT},
-                                             {RomSource::VERSION_JSON_FIELD, projectVersion},
-                                             {
-                                                 RomSource::ROMS_JSON_FIELD,
-                                                 {},
-                                             }};
-
-static const std::vector<std::filesystem::path> folderMock{ROM_PATH, SCREENSHOT_PATH, NOT_ROM_PATH, USELESS_PATH,
-                                                           BIOS_PATH};
-static const std::vector<std::filesystem::path> emptyFolderMock{};
-
-class RomSourceFixture : public ::testing::Test
+/*
+    We start monitoring a rom source with no cache available.
+    Expectation: we scan the rom source and we find all the roms.
+*/
+TEST(RomSource, scan)
 {
- protected:
-    RomSourceMock romSource{ROM_FOLDER, CACHE_FOLDER};
-};
+    const std::filesystem::path INVALID_ROM_PATH = std::filesystem::absolute("lol.zip");
 
-TEST_F(RomSourceFixture, scanNoCache)
-{
-    /*
-        Ask for a scan on a rom source which is not a folder.
-        Expectation: returned folder is empty
-    */
-    EXPECT_EQ(romSource.romFolder(), ROM_FOLDER);
-    EXPECT_EQ(romSource.cacheFolder(), CACHE_FOLDER);
+    const std::filesystem::path UNLAUNCHABLE_ROM_PATH = std::filesystem::absolute("neogeo.zip");
+    const Rom::Info UNLAUNCHABLE_ROM_INFO{.title{"NeoGeo"}, .isBios{true}};
 
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(false));
-    EXPECT_TRUE(romSource.scan().empty());
+    const std::filesystem::path NOSCREENSHOT_ROM_PATH = std::filesystem::absolute("mslug.zip");
+    const Rom::Info NOSCREENSHOT_ROM_INFO{.title{"Metal Slug"}, .isBios{false}};
 
-    /*
-        Ask for a scan on a rom source with no cache available.
-        Expectation: we physically scan the folder and retrieve information from it.
-            - sf2.zip is an existing rom: it will be returned by the scan with all the information associated to it
-            - sf2.mp3 it's a music file: it will not be returned
-            - lollete.zip: looks like a rom but it's not in our database, will not be returned
-            - neogeo.zip: is a bios file, will not be returned
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
+    const std::filesystem::path UNKNOWN_FILE_PATH = std::filesystem::absolute("lol.bat");
+    const std::filesystem::path SCREENSHOT_FILE_PATH = std::filesystem::absolute("sf2.png");
 
-    EXPECT_CALL(romSource, romInfo(ROM_PATH)).WillOnce(testing::Return(INFO_SET_COMPLETE));
-    EXPECT_CALL(romSource, romInfo(NOT_ROM_PATH)).WillOnce(testing::Return(std::nullopt));
-    EXPECT_CALL(romSource, romInfo(BIOS_PATH)).WillOnce(testing::Return(INFO_SET_BIOS));
+    std::vector<std::filesystem::path> fileList({VALID_ROM_PATH, INVALID_ROM_PATH, UNLAUNCHABLE_ROM_PATH,
+                                                 NOSCREENSHOT_ROM_PATH, UNKNOWN_FILE_PATH, SCREENSHOT_FILE_PATH});
 
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
-    auto roms = romSource.scan();
-    ASSERT_EQ(roms.size(), 1);
-    const auto& rom = roms[0];
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.info().title == INFO_SET_COMPLETE.title);
-    EXPECT_TRUE(rom.info().year && *(rom.info().year) == INFO_SET_COMPLETE.year);
-    EXPECT_TRUE(rom.info().manufacturer && *(rom.info().manufacturer) == INFO_SET_COMPLETE.manufacturer);
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(std::nullopt));
+    EXPECT_CALL(source, scan()).WillOnce(testing::Return(fileList));
 
-    /*
-        Ask for a scan on an empty rom source with no cache available.
-        Expectation: we correctly return an empty vector.
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(emptyFolderMock));
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
-    EXPECT_TRUE(romSource.scan().empty());
+    // zip extension, we expect the database to be queried
+    EXPECT_CALL(source, romInfo(VALID_ROM_PATH)).WillOnce(testing::Return(VALID_ROM_INFO));
 
-    /*
-        Ask for a scan on an empty rom source with no cache available, we fail to retrieve folder modification time.
-        Expectation: we throw.
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(std::nullopt));
-    EXPECT_THROW(romSource.scan(), RomSource::Exception);
+    // zip extension, we expect the database to be queried
+    EXPECT_CALL(source, romInfo(INVALID_ROM_PATH)).WillOnce(testing::Return(std::nullopt));
+
+    // zip extension, we expect the database to be queried
+    EXPECT_CALL(source, romInfo(UNLAUNCHABLE_ROM_PATH)).WillOnce(testing::Return(UNLAUNCHABLE_ROM_INFO));
+
+    // zip extension, we expect the database to be queried
+    EXPECT_CALL(source, romInfo(NOSCREENSHOT_ROM_PATH)).WillOnce(testing::Return(NOSCREENSHOT_ROM_INFO));
+
+    // bat extensione, we expect the database not to be queried
+    EXPECT_CALL(source, romInfo(UNKNOWN_FILE_PATH)).Times(0);
+
+    // png extensione, we expect the database not to be queried
+    EXPECT_CALL(source, romInfo(SCREENSHOT_FILE_PATH)).Times(0);
+
+    source.monitor();
+
+    auto roms = source.elements();
+
+    EXPECT_EQ(roms.size(), 2);
+
+    // The valid rom should be completely constructed
+    auto validRom = std::ranges::find(roms, Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO));
+    ASSERT_TRUE(validRom != roms.end());
+    EXPECT_EQ(validRom->path(), VALID_ROM_PATH);
+    EXPECT_EQ(validRom->info(), VALID_ROM_INFO);
+    EXPECT_EQ(validRom->media(), Rom::Media{.screenshot{SCREENSHOT_FILE_PATH}});
+
+    // This is not a valid rom, shouldn't be listed in the source
+    auto invalidRom = std::ranges::find(roms, Rom::Game(INVALID_ROM_PATH, Rom::Info{}));
+    EXPECT_EQ(invalidRom, roms.end());
+
+    // This is not a launchable rom, shouldn't be listed in the source
+    auto unlaunchableRom = std::ranges::find(roms, Rom::Game(UNLAUNCHABLE_ROM_PATH, UNLAUNCHABLE_ROM_INFO));
+    EXPECT_EQ(unlaunchableRom, roms.end());
+
+    // This is not a valid rom, shouldn't be listed in the source
+    auto unknownFile = std::ranges::find(roms, Rom::Game(UNKNOWN_FILE_PATH, Rom::Info{}));
+    EXPECT_EQ(unknownFile, roms.end());
+
+    // This is a screenshot, shouldn't be listed in the source
+    auto screenshotFile = std::ranges::find(roms, Rom::Game(SCREENSHOT_FILE_PATH, Rom::Info{}));
+    EXPECT_EQ(screenshotFile, roms.end());
+
+    // This rom should just miss the screenshot
+    auto missingScreenshotRom = std::ranges::find(roms, Rom::Game(NOSCREENSHOT_ROM_PATH, NOSCREENSHOT_ROM_INFO));
+    ASSERT_TRUE(missingScreenshotRom != roms.end());
+    EXPECT_EQ(missingScreenshotRom->path(), NOSCREENSHOT_ROM_PATH);
+    EXPECT_EQ(missingScreenshotRom->info(), NOSCREENSHOT_ROM_INFO);
+    EXPECT_EQ(missingScreenshotRom->media(), Rom::Media{.screenshot{std::nullopt}});
 }
 
-TEST_F(RomSourceFixture, scanCache)
+/*
+    We start monitoring a source with cache available.
+    Expectation: we have a correctly built source without scanning.
+*/
+TEST(RomSource, cache)
 {
-    /*
-        Ask for a scan on a rom source with cache available.
-        Expectation: we read the cache correctly.
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
-    EXPECT_CALL(romSource, readCacheFile(CACHE_FILE)).WillOnce(testing::Return(CACHE_JSON));
-    EXPECT_CALL(romSource, version()).WillOnce(testing::Return(projectVersion));
-    auto roms = romSource.scan();
-    ASSERT_EQ(roms.size(), 1);
-    const auto& rom = roms[0];
-    EXPECT_EQ(rom.path(), ROM_PATH);
-    EXPECT_TRUE(rom.info().title == INFO_SET_COMPLETE.title);
-    EXPECT_TRUE(rom.info().year && *(rom.info().year) == INFO_SET_COMPLETE.year);
-    EXPECT_TRUE(rom.info().manufacturer && *(rom.info().manufacturer) == INFO_SET_COMPLETE.manufacturer);
+    const std::string VERSION = "version";
+    const std::string LAST_MODIFIED = "lastModified";
+    nlohmann::json romJson{{Rom::SourceMock::VERSION_JSON_FIELD, VERSION},
+                           {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, LAST_MODIFIED},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}}};
 
-    /*
-        Ask for a scan on a rom source with cache unavailable.
-        Expectation: we resort to physically scanning the folder.
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
-    EXPECT_CALL(romSource, readCacheFile(CACHE_FILE)).WillOnce(testing::Return(std::nullopt));
-    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(emptyFolderMock));
-    EXPECT_EQ(romSource.scan().size(), 0);
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).WillOnce(testing::Return(VERSION));
+    EXPECT_CALL(source, lastModified()).WillOnce(testing::Return(LAST_MODIFIED));
+    EXPECT_CALL(source, scan()).Times(0);
 
-    /*
-        Ask for a scan on a rom source with cache available but produced with an older version.
-        Expectation: we resort to physically scanning the folder.
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
-    EXPECT_CALL(romSource, readCacheFile(CACHE_FILE)).WillOnce(testing::Return(CACHE_JSON));
-    EXPECT_CALL(romSource, version()).WillOnce(testing::Return("oldversion"));
-    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(emptyFolderMock));
-    EXPECT_EQ(romSource.scan().size(), 0);
+    source.monitor();
 
-    /*
-        Ask for a scan on a rom source with cache available but modified since last check.
-        Expectation: we resort to physically scanning the folder.
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return("1969-01-01 00:00:00"));
-    EXPECT_CALL(romSource, readCacheFile(CACHE_FILE)).WillOnce(testing::Return(CACHE_JSON));
-    EXPECT_CALL(romSource, version()).WillOnce(testing::Return(projectVersion));
-    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(emptyFolderMock));
-    EXPECT_EQ(romSource.scan().size(), 0);
+    auto roms = source.elements();
+    EXPECT_EQ(roms.size(), 1);
 }
 
-TEST_F(RomSourceFixture, saveOnCache)
+/*
+    We start monitoring a source with cache available but the json is empty.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheJsonEmpty)
 {
-    /*
-        Ask for a scan then for a save in cache.
-        Expectation: we correctly write the cache on file
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(folderMock));
+    nlohmann::json romJson;
 
-    EXPECT_CALL(romSource, romInfo(ROM_PATH)).WillOnce(testing::Return(INFO_SET_COMPLETE));
-    EXPECT_CALL(romSource, romInfo(NOT_ROM_PATH)).WillOnce(testing::Return(std::nullopt));
-    EXPECT_CALL(romSource, romInfo(BIOS_PATH)).WillOnce(testing::Return(INFO_SET_BIOS));
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, scan()).Times(1);
 
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
-    EXPECT_CALL(romSource, version()).WillOnce(testing::Return(projectVersion));
-    EXPECT_CALL(romSource, writeCacheFile(CACHE_JSON, CACHE_FILE)).WillOnce(testing::Return(true));
-    EXPECT_EQ(romSource.scan().size(), 1);
-    EXPECT_TRUE(romSource.saveOnCache());
+    source.monitor();
+}
 
-    /*
-        Ask for a scan in an empty folder then for a save in cache.
-        Expectation: we correctly write the cache on file (with no rom)
-    */
-    EXPECT_CALL(romSource, isFolder(ROM_FOLDER)).WillOnce(testing::Return(true));
-    EXPECT_CALL(romSource, scanFolder(ROM_FOLDER)).WillOnce(testing::Return(emptyFolderMock));
-    EXPECT_CALL(romSource, lastFolderModification(ROM_FOLDER)).WillOnce(testing::Return(LAST_EDIT));
-    EXPECT_CALL(romSource, version()).WillOnce(testing::Return(projectVersion));
-    EXPECT_CALL(romSource, writeCacheFile(EMPTY_CACHE_JSON, CACHE_FILE)).WillOnce(testing::Return(true));
-    EXPECT_EQ(romSource.scan().size(), 0);
-    EXPECT_TRUE(romSource.saveOnCache());
+/*
+    We start monitoring a source with cache available but it misses the cache version.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheMissingVersion)
+{
+    const std::string LAST_MODIFIED = "lastModified";
+    nlohmann::json romJson{{Rom::SourceMock::LASTMODIFIED_JSON_FIELD, LAST_MODIFIED},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}}};
 
-    /*
-        Ask for a save in cache but writing on disk fails.
-        Expectation: we return an error
-    */
-    EXPECT_CALL(romSource, version()).WillOnce(testing::Return(projectVersion));
-    EXPECT_CALL(romSource, writeCacheFile(EMPTY_CACHE_JSON, CACHE_FILE)).WillOnce(testing::Return(false));
-    EXPECT_FALSE(romSource.saveOnCache());
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We start monitoring a source with cache available but the version has an invalid value.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheInvalidVersion)
+{
+    const std::string LAST_MODIFIED = "lastModified";
+    nlohmann::json romJson{{Rom::SourceMock::VERSION_JSON_FIELD, 1},
+                           {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, LAST_MODIFIED},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}}};
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We start monitoring a source with cache available but the versions are mismatching.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheMismatchingVersion)
+{
+    const std::string LAST_MODIFIED = "lastModified";
+    nlohmann::json romJson{{Rom::SourceMock::VERSION_JSON_FIELD, "0.1"},
+                           {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, LAST_MODIFIED},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}}};
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).WillOnce(testing::Return("0.2"));
+
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We start monitoring a source with cache available but it misses the modified time.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheMissingLastModified)
+{
+    const std::string VERSION = "version";
+    nlohmann::json romJson{{Rom::SourceMock::VERSION_JSON_FIELD, VERSION},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}}};
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).WillOnce(testing::Return(VERSION));
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We start monitoring a source with cache available but it has invalid mofied time.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheInvalidLastModified)
+{
+    const std::string VERSION = "version";
+    nlohmann::json romJson{{Rom::SourceMock::VERSION_JSON_FIELD, VERSION},
+                           {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, 1},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}}};
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).WillOnce(testing::Return(VERSION));
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We start monitoring a source with cache available bit with mismatching last modified.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheMismatchingLastModified)
+{
+    const std::string VERSION = "version";
+    nlohmann::json romJson{{Rom::SourceMock::VERSION_JSON_FIELD, VERSION},
+                           {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, "2023"},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}}};
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).WillOnce(testing::Return(VERSION));
+    EXPECT_CALL(source, lastModified()).Times(testing::AtLeast(1)).WillRepeatedly(testing::Return("2024"));
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We start monitoring a source with cache available but missing roms.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheMissingRoms)
+{
+    const std::string VERSION = "version";
+    const std::string LAST_MODIFIED = "lastModified";
+    nlohmann::json romJson{
+        {Rom::SourceMock::VERSION_JSON_FIELD, VERSION},
+        {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, LAST_MODIFIED},
+    };
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).WillOnce(testing::Return(VERSION));
+    EXPECT_CALL(source, lastModified()).Times(testing::AtLeast(1)).WillRepeatedly(testing::Return("2024"));
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We start monitoring a source with cache available but invalid roms.
+    Expectation: cache deemed unusable, we resort to scanning.
+*/
+TEST(RomSource, cacheInvalidRoms)
+{
+    const std::string VERSION = "version";
+    const std::string LAST_MODIFIED = "lastModified";
+    nlohmann::json romJson{{Rom::SourceMock::VERSION_JSON_FIELD, VERSION},
+                           {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, LAST_MODIFIED},
+                           {Rom::SourceMock::ROMS_JSON_FIELD, 1}};
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).WillOnce(testing::Return(VERSION));
+    EXPECT_CALL(source, lastModified()).Times(testing::AtLeast(1)).WillRepeatedly(testing::Return("2024"));
+    EXPECT_CALL(source, scan()).Times(1);
+
+    source.monitor();
+}
+
+/*
+    We monitor a rom and then we try to cache the result.
+    Expectation: we write the cache successfully.
+*/
+TEST(RomSource, writeCache)
+{
+    const std::string VERSION = "version";
+    const std::string LAST_MODIFIED = "lastModified";
+    nlohmann::json romJson{
+        {Rom::SourceMock::LASTMODIFIED_JSON_FIELD, LAST_MODIFIED},
+        {Rom::SourceMock::ROMS_JSON_FIELD, {Rom::Game(VALID_ROM_PATH, VALID_ROM_INFO)}},
+        {Rom::SourceMock::VERSION_JSON_FIELD, VERSION},
+    };
+
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(romJson));
+    EXPECT_CALL(source, version()).Times(testing::AtLeast(2)).WillRepeatedly(testing::Return(VERSION));
+    EXPECT_CALL(source, lastModified()).WillOnce(testing::Return(LAST_MODIFIED));
+
+    source.monitor();
+
+    EXPECT_CALL(source, writeCacheFile(romJson, testing::_)).WillOnce(testing::Return(true));
+    EXPECT_TRUE(source.writeCache());
+}
+
+/*
+    We try to cache an unmonitored source.
+    Expectation: we return a failure as this is meaningless.
+*/
+TEST(RomSource, writeCacheUnmonitoredSource)
+{
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_FALSE(source.writeCache());
+}
+
+/*
+    We try to cache a source without a valid last modified time.
+    Expectation: we return a failure as this is meaningless.
+*/
+TEST(RomSource, writeCacheInvalidSource)
+{
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(std::nullopt));
+    EXPECT_CALL(source, lastModified()).WillOnce(testing::Return(std::nullopt));
+
+    source.monitor();
+    EXPECT_FALSE(source.writeCache());
+}
+
+/*
+    We try to cache a source but we fail to write on disk.
+    Expectation: we return a failure.
+*/
+TEST(RomSource, writeCacheErrorWrite)
+{
+    Rom::SourceMock source("test", std::filesystem::absolute("cachedir"));
+    EXPECT_CALL(source, readCacheFile(testing::_)).WillOnce(testing::Return(std::nullopt));
+    EXPECT_CALL(source, lastModified()).WillOnce(testing::Return("2024"));
+
+    source.monitor();
+    EXPECT_CALL(source, writeCacheFile(testing::_, testing::_)).WillOnce(testing::Return(false));
+    EXPECT_FALSE(source.writeCache());
 }

@@ -39,7 +39,7 @@ std::string RomMenu::romName(const Rom::Game& rom)
     result = rom.info().title;
     result = result.substr(0, result.find_first_of('('));
 
-    return result;
+    return result.empty() ? rom.path().stem().string() : result;
 }
 
 bool RomMenu::setSelected(const unsigned int selected)

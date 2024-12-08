@@ -24,6 +24,11 @@ struct Info
         return title;
     }
 
+    [[nodiscard]] inline bool isLaunchable() const
+    {
+        return isBios.has_value() && !(*isBios);
+    }
+
     bool operator==(const Info&) const = default;
 };
 

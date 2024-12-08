@@ -24,6 +24,7 @@ TEST(RomInfo, fromCompleteJson)
     EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
     EXPECT_TRUE(romInfo.manufacturer && *(romInfo.manufacturer) == ROM_MANUFACTURER);
     EXPECT_TRUE(romInfo.isBios && *(romInfo.isBios) == ROM_IS_BIOS);
+    EXPECT_TRUE(romInfo.isLaunchable());
 }
 
 /*
@@ -76,6 +77,7 @@ TEST(RomInfo, fromJsonMissingYear)
     EXPECT_FALSE(romInfo.year);
     EXPECT_TRUE(romInfo.manufacturer && *(romInfo.manufacturer) == ROM_MANUFACTURER);
     EXPECT_TRUE(romInfo.isBios && *(romInfo.isBios) == ROM_IS_BIOS);
+    EXPECT_TRUE(romInfo.isLaunchable());
 }
 
 /*
@@ -108,6 +110,7 @@ TEST(RomInfo, fromJsonMissingManufacturer)
     EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
     EXPECT_FALSE(romInfo.manufacturer);
     EXPECT_TRUE(romInfo.isBios && *(romInfo.isBios) == ROM_IS_BIOS);
+    EXPECT_TRUE(romInfo.isLaunchable());
 }
 
 /*
@@ -139,6 +142,7 @@ TEST(RomInfo, fromJsonMissingBios)
     EXPECT_TRUE(romInfo.year && *(romInfo.year) == ROM_YEAR);
     EXPECT_TRUE(romInfo.manufacturer && *(romInfo.manufacturer) == ROM_MANUFACTURER);
     EXPECT_FALSE(romInfo.isBios);
+    EXPECT_FALSE(romInfo.isLaunchable());
 }
 
 /*

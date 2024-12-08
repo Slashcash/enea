@@ -7,8 +7,8 @@
 #include "configuration.hpp"
 #include "emulator.hpp"
 #include "gui.hpp"
+#include "rom/folder.hpp"
 #include "rom/game.hpp"
-#include "romsource.hpp"
 #include "softwareinfo.hpp"
 
 int main()
@@ -48,20 +48,18 @@ int main()
 
         // Searching for roms
         spdlog::info("Searching for roms and media");
-        RomSource romSource(romPath, cachePath);
-        std::vector<Rom::Game> romList = romSource.scan();
+        Rom::Folder romFolder(romPath, cachePath);
+        romFolder.monitor();
+        std::vector<Rom::Game> romList = romFolder.elements();
+
+        std::ignore = romFolder.writeCache();
 
         // If we found no roms we search for bundled roms as a fallback
         if (romList.empty())
         {
-            RomSource bundledRomSource(Configuration::get().bundledRomDirectory(), cachePath);
-            romList = bundledRomSource.scan();
-        }
-
-        spdlog::info("Saving cache information");
-        if (!romSource.saveOnCache())
-        {
-            spdlog::warn("Failed to write cache file, cache will not be available");
+            Rom::Folder bundledRomFolder(Configuration::get().bundledRomDirectory(), cachePath);
+            bundledRomFolder.monitor();
+            romList = bundledRomFolder.elements();
         }
 
         // Starting gui
