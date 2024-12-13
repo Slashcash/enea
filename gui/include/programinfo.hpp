@@ -18,9 +18,7 @@ class ProgramInfo : public Node
     static constexpr unsigned int FONT_SIZE = 16;
     static constexpr float SPACING = 8.0F;
 
-    void inline drawEffective(sf::RenderTarget& target, sf::RenderStates states) const override
-    {
-    }
+    void inline drawEffective(sf::RenderTarget& target, sf::RenderStates states) const override {}
 
  public:
     ProgramInfo();

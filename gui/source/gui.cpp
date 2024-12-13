@@ -11,9 +11,7 @@
 #include "rommenu.hpp"
 #include "softwareinfo.hpp"
 
-Gui::Gui(const std::vector<Rom::Game>& romList) : mRomList(romList)
-{
-}
+Gui::Gui(const std::vector<Rom::Game>& romList) : mRomList(romList) {}
 
 void Gui::run()
 {

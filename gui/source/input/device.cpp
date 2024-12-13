@@ -182,8 +182,7 @@ Input::Device::Device(const Input::Identification& identification, const unsigne
 
 Device::Device(const Input::Identification& identification, const unsigned int id, const Mapping& mapping)
     : mId(id), mIdentification(identification), mMapping{mapping}
-{
-}
+{}
 
 unsigned int Input::Device::getId() const
 {
