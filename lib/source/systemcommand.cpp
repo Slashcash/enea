@@ -4,9 +4,7 @@
 #include <cstdio>
 #include <cstdlib>
 
-SystemCommand::SystemCommand(std::string cmd) : mCmd(std::move(cmd))
-{
-}
+SystemCommand::SystemCommand(std::string cmd) : mCmd(std::move(cmd)) {}
 
 SystemCommand::Result SystemCommand::launchCmd() const
 {

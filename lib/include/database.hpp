@@ -130,9 +130,7 @@ template <DatabaseKey Key, DatabaseValue Value> class Database
     static constexpr std::string_view KEY_JSON_FIELD = "key";
     static constexpr std::string_view INFO_JSON_FIELD = "info";
 
-    inline explicit Database(const std::string& path) : mPath(path)
-    {
-    }
+    inline explicit Database(const std::string& path) : mPath(path) {}
     Database() = delete;
     Database(const Database& romdb) = delete;
     Database(Database&& romdb) = delete;

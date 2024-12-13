@@ -3,8 +3,7 @@
 Input::Mapping::Mapping(const std::unordered_map<Input::Emulator::Command, Input::Emulator::Button>& emulatorMap,
                         const std::unordered_map<Input::Frontend::Command, Frontend::Button>& frontendMap)
     : mEmulatorMapping(emulatorMap), mFrontendMapping(frontendMap)
-{
-}
+{}
 
 std::optional<Input::Emulator::Button> Input::Mapping::getButton(Emulator::Command command) const
 {

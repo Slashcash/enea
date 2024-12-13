@@ -37,8 +37,7 @@ class Source : public Model<Game>
         : mIdentifier(identifier),
           mCacheFile(cacheFolder /
                      fmt::format("{}{}", std::to_string(std::filesystem::hash_value(identifier)), ".json"))
-    {
-    }
+    {}
 
     virtual void monitor() final;
     [[nodiscard]] virtual bool writeCache() const final;

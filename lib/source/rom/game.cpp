@@ -2,8 +2,7 @@
 
 Rom::Game::Game(const std::filesystem::path& path, const Rom::Info& info, const std::optional<Rom::Media>& media)
     : mPath(path), mInfo(info), mMedia(media)
-{
-}
+{}
 
 std::filesystem::path Rom::Game::path() const
 {

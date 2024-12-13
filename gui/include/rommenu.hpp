@@ -28,9 +28,7 @@ class RomMenu : public Node
     [[nodiscard]] bool setSelected(unsigned int selected);
     [[nodiscard]] static std::string romName(const Rom::Game& rom);
     [[nodiscard]] static std::string shortenedRomName(const Rom::Game& rom);
-    void inline drawEffective(sf::RenderTarget& target, sf::RenderStates states) const override
-    {
-    }
+    void inline drawEffective(sf::RenderTarget& target, sf::RenderStates states) const override {}
 
  public:
     RomMenu() = delete;

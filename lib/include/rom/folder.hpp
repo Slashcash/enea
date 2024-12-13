@@ -13,8 +13,7 @@ class Folder : public Source
  public:
     explicit inline Folder(const std::filesystem::path& folderPath, const std::filesystem::path& folderCache)
         : Source(folderPath.string(), folderCache), mFolderPath(folderPath)
-    {
-    }
+    {}
 
  private:
     [[nodiscard]] std::vector<std::filesystem::path> scan() const override;
