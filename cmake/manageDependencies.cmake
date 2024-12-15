@@ -18,3 +18,6 @@ find_package(
 
 # rocket
 find_package(rocket REQUIRED)
+
+# chef-fun
+find_package(chef-fun REQUIRED)

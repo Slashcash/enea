@@ -3,6 +3,7 @@ enable_testing()
 
 add_executable(
   ${EXECUTABLE}Test
+  source/main.cpp
   mock/database_mock.hpp
   source/database_test.cpp
   mock/configuration_mock.hpp
@@ -31,7 +32,7 @@ add_executable(
   source/model_test.cpp)
 
 target_link_libraries(
-  ${EXECUTABLE}Test PRIVATE GTest::gtest_main GTest::gmock ${EXECUTABLE}Lib
+  ${EXECUTABLE}Test PRIVATE GTest::gtest GTest::gmock ${EXECUTABLE}Lib
                             ${EXECUTABLE}Gui)
 
 target_include_directories(${EXECUTABLE}Test PRIVATE mock)

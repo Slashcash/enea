@@ -44,7 +44,7 @@ class Game
 };
 
 static constexpr char dbPath[] = "romdb/romdb.json";
-using Database = DB<std::string, Rom::Info, dbPath>;
+using Database = DatabaseSingleton<std::string, Rom::Info, dbPath>;
 } // namespace Rom
 
 namespace nlohmann {

@@ -58,7 +58,7 @@ class Device
 };
 
 static constexpr char dbPath[] = "inputdb/inputdb.json";
-using Database = DB<Input::Identification, Input::Mapping, dbPath>;
+using Database = DatabaseSingleton<Input::Identification, Input::Mapping, dbPath>;
 
 } // namespace Input
 
