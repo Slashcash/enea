@@ -23,8 +23,13 @@ add_library(
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
 target_link_libraries(
   ${EXECUTABLE}Lib
-  PUBLIC spdlog::spdlog nlohmann_json::nlohmann_json rocket::rocket
-         magic_enum::magic_enum stduuid::stduuid ${RESOURCE_LIBRARY})
+  PUBLIC spdlog::spdlog
+         nlohmann_json::nlohmann_json
+         rocket::rocket
+         magic_enum::magic_enum
+         stduuid::stduuid
+         chef-fun::chef-fun
+         ${RESOURCE_LIBRARY})
 
 # Generating files
 set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/generated")

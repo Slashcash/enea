@@ -52,7 +52,10 @@ int main()
         romFolder.monitor();
         std::vector<Rom::Game> romList = romFolder.elements();
 
-        std::ignore = romFolder.writeCache();
+        if (!romFolder.elements().empty())
+        {
+            std::ignore = romFolder.writeCache();
+        }
 
         // If we found no roms we search for bundled roms as a fallback
         if (romList.empty())

@@ -25,7 +25,7 @@ void Rom::Source::monitor()
         {
             if (rom.info().isLaunchable())
             {
-                spdlog::debug(R"({} Found rom "{}")", monitorLog, rom.info().title);
+                spdlog::trace(R"({} Found rom "{}")", monitorLog, rom.info().title);
                 addElement(rom);
             }
             else
