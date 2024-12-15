@@ -4,7 +4,7 @@
 DEFAULT_SOURCE_DIR="$( cd "$(dirname "$0/..")" >/dev/null 2>&1 ; pwd -P )"
 DEFAULT_OUTPUT_DIR="$DEFAULT_SOURCE_DIR"
 DEFAULT_ENEA_ARCH="x86_64"
-DEFAULT_BUILD_DEPS="missing"
+DEFAULT_BUILD_DEPS="never"
 DEFAULT_GENERATE_UPDATE_INFO=false
 
 # temporary folders
