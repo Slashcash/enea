@@ -1,3 +1,24 @@
+## v0.9.0 (2024-12-20)
+
+### Feat
+
+- add support for 4 players
+- bundle copyleft roms within software package
+
+### Fix
+
+- stop using system provided advmame configuration file
+
+### Refactor
+
+- improve error handling of database class by usage of ChefFun::Either
+- rewrite RomSource class
+- rewrite Configuration class
+- rewrite Game class
+- rewrite RomMedia class
+- rewrite RomInfo class
+- rename Rom class to Game
+
 ## v0.8.0 (2024-11-23)
 
 ### Feat
