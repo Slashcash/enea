@@ -41,7 +41,8 @@ class EmulatorFixture : public ::testing::Test
 TEST_F(EmulatorFixture, info)
 {
     EXPECT_CALL(emulator, launch("-version"))
-        .WillOnce(testing::Return(SystemCommand::Result(0, EMULATOR_VERSION_OUTPUT)));
+        .WillOnce(testing::Return(ChefFun::Either<SystemCommand::Error, SystemCommand::Output>::Right(
+            SystemCommand::Output{0, EMULATOR_VERSION_OUTPUT})));
     auto info = emulator.info();
     ASSERT_TRUE(info.has_value());
     EXPECT_EQ((*info).name, EMULATOR_NAME);
@@ -51,7 +52,8 @@ TEST_F(EmulatorFixture, info)
 TEST_F(EmulatorFixture, infoEmulatorCallFails)
 {
     EXPECT_CALL(emulator, launch("-version"))
-        .WillOnce(testing::Return(SystemCommand::Result(1, EMULATOR_VERSION_OUTPUT)));
+        .WillOnce(testing::Return(ChefFun::Either<SystemCommand::Error, SystemCommand::Output>::Right(
+            SystemCommand::Output{1, EMULATOR_VERSION_OUTPUT})));
     auto info = emulator.info();
     ASSERT_FALSE(info.has_value());
 }
@@ -59,7 +61,8 @@ TEST_F(EmulatorFixture, infoEmulatorCallFails)
 TEST_F(EmulatorFixture, infoEmulatorUnexpectedOutput)
 {
     EXPECT_CALL(emulator, launch("-version"))
-        .WillOnce(testing::Return(SystemCommand::Result(0, EMULATOR_VERSION_UNEXPECTED_OUTPUT)));
+        .WillOnce(testing::Return(ChefFun::Either<SystemCommand::Error, SystemCommand::Output>::Right(
+            SystemCommand::Output{0, EMULATOR_VERSION_UNEXPECTED_OUTPUT})));
     auto info = emulator.info();
     ASSERT_FALSE(info.has_value());
 }
@@ -68,7 +71,9 @@ TEST_F(EmulatorFixture, DISABLED_run)
 {
     EXPECT_CALL(emulator, romExists(rom)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, romIsReadable(rom)).WillOnce(testing::Return(true));
-    EXPECT_CALL(emulator, launch(LAUNCH_COMMAND)).WillOnce(testing::Return(SystemCommand::Result(0, "")));
+    EXPECT_CALL(emulator, launch(LAUNCH_COMMAND))
+        .WillOnce(testing::Return(
+            ChefFun::Either<SystemCommand::Error, SystemCommand::Output>::Right(SystemCommand::Output{0, ""})));
 
     EXPECT_FALSE(emulator.run(rom, INPUT_STRING).has_value());
 }
@@ -106,7 +111,9 @@ TEST_F(EmulatorFixture, DISABLED_runEmulatorError)
 {
     EXPECT_CALL(emulator, romExists(rom)).WillOnce(testing::Return(true));
     EXPECT_CALL(emulator, romIsReadable(rom)).WillOnce(testing::Return(true));
-    EXPECT_CALL(emulator, launch(LAUNCH_COMMAND)).WillOnce(testing::Return(SystemCommand::Result(1, "")));
+    EXPECT_CALL(emulator, launch(LAUNCH_COMMAND))
+        .WillOnce(testing::Return(
+            ChefFun::Either<SystemCommand::Error, SystemCommand::Output>::Right(SystemCommand::Output{1, ""})));
 
     auto runError = emulator.run(rom, INPUT_STRING);
     ASSERT_TRUE(runError.has_value());

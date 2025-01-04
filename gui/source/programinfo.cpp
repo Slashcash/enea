@@ -9,6 +9,7 @@
 #include <fmt/core.h>
 
 #include "emulator.hpp"
+#include "exception.hpp"
 #include "internalresourcemanager.hpp"
 #include "softwareinfo.hpp"
 
@@ -29,6 +30,7 @@ ProgramInfo::ProgramInfo()
     builderInfo->setPosition(0, softwareInfo->element().getGlobalBounds().height + SPACING);
     softwareInfo->addChild(builderInfo);
 
+#ifndef TARGET_OS_WINDOWS
     Emulator emulator;
     if (auto info = emulator.info(); info)
     {
@@ -40,4 +42,9 @@ ProgramInfo::ProgramInfo()
         emulatorInfo->setPosition(0, builderInfo->element().getGlobalBounds().height + SPACING);
         builderInfo->addChild(emulatorInfo);
     }
+    else
+    {
+        throw enea::Exception("advanceMAME not found on the system");
+    }
+#endif
 }

@@ -10,7 +10,7 @@ class SystemCommandMock : public SystemCommand
  public:
     using SystemCommand::SystemCommand;
 
-    MOCK_METHOD(SystemCommand::Result, launchCmd, (), (const override));
+    MOCK_METHOD((ChefFun::Either<SYSTEM2_RESULT, SystemCommand::Output>), launchCmd, (), (const override));
 };
 
 #endif // SYSTEMCOMMANDMOCK_HPP

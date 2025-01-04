@@ -75,7 +75,8 @@ class Emulator
     };
 
  private:
-    [[nodiscard]] virtual SystemCommand::Result launch(const std::string& arguments) const;
+    [[nodiscard]] virtual ChefFun::Either<SystemCommand::Error, SystemCommand::Output>
+    launch(const std::string& arguments) const;
     [[nodiscard]] virtual bool romExists(const Rom::Game& rom) const;
     [[nodiscard]] virtual bool romIsReadable(const Rom::Game& rom) const;
 

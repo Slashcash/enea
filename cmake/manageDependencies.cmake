@@ -21,3 +21,6 @@ find_package(rocket REQUIRED)
 
 # chef-fun
 find_package(chef-fun REQUIRED)
+
+# system2.cpp
+find_package(system2.cpp REQUIRED)

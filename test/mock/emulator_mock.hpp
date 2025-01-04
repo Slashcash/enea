@@ -10,7 +10,8 @@ class EmulatorMock : public Emulator
  public:
     using Emulator::Emulator;
 
-    MOCK_METHOD((SystemCommand::Result), launch, (const std::string& arguments), (const override));
+    MOCK_METHOD((ChefFun::Either<SystemCommand::Error, SystemCommand::Output>), launch, (const std::string& arguments),
+                (const override));
     MOCK_METHOD(bool, romExists, (const Rom::Game& rom), (const override));
     MOCK_METHOD(bool, romIsReadable, (const Rom::Game& rom), (const override));
 };

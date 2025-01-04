@@ -55,15 +55,12 @@ std::optional<Emulator::Error> Emulator::run(const Rom::Game& rom, const std::st
                                  Configuration::get().advMameConfigurationFile().string(), inputString,
                                  romPath.parent_path().string(), romPath.stem().string());
 
-    if (launch(cmdString).exitcode != 0)
-    {
-        return Emulator::Error::EMULATOR_ERROR;
-    }
-
-    return std::nullopt;
+    return launch(cmdString).matchRight([](auto&& output) { return std::nullopt; }).matchLeft([](auto&& error) {
+        return std::optional<Emulator::Error>(Emulator::Error::EMULATOR_ERROR);
+    });
 }
 
-SystemCommand::Result Emulator::launch(const std::string& arguments) const
+ChefFun::Either<SystemCommand::Error, SystemCommand::Output> Emulator::launch(const std::string& arguments) const
 {
     SystemCommand cmd(fmt::format("advmame {}", arguments));
     return cmd.launch();
@@ -71,38 +68,34 @@ SystemCommand::Result Emulator::launch(const std::string& arguments) const
 
 std::optional<Emulator::EmulatorInfo> Emulator::info() const
 {
-    try
-    {
-        auto [exitValue, launchOutput] = launch("-version");
-
-        // If launching the advmame version fails we assume emulator is not available
-        if (exitValue != 0)
-        {
-            return std::nullopt;
-        }
-
-        // Searching for a newline in the emulator output
-        // The first line of the output will likely contain name of emulator and version
-        auto newlinePos = launchOutput.find_first_of('\n');
-        if (newlinePos == std::string::npos)
-        {
-            return std::nullopt;
-        }
-
-        // Searching for a space in the first line of the emulator output
-        // The first space will likely separate emulator name and version
-        auto spacePos = launchOutput.substr(0, newlinePos).find_first_of(' ');
-        if (spacePos == std::string::npos)
-        {
-            return std::nullopt;
-        }
-
-        return std::optional<EmulatorInfo>(
-            {launchOutput.substr(0, spacePos), launchOutput.substr(spacePos + 1, newlinePos - spacePos - 1)});
-    }
-
-    catch ([[maybe_unused]] const SystemCommand::Exception& ex)
+    auto result = launch("-version");
+    if (result.isLeft())
     {
         return std::nullopt;
     }
-};
+
+    // If launching the advmame version fails we assume emulator is not available
+    if (result.getRight().exitCode != 0)
+    {
+        return std::nullopt;
+    }
+
+    // Searching for a newline in the emulator output
+    // The first line of the output will likely contain name of emulator and version
+    auto newlinePos = result.getRight().output.find_first_of('\n');
+    if (newlinePos == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    // Searching for a space in the first line of the emulator output
+    // The first space will likely separate emulator name and version
+    auto spacePos = result.getRight().output.substr(0, newlinePos).find_first_of(' ');
+    if (spacePos == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    return std::optional<EmulatorInfo>({result.getRight().output.substr(0, spacePos),
+                                        result.getRight().output.substr(spacePos + 1, newlinePos - spacePos - 1)});
+}
