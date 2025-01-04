@@ -29,6 +29,7 @@ target_link_libraries(
          magic_enum::magic_enum
          stduuid::stduuid
          chef-fun::chef-fun
+         system2.cpp::system2.cpp
          ${RESOURCE_LIBRARY})
 
 # Generating files

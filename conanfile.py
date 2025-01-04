@@ -39,6 +39,7 @@ class Recipe(ConanFile):
         self.requires("rocket/cci.20200603")
         self.requires("stduuid/1.2.3")
         self.requires("chef-fun/cci.20233110")
+        self.requires("system2.cpp/cci.20241020")
         # We do not try to compile advmame on Windows for now
         if self.settings.os == "Linux":
             self.requires("advmame/4.0")

@@ -20,15 +20,6 @@ int main()
 
         spdlog::info("Starting {} {}", projectName, projectVersion);
 
-        // Searching for advmame
-        spdlog::info("Searching for advanceMAME on the system");
-        Emulator emulator;
-        if (auto emulatorInfo = emulator.info(); !emulatorInfo)
-        {
-            spdlog::error("advanceMAME not found on the system");
-            return 1;
-        }
-
         // Creating useful folders
         auto romPath = Configuration::get().romDirectory();
 

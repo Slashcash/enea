@@ -4,35 +4,52 @@
 #include <cstdio>
 #include <cstdlib>
 
-SystemCommand::SystemCommand(std::string cmd) : mCmd(std::move(cmd)) {}
+#include <fmt/format.h>
+#include <magic_enum.hpp>
+#include <spdlog/spdlog.h>
 
-SystemCommand::Result SystemCommand::launchCmd() const
+ChefFun::Either<SYSTEM2_RESULT, SystemCommand::Output> SystemCommand::launchCmd() const
 {
-    constexpr unsigned int bufferSize = 1024;
+    // Launching command
+    System2CommandInfo commandInfo = {};
+    commandInfo.RedirectOutput = true;
+    if (auto result = System2CppRun(mCmd, commandInfo); result != SYSTEM2_RESULT_SUCCESS)
+    {
+        return ChefFun::Either<SYSTEM2_RESULT, Output>::Left(result);
+    }
 
-    std::array<char, bufferSize> buffer{};
+    // Getting command text output
     std::string output;
-    auto* pipe = popen(mCmd.c_str(), "r");
-
-    if (pipe == nullptr)
+    if (auto result = System2CppReadFromOutput(commandInfo, output); result != SYSTEM2_RESULT_SUCCESS)
     {
-        throw Exception("Unable to open process pipe");
+        return ChefFun::Either<SYSTEM2_RESULT, Output>::Left(result);
     }
 
-    while (feof(pipe) == 0)
+    // Getting command return code
+    int returnCode;
+    if (auto result = System2CppGetCommandReturnValueSync(commandInfo, returnCode); result != SYSTEM2_RESULT_SUCCESS)
     {
-        if (fgets(buffer.data(), bufferSize, pipe) != nullptr)
-        {
-            output += buffer.data();
-        }
+        return ChefFun::Either<SYSTEM2_RESULT, Output>::Left(result);
     }
 
-    auto returnCode = pclose(pipe);
-    return Result{returnCode, output};
+    return ChefFun::Either<SYSTEM2_RESULT, Output>::Right(Output{returnCode, output});
 }
 
-SystemCommand::Result SystemCommand::launch() const
+ChefFun::Either<SystemCommand::Error, SystemCommand::Output> SystemCommand::launch() const
 {
-    auto result = launchCmd();
-    return result.exitcode == EXIT_SUCCESS ? result : Result{result.exitcode, ""};
+    const std::string launchOperationLog = fmt::format(R"(Launched command: "{}".)", mCmd);
+
+    return launchCmd()
+        .matchRight([&launchOperationLog](auto&& output) {
+            spdlog::debug(R"({} Command exited with exit code: "{}", with output "{}")", launchOperationLog,
+                          output.exitCode, output.output);
+
+            return ChefFun::Either<Error, Output>::Right(output);
+        })
+        .matchLeft([&launchOperationLog](auto&& error) {
+            spdlog::error(R"({} Operation failed, underlying subprocess library reported error: "{}")",
+                          launchOperationLog, magic_enum::enum_name(error));
+
+            return ChefFun::Either<Error, Output>::Left(Error::LAUNCH_COMMAND);
+        });
 }

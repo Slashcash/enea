@@ -2,30 +2,39 @@
 
 #include <gtest/gtest.h>
 
-static const std::string CMD_OUTPUT = "lol";
-
-class SystemCommandFixture : public ::testing::Test
+/*
+    Launching a command with a failure
+    Expectation: the error code is returned
+*/
+TEST(SystemCommand, launchFailure)
 {
- protected:
     SystemCommandMock cmd{"./advmame"};
-};
 
-TEST_F(SystemCommandFixture, launch)
-{
-    constexpr int SUCCESS = 0;
+    EXPECT_CALL(cmd, launchCmd())
+        .WillOnce(testing::Return(ChefFun::Either<SYSTEM2_RESULT, SystemCommand::Output>::Left(
+            SYSTEM2_RESULT::SYSTEM2_RESULT_PIPE_CREATE_FAILED)));
 
-    EXPECT_CALL(cmd, launchCmd()).WillOnce(testing::Return(SystemCommand::Result{SUCCESS, CMD_OUTPUT}));
     auto result = cmd.launch();
-    EXPECT_EQ(result.exitcode, SUCCESS);
-    EXPECT_EQ(result.output, CMD_OUTPUT);
+    ASSERT_TRUE(result.isLeft());
+    EXPECT_EQ(result.getLeft(), SystemCommand::Error::LAUNCH_COMMAND);
 }
 
-TEST_F(SystemCommandFixture, launchFailure)
+/*
+    Succesfully launching a command
+    Expectation: the process return code and output is returned
+*/
+TEST(SystemCommand, launch)
 {
-    constexpr int FAILURE = 1;
+    SystemCommandMock cmd{"./advmame"};
+    const int returnCode = 0;
+    const std::string cmdOutput = "output";
 
-    EXPECT_CALL(cmd, launchCmd()).WillOnce(testing::Return(SystemCommand::Result{FAILURE, CMD_OUTPUT}));
+    EXPECT_CALL(cmd, launchCmd())
+        .WillOnce(testing::Return(ChefFun::Either<SYSTEM2_RESULT, SystemCommand::Output>::Right(
+            SystemCommand::Output{returnCode, cmdOutput})));
+
     auto result = cmd.launch();
-    EXPECT_EQ(result.exitcode, FAILURE);
-    EXPECT_TRUE(result.output.empty());
+    ASSERT_TRUE(result.isRight());
+    EXPECT_EQ(result.getRight().exitCode, returnCode);
+    EXPECT_EQ(result.getRight().output, cmdOutput);
 }
