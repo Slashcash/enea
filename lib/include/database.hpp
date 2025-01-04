@@ -211,8 +211,17 @@ Database<Key, Value>::parseRecords(const nlohmann::json& json) const
         try
         {
             auto [insertedElem, inserted] = result.try_emplace(value.at(KEY_JSON_FIELD), value.at(INFO_JSON_FIELD));
-            spdlog::trace(R"({} Value added to database "{}: {}")", mLoadOperationLog, insertedElem->first,
-                          insertedElem->second);
+            if (inserted)
+            {
+                spdlog::trace(R"({} Value added to database "{}: {}")", mLoadOperationLog, insertedElem->first,
+                              insertedElem->second);
+            }
+            else
+            {
+                spdlog::warn(
+                    R"({} Double insertion for key "{}", it was already contained in the database with value "{}", second entry will not be added)",
+                    mLoadOperationLog, insertedElem->first, insertedElem->second);
+            }
         }
         catch (const nlohmann::json::exception& excep)
         {

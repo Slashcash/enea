@@ -93,7 +93,7 @@ TEST(Database, entryMissesKey)
 }
 
 /*
-    Trying to query a database. we parse the json but one of the database entries has an invalid key (unconvertible to
+   Trying to query a database. we parse the json but one of the database entries has an invalid key (unconvertible to
    desired type)
    Expectation: that entry will not be added to the database
 */
@@ -131,7 +131,7 @@ TEST(Database, entryMissesInfo)
 }
 
 /*
-    Trying to query a database. we parse the json but one of the database entries has an invalid info (unconvertible to
+   Trying to query a database. we parse the json but one of the database entries has an invalid info (unconvertible to
    desired type)
    Expectation: that entry will not be added to the database, querying for its associated key will return
    no result
@@ -150,6 +150,28 @@ TEST(Database, entryInvalidInfo)
 
     EXPECT_EQ(db.entries(), 0);
     EXPECT_FALSE(db.find(key));
+}
+
+/*
+   Trying to query a database. we parse the json but there is a duplicated database entry
+   Expectation: that entry will only be added once to the database
+*/
+TEST(Database, entryDoubleInsertion)
+{
+    DatabaseMock db(DB_NAME);
+    auto key = "key";
+    auto value = "value";
+    const nlohmann::json json{{DatabaseMock::VALUES_JSON_FIELD,
+                               {{{DatabaseMock::KEY_JSON_FIELD, key}, {DatabaseMock::INFO_JSON_FIELD, value}},
+                                {{DatabaseMock::KEY_JSON_FIELD, key}, {DatabaseMock::INFO_JSON_FIELD, "value2"}}}}};
+
+    EXPECT_CALL(db, read(DB_NAME))
+        .WillOnce(testing::Return(ChefFun::Either<DatabaseMock::Error, std::string>::Right(json.dump())));
+
+    EXPECT_EQ(db.entries(), 1);
+    auto element = db.find(key);
+    ASSERT_TRUE(element);
+    ASSERT_EQ(*element, value);
 }
 
 /*
