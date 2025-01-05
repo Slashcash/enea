@@ -24,7 +24,7 @@ template <SFMLLoadable T> class ResourceManager
     struct MemoryRegion
     {
         const char* data;
-        long unsigned int size;
+        long long unsigned int size;
     };
 
  private:
