@@ -160,13 +160,7 @@ void Input::Manager::removeDevice(const Input::Device& device)
 
 unsigned int Input::Manager::getNumberDevices(const std::vector<Input::Device>& availableInputs)
 {
-    unsigned int result = 0;
-    for (const auto& input : availableInputs)
-    {
-        input.getIdentification().type == Input::Type::Keyboard ? result += 2 : result += 1;
-    }
-
-    return result;
+    return availableInputs.size();
 }
 
 std::string Input::Manager::inputString(const Input::Device& device, const Input::Emulator::Command& command)
@@ -190,10 +184,6 @@ std::optional<Input::Device> Input::Manager::mapDeviceToPlayerNumber(const std::
     for (const auto& device : availableInput)
     {
         buffer.push_back(device);
-        if (device.getIdentification().type == Input::Type::Keyboard)
-        {
-            buffer.push_back(device);
-        }
     }
 
     std::ranges::sort(buffer);
