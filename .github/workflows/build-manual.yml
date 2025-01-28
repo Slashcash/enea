@@ -16,5 +16,6 @@ jobs:
       uses: ./.github/workflows/build-workflow.yml
       with:
         architecture: ${{ matrix.arch }}
+        embed_update_info: false
         build_dependencies: ${{ inputs.build_dependencies }}
         build_author: "Manual Build from Github Actions"
