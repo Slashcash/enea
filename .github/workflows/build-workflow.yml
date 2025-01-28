@@ -92,7 +92,7 @@ jobs:
 
     - name: Add arm Ubuntu sources
       if: ${{ inputs.architecture != 'Linux-x86_64' && inputs.architecture != 'Windows' }}
-      uses: ryankurte/action-apt@master
+      uses: ryankurte/action-apt@v0.4.1
       with:
         arch: ${{ env.ENEA_LINUX_ARCH }}
 
