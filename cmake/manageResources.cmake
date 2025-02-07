@@ -90,7 +90,7 @@ set(RESOURCE_LIBRARY "resources")
 cmrc_add_resource_library(${RESOURCE_LIBRARY})
 
 # Bundle resources
-set(RESOURCE_URL "https://enea.geniorio.it/resources")
+set(RESOURCE_URL "https://web.enea.geniorio.it/resources")
 
 # Rom database
 add_resource(IDENTIFIER "${CMAKE_SOURCE_DIR}/db/romdb.json" FOLDER "romdb")
