@@ -270,14 +270,14 @@ if ! is_path_writable "$bundled_roms_dir"; then
 fi
 
 # Downloading the icon file
-icon_url="https://enea.geniorio.it/resources/icon/icon.png"
+icon_url="https://web.enea.geniorio.it/resources/icon/icon.png"
 icon_path="$downloads_dir/icon.png"
 if ! download_file "$icon_url" "$icon_path"; then
     exit 1
 fi
 
 # Downloading bundled roms
-bundled_roms_url="https://enea.geniorio.it/resources/bundled_roms"
+bundled_roms_url="https://web.enea.geniorio.it/resources/bundled_roms"
 if ! download_folder "$bundled_roms_url" "$bundled_roms_dir"; then
     exit 1
 fi
