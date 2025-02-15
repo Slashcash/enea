@@ -6,6 +6,5 @@ option(
   OFF)
 
 if(USE_POSIX_FILE_LIST)
-  add_definitions(-DUSE_POSIX_FILE_LIST) # Define USE_POSIX macro for
-                                         # preprocessor
+  add_definitions(-DUSE_POSIX_FILE_LIST)
 endif()

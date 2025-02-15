@@ -11,7 +11,7 @@
 #include <optional>
 #include <string>
 
-#include "database.hpp"
+#include "database/table.hpp"
 #include "exception.hpp"
 #include "rom/info.hpp"
 #include "rom/media.hpp"
@@ -44,7 +44,7 @@ class Game
 };
 
 static constexpr char dbPath[] = "romdb/romdb.json";
-using Database = DatabaseSingleton<std::string, Rom::Info, dbPath>;
+using Database = Database::Table<std::string, Rom::Info, dbPath>;
 } // namespace Rom
 
 namespace nlohmann {

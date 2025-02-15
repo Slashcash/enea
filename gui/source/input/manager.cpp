@@ -20,10 +20,10 @@ Input::Manager::Manager()
                 .type{Input::Type::Joystick}, .name{id.name}, .vendorId{id.vendorId}, .productId{id.productId}};
             spdlog::info("Querying input database for: {}", identification);
             auto mapping = Input::Database::get().find(identification);
-            if (mapping)
+            if (mapping.isRight() && mapping.getRight().has_value())
             {
                 spdlog::info("Found predetermined mapping for: {}", identification);
-                addDevice(Input::Device(identification, it, *mapping));
+                addDevice(Input::Device(identification, it, mapping.getRight().value()));
             }
             else
             {
@@ -101,10 +101,10 @@ void Input::Manager::manage(sf::RenderWindow& window)
                 .type{Input::Type::Joystick}, .name{id.name}, .vendorId{id.vendorId}, .productId{id.productId}};
             spdlog::info("Querying input database for: {}", identification);
             auto mapping = Input::Database::get().find(identification);
-            if (mapping)
+            if (mapping.isRight() && mapping.getRight().has_value())
             {
                 spdlog::info("Found predetermined mapping for: {}", identification);
-                addDevice(Input::Device(identification, event.joystickConnect.joystickId, *mapping));
+                addDevice(Input::Device(identification, event.joystickConnect.joystickId, mapping.getRight().value()));
             }
             else
             {

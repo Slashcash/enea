@@ -2,6 +2,8 @@
 
 #include <fstream>
 
+#include <spdlog/spdlog.h>
+
 void Rom::Source::monitor()
 {
     std::call_once(mMonitorCalled, [this]() {
@@ -183,7 +185,10 @@ std::vector<Rom::Game> Rom::Source::parse() const
 
 std::optional<Rom::Info> Rom::Source::romInfo(const std::filesystem::path& path) const
 {
-    return Rom::Database::get().find(path.stem().string());
+    std::optional<Rom::Info> result;
+    std::ignore = Rom::Database::get().find(path.stem().string()).matchRight([&result](auto&& rom) { result = rom; });
+
+    return result;
 }
 
 std::optional<nlohmann::json> Rom::Source::readCacheFile(const std::filesystem::path& path) const
