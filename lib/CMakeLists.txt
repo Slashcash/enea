@@ -1,6 +1,6 @@
 add_library(
   ${EXECUTABLE}Lib
-  include/database.hpp
+  include/database/table.hpp
   include/rom/game.hpp
   source/rom/game.cpp
   include/configuration.hpp
@@ -18,7 +18,8 @@ add_library(
   source/rom/folder.cpp
   include/utils.hpp
   include/singleton.hpp
-  include/model.hpp)
+  include/model.hpp
+  include/utils/lazy.hpp)
 
 target_include_directories(${EXECUTABLE}Lib PUBLIC include)
 target_link_libraries(

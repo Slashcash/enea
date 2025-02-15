@@ -4,8 +4,8 @@ enable_testing()
 add_executable(
   ${EXECUTABLE}Test
   source/main.cpp
-  mock/database_mock.hpp
-  source/database_test.cpp
+  mock/database/table_mock.hpp
+  source/database/table_test.cpp
   mock/configuration_mock.hpp
   source/configuration_test.cpp
   mock/romsource_mock.hpp

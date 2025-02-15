@@ -6,7 +6,7 @@
 #include <SFML/Window/Event.hpp>
 #include <spdlog/spdlog.h>
 
-#include "database.hpp"
+#include "database/table.hpp"
 #include "emulator.hpp"
 #include "input/identification.hpp"
 #include "input/mapping.hpp"
@@ -58,7 +58,7 @@ class Device
 };
 
 static constexpr char dbPath[] = "inputdb/inputdb.json";
-using Database = DatabaseSingleton<Input::Identification, Input::Mapping, dbPath>;
+using Database = Database::Table<Input::Identification, Input::Mapping, dbPath>;
 
 } // namespace Input
 

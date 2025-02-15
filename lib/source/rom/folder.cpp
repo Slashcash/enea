@@ -7,6 +7,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <spdlog/spdlog.h>
+
 std::vector<std::filesystem::path> Rom::Folder::scan() const
 {
     std::vector<std::filesystem::path> result;

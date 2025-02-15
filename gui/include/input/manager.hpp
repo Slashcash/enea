@@ -7,7 +7,7 @@
 #include <SFML/Window/Event.hpp>
 #include <rocket.hpp>
 
-#include "database.hpp"
+#include "database/table.hpp"
 #include "input/device.hpp"
 #include "input/identification.hpp"
 
