@@ -2,7 +2,7 @@
     "remotes": [
         {
             "name": "enea",
-            "url": "https://conan.geniorio.it",
+            "url": "https://conan.enea.geniorio.it",
             "verify_ssl": true
         }
     ]
