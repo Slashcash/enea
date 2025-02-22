@@ -5,6 +5,8 @@
 #include <mutex>
 #include <utility>
 
+#include "utils/lazy.hpp"
+
 template <typename T, auto... constructorArgs> class Singleton
 {
  private:
@@ -27,5 +29,14 @@ template <typename T, auto... constructorArgs> class Singleton
 template <typename T, auto... constructorArgs> std::unique_ptr<T> Singleton<T, constructorArgs...>::instance = nullptr;
 
 template <typename T, auto... constructorArgs> std::once_flag Singleton<T, constructorArgs...>::instanceFlag;
+
+template <typename T> class LazySingleton
+{
+ public:
+    [[nodiscard]] static inline T& get()
+    {
+        return Singleton<Lazy<T>>::get().get();
+    }
+};
 
 #endif // SINGLETON_HPP

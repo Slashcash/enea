@@ -6,6 +6,8 @@ add_executable(
   source/main.cpp
   mock/database/table_mock.hpp
   source/database/table_test.cpp
+  mock/utils/lazy_mock.hpp
+  source/utils/lazy_test.cpp
   mock/configuration_mock.hpp
   source/configuration_test.cpp
   mock/romsource_mock.hpp

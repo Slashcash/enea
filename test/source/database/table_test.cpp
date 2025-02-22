@@ -1,6 +1,6 @@
-#include <gtest/gtest.h>
-
 #include "database/table_mock.hpp"
+
+#include <gtest/gtest.h>
 
 using Key = std::string;
 using Value = std::string;
