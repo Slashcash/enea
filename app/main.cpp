@@ -18,7 +18,8 @@ int main()
         // Loading log level from environment variable
         spdlog::cfg::load_env_levels();
 
-        spdlog::info("Starting {} {}", projectName, projectVersion);
+        spdlog::info("Starting {} {} with render mode {}", projectName, projectVersion,
+                     magic_enum::enum_name(Configuration::get().renderMode()));
 
         // Creating useful folders
         auto romPath = Configuration::get().romDirectory();

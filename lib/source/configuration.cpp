@@ -82,3 +82,12 @@ std::filesystem::path Conf::advMameConfigurationFile() const
 {
     return baseDirectory() / "advmame.rc";
 }
+
+Conf::RenderMode Conf::availableRenderMode() const
+{
+#ifdef USE_DIRECT_RENDERING
+    return RenderMode::DIRECT;
+#else
+    return RenderMode::WINDOW;
+#endif
+}

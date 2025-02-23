@@ -9,9 +9,17 @@
 
 class Conf
 {
+ public:
+    enum RenderMode
+    {
+        DIRECT,
+        WINDOW
+    };
+
  private:
     [[nodiscard]] virtual std::optional<std::filesystem::path> homeDirectory() const;
     [[nodiscard]] virtual std::optional<std::filesystem::path> executableDirectory() const;
+    [[nodiscard]] virtual RenderMode availableRenderMode() const;
     [[nodiscard]] std::filesystem::path baseDirectory() const;
 
  public:
@@ -28,6 +36,10 @@ class Conf
     [[nodiscard]] std::filesystem::path bundledRomDirectory() const;
     [[nodiscard]] std::filesystem::path cacheDirectory() const;
     [[nodiscard]] std::filesystem::path advMameConfigurationFile() const;
+    [[nodiscard]] inline RenderMode renderMode() const
+    {
+        return availableRenderMode();
+    }
 
     Conf& operator=(const Conf& conf) = delete;
     Conf& operator=(Conf&& conf) = delete;

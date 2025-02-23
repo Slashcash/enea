@@ -353,12 +353,26 @@ done
 export PATH="$APPDIR/usr/bin"
 export SPDLOG_LEVEL
 
-exec $APPDIR/usr/bin/enea' > "$launcher_path"
+# If $DISPLAY is not set we assume there is no graphical environment so we go with direct rendering
+if [ -z ${DISPLAY+x} ];
+then
+  ENEA_EXEC="enea_direct_rendering";
+else
+  ENEA_EXEC="enea";
+fi
+
+exec $APPDIR/usr/bin/$ENEA_EXEC' > "$launcher_path"
 
 # Compiling enea
+ENEA_TMP_BUILD_FOLDER="/tmp/enea_appimage_build"
+rm -r $ENEA_TMP_BUILD_FOLDER
 conan config install "$SOURCE_DIR/conan"
+
+ENEA_BUILD_FOLDER="$ENEA_TMP_BUILD_FOLDER/build"
 PKG_CONFIG_PATH="/usr/lib/$PKGCONFIG_ARCH/pkgconfig" \
-conan build -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "$BUILD_DEPS" -c tools.build:skip_test=$SKIP_TESTS "$SOURCE_DIR"
+  conan build -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "$BUILD_DEPS" -of $ENEA_BUILD_FOLDER \
+  -o="use_direct_rendering=False" \
+  -c tools.build:skip_test=$SKIP_TESTS "$SOURCE_DIR"
 
 # Check if building enea was successful
 if [ $? -ne 0 ]; then
@@ -366,8 +380,25 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
+# Compiling enea with direct rendering support (we include both executables into AppImage and select the right one at runtime)
+ENEA_DIRECT_RENDERING_BUILD_FOLDER="$ENEA_TMP_BUILD_FOLDER/build_direct_rendering"
+PKG_CONFIG_PATH="/usr/lib/$PKGCONFIG_ARCH/pkgconfig" \
+conan build -pr:h linux-$ENEA_ARCH-gcc-11.3-release -pr:b linux-x86_64-gcc-11.3-host --build "$BUILD_DEPS" -of $ENEA_DIRECT_RENDERING_BUILD_FOLDER \
+  -o="use_direct_rendering=True" \
+  -c tools.build:skip_test=$SKIP_TESTS "$SOURCE_DIR"
+
+# Check if building direct rendering enea was successful
+if [ $? -ne 0 ]; then
+    echo "Error: building enea with direct rendering support failed."
+    exit 1
+fi
+
+ENEA_EXEC="$ENEA_BUILD_FOLDER/build/Release/app/enea"
+
+ENEA_DIRECT_RENDERING_EXEC="$ENEA_DIRECT_RENDERING_BUILD_FOLDER/build/Release/app/enea_direct_rendering"
+mv "$ENEA_DIRECT_RENDERING_BUILD_FOLDER/build/Release/app/enea" "$ENEA_DIRECT_RENDERING_EXEC"
+
 advmame_package_folder="$(conan cache path advmame/4.0:$(conan list -p "arch=$CONAN_ARCH" "advmame/4.0:*" | grep -A1 packages | grep -v packages | sed 's/^ *//'))"
-ENEA_EXEC="$SOURCE_DIR/build/Release/app/enea"
 ADVMAME_EXEC="$advmame_package_folder/bin/advmame"
 
 # Downloading AppImage runtime for the correct architecture
@@ -408,7 +439,8 @@ export NO_STRIP=1
 export ARCH="$APPIMAGE_ARCH"
 
 cd $OUTPUT_DIR
-$deploy_path --appimage-extract-and-run --appdir="$app_dir" --custom-apprun="$launcher_path" --executable="$ENEA_EXEC" --executable="$ADVMAME_EXEC" $dynamic_deps --icon-file="$icon_path" --desktop-file="$desktop_path" --output appimage
+$deploy_path --appimage-extract-and-run --appdir="$app_dir" --custom-apprun="$launcher_path" --executable="$ENEA_EXEC" \
+  --executable="$ENEA_DIRECT_RENDERING_EXEC" --executable="$ADVMAME_EXEC" $dynamic_deps --icon-file="$icon_path" --desktop-file="$desktop_path" --output appimage
 
 # Check if linuxdeploy was successful
 if [ $? -ne 0 ]; then
