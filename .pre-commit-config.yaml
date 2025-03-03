@@ -12,7 +12,7 @@ repos:
   - id: cmake-format
 
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v4.1.1
+  rev: v4.4.1
   hooks:
   - id: commitizen
 
