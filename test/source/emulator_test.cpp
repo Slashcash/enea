@@ -26,7 +26,7 @@ static const std::string INPUT_STRING =
     "-input_map[ui_cancel] keyboard[0,esc]";
 
 static const std::string LAUNCH_COMMAND =
-    fmt::format("-misc_quiet -nomisc_safequit {} "
+    fmt::format("-misc_quiet -nomisc_safequit --device_video sdl --device_keyboard sdl --device_joystick sdl {} "
                 "-dir_rom {} {}",
                 INPUT_STRING, ROM_PATH.parent_path().string(), ROM_PATH.stem().string());
 
