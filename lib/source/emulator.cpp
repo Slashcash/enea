@@ -51,7 +51,8 @@ std::optional<Emulator::Error> Emulator::run(const Rom::Game& rom, const std::st
     }
 
     // Launching emulator
-    auto cmdString = fmt::format("-cfg {} -misc_quiet -nomisc_safequit {} -dir_rom {} {}",
+    auto cmdString = fmt::format("-cfg {} -misc_quiet -nomisc_safequit --device_video sdl --device_keyboard sdl "
+                                 "--device_joystick sdl {} -dir_rom {} {}",
                                  Configuration::get().advMameConfigurationFile().string(), inputString,
                                  romPath.parent_path().string(), romPath.stem().string());
 
