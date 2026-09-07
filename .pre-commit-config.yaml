@@ -2,7 +2,7 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 - repo: https://github.com/pre-commit/mirrors-clang-format
-  rev: v20.1.3
+  rev: v23.1.0
   hooks:
   - id: clang-format
 
@@ -12,12 +12,12 @@ repos:
   - id: cmake-format
 
 - repo: https://github.com/commitizen-tools/commitizen
-  rev: v4.6.1
+  rev: v4.18.0
   hooks:
   - id: commitizen
 
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0
+  rev: v6.0.0
   hooks:
   - id: check-added-large-files
     exclude: 'db/romdb.json'
